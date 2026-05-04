@@ -16,14 +16,17 @@
 
 This repository is in active **post-0.9.6 hardening and release-state reconciliation**. All eight implementation phases are complete, and the codebase is undergoing final remediation toward v1.0 certification.
 
-An [**AAA Production Release Audit**](AAA_RELEASE_AUDIT_REPORT.md) was completed on **2026-05-03**. Findings include:
+An [**AAA Production Release Audit**](AAA_RELEASE_AUDIT_REPORT.md) was completed on **2026-05-03**. Remediation status:
 
-| Severity | Count | Summary |
-|----------|-------|---------|
-| 🔴 Blocker | 6 | Version fragmentation, silent-failure patterns, credential exposure vectors, missing CDN vendoring, and documentation gaps |
-| 🟠 High | 15 | Module-loader guards, Docker hardening, dashboard reliability, cross-platform path issues, and certification alignment |
+| Severity | Original | Resolved | Remaining |
+|----------|----------|----------|-----------|
+| 🔴 Blocker | 6 | 5 | 1 — systematic `-ErrorAction SilentlyContinue` reduction (critical paths cleared; repo-wide sweep in progress) |
+| 🟠 High | 15 | 14 | 1 — ongoing observability hardening |
 
-**All 6 BLOCKER issues are actively being remediated on this branch.** Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) and [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md).
+**Resolved blockers:** version fragmentation unified, mock data removed from dashboards, CDN vendoring eliminated, credential exposure vectors closed, missing documentation produced.  
+**Resolved high issues:** module-loader guard added, Dockerfile/composer hardened, requirements manifest expanded, dashboard `exit()` removed, duplicate provider functions deduplicated, retrieval metrics now distinguish "no data" from "zero data", exception suppression elevated to warnings, empty catch blocks eliminated, cross-platform path separators fixed, SBOM/security reports generated, release certification alignment completed, plugin exports completed.
+
+Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) and [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md).
 
 > **Note:** This branch (`work`) is the active development line. Do not treat it as a stable release target until `Invoke-ReleaseCertification.ps1` passes all categories.
 
