@@ -106,7 +106,7 @@ $script:HtmlThemes = @{
 function Write-DashboardSuppressedException {
     <#
     .SYNOPSIS
-        Emits verbose diagnostics for intentionally suppressed dashboard exceptions.
+        Emits diagnostics for intentionally suppressed dashboard exceptions.
     #>
     [CmdletBinding()]
     param(
@@ -117,7 +117,10 @@ function Write-DashboardSuppressedException {
         [System.Management.Automation.ErrorRecord]$ErrorRecord
     )
 
-    Write-Verbose "[DashboardViews] $($Context): $($ErrorRecord.Exception.Message)"
+    # Surface suppressed diagnostics as warnings so operators can see degradation
+    # without needing Verbose logging enabled.
+    Write-Warning "[DashboardViews] $($Context): $($ErrorRecord.Exception.Message)"
+    Write-Verbose "[DashboardViews] $($Context) full error: $($ErrorRecord | Out-String)"
 }
 
 function Get-DashboardCommand {
@@ -846,6 +849,7 @@ function Get-RetrievalMetrics {
         escalationCount = 0
         p95Latency = 0
         p99Latency = 0
+        dataAvailable = $false
     }
     
     # Try to get from telemetry
@@ -866,11 +870,15 @@ function Get-RetrievalMetrics {
                 $metrics.p95Latency = Get-PercentileValue -Values $latencies -Percentile 95
                 $metrics.p99Latency = Get-PercentileValue -Values $latencies -Percentile 99
                 $metrics.avgResponseTime = ($latencies | Measure-Object -Average).Average
+                $metrics.dataAvailable = $true
             }
         }
         catch {
-            Write-Verbose "Failed to read telemetry for $PackId`: $_"
+            Write-Warning "Failed to read telemetry for $PackId`: $_"
         }
+    }
+    else {
+        Write-Verbose "Telemetry file not found for pack $PackId`: $telemetryFile"
     }
     
     # Try cache metrics
@@ -888,12 +896,16 @@ function Get-RetrievalMetrics {
                 $totalAccess = $cacheEntries.Count + $hitCount
                 if ($totalAccess -gt 0) {
                     $metrics.cacheHitRate = [math]::Round($hitCount / $totalAccess, 2)
+                    $metrics.dataAvailable = $true
                 }
             }
         }
         catch {
-            Write-Verbose "Failed to read cache metrics for $PackId`: $_"
+            Write-Warning "Failed to read cache metrics for $PackId`: $_"
         }
+    }
+    else {
+        Write-Verbose "Cache file not found: $cacheFile"
     }
     
     return $metrics

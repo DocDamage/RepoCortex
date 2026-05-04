@@ -403,7 +403,8 @@ function Find-PythonInstallation {
     $possiblePaths = @()
     
     # Common Windows Python locations
-    if ($IsWindows -or ($PSVersionTable.PSVersion.Major -lt 6)) {
+    $isWindowsPlatform = ($PSVersionTable.PSVersion.Major -ge 6 -and $IsWindows) -or ($PSVersionTable.PSVersion.Major -lt 6 -and $env:OS -eq 'Windows_NT')
+    if ($isWindowsPlatform) {
         # Search common install roots via environment variables and wildcards
         $searchRoots = @(
             (Join-Path $env:ProgramFiles 'Python*'),
@@ -507,10 +508,20 @@ function Read-SecureInput {
     
     Write-Host $Prompt -NoNewline
     $secure = Read-Host -AsSecureString
+    
+    # PSCore 7+ cross-platform plain-text conversion (avoids deprecated Marshal APIs on Linux/macOS)
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        return (ConvertFrom-SecureString -AsPlainText $secure)
+    }
+    
+    # Windows PowerShell 5.1 fallback using BSTR (Windows-only, safe on this platform)
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
-    $plain = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
-    return $plain
+    try {
+        $plain = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+        return $plain
+    } finally {
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+    }
 }
 
 function Invoke-WhatIfMessage {

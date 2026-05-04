@@ -18,7 +18,7 @@
         'New-AnswerPlan', 'Add-PlanEvidence', 'Test-AnswerPlanCompleteness',
         'New-AnswerTrace', 'Add-TraceEvidence', 'Export-AnswerTrace',
         'Get-CachedRetrieval', 'Invoke-CacheInvalidation', 'Invoke-CacheMaintenance', 'Clear-RetrievalCache',
-        'Invoke-LLMWorkflowHeal', 'Show-LLMWorkflowDashboard', 'Get-LLMWorkflowPlugins', 'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
+        'Invoke-LLMWorkflowHeal', 'Show-LLMWorkflowDashboard', 'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins', 'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
         'Get-GoldenTasks', 'Test-GoldenTaskCompleteness', 'Invoke-PackGoldenTasks', 'Test-GoldenTaskResult',
         'Get-TelemetryLog', 'Clear-TelemetryLog',
         'New-IngestionJob', 'Start-IngestionJob', 'Get-IngestionJob', 'Stop-IngestionJob', 'Remove-IngestionJob',

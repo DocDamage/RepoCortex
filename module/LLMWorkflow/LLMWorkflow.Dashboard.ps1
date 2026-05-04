@@ -27,13 +27,24 @@
 [CmdletBinding()]
 param(
     [string]$ProjectRoot = ".",
-    [ValidateSet("auto", "openai", "kimi", "gemini", "glm")]
+    [ValidateSet("auto", "openai", "claude", "kimi", "gemini", "glm", "ollama")]
     [string]$Provider = "auto",
     [switch]$CheckContext,
     [int]$TimeoutSec = 10,
     [switch]$NoInteractive,
     [int]$RefreshInterval = 0
 )
+
+# Ensure module provider functions are available when this script is run standalone.
+# When dot-sourced by the LLMWorkflow module, these functions are already loaded.
+try {
+    $null = Get-Command Get-ProviderProfile -ErrorAction Stop
+} catch {
+    $manifestPath = Join-Path $PSScriptRoot 'LLMWorkflow.psd1'
+    if (Test-Path -LiteralPath $manifestPath) {
+        Import-Module $manifestPath -Force
+    }
+}
 
 #region ANSI Escape Codes
 $script:Ansi = @{
@@ -98,7 +109,8 @@ function Test-AnsiSupport {
     }
     if ($env:TERM -and $env:TERM -ne "dumb") { return $true }
     if ($env:WT_SESSION) { return $true }
-    if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
+    $isWindowsPlatform = ($PSVersionTable.PSVersion.Major -ge 6 -and $IsWindows) -or ($PSVersionTable.PSVersion.Major -lt 6 -and $env:OS -eq 'Windows_NT')
+    if ($isWindowsPlatform) {
         return ($Host.Name -eq "ConsoleHost")
     }
     return $false
@@ -114,7 +126,10 @@ function Write-DashboardSuppressedException {
         [System.Management.Automation.ErrorRecord]$ErrorRecord
     )
 
-    Write-Verbose "[LLMWorkflow.Dashboard] $($Context): $($ErrorRecord.Exception.Message)"
+    # Surface suppressed diagnostics as warnings so operators can see degradation
+    # without needing Verbose logging enabled.
+    Write-Warning "[LLMWorkflow.Dashboard] $($Context): $($ErrorRecord.Exception.Message)"
+    Write-Verbose "[LLMWorkflow.Dashboard] $($Context) full error: $($ErrorRecord | Out-String)"
 }
 
 function Get-DashboardCommand {
@@ -472,112 +487,6 @@ function Get-FirstEnvValue {
         }
     }
     return @{ Name = ""; Value = "" }
-}
-
-function Get-ProviderProfile {
-    [CmdletBinding()]
-    param([string]$Name)
-    
-    switch ($Name.ToLowerInvariant()) {
-        "openai" {
-            return @{ Name = "openai"; ApiKeyVars = @("OPENAI_API_KEY"); BaseUrlVars = @("OPENAI_BASE_URL"); DefaultBaseUrl = "https://api.openai.com/v1" }
-        }
-        "kimi" {
-            return @{ Name = "kimi"; ApiKeyVars = @("KIMI_API_KEY", "MOONSHOT_API_KEY"); BaseUrlVars = @("KIMI_BASE_URL", "MOONSHOT_BASE_URL"); DefaultBaseUrl = "https://api.moonshot.cn/v1" }
-        }
-        "gemini" {
-            return @{ Name = "gemini"; ApiKeyVars = @("GEMINI_API_KEY", "GOOGLE_API_KEY"); BaseUrlVars = @("GEMINI_BASE_URL"); DefaultBaseUrl = "https://generativelanguage.googleapis.com/v1beta/openai" }
-        }
-        "glm" {
-            return @{ Name = "glm"; ApiKeyVars = @("GLM_API_KEY", "ZHIPU_API_KEY"); BaseUrlVars = @("GLM_BASE_URL"); DefaultBaseUrl = "https://open.bigmodel.cn/api/paas/v4" }
-        }
-        default {
-            throw "Unsupported provider: $Name"
-        }
-    }
-}
-
-function Resolve-ProviderProfile {
-    [CmdletBinding()]
-    param([string]$RequestedProvider)
-    
-    $requested = $RequestedProvider.ToLowerInvariant()
-    $order = @("openai", "kimi", "gemini", "glm")
-    
-    if ($requested -ne "auto") {
-        $profile = Get-ProviderProfile -Name $requested
-        $api = Get-FirstEnvValue -Names $profile.ApiKeyVars
-        $base = Get-FirstEnvValue -Names $profile.BaseUrlVars
-        return @{
-            Profile = $profile
-            ApiKeyVar = $api.Name
-            ApiKeySet = -not [string]::IsNullOrWhiteSpace($api.Value)
-            BaseUrlVar = $base.Name
-            BaseUrl = if ([string]::IsNullOrWhiteSpace($base.Value)) { $profile.DefaultBaseUrl } else { $base.Value }
-        }
-    }
-    
-    foreach ($name in $order) {
-        $profile = Get-ProviderProfile -Name $name
-        $api = Get-FirstEnvValue -Names $profile.ApiKeyVars
-        if (-not [string]::IsNullOrWhiteSpace($api.Value)) {
-            $base = Get-FirstEnvValue -Names $profile.BaseUrlVars
-            return @{
-                Profile = $profile
-                ApiKeyVar = $api.Name
-                ApiKeySet = $true
-                BaseUrlVar = $base.Name
-                BaseUrl = if ([string]::IsNullOrWhiteSpace($base.Value)) { $profile.DefaultBaseUrl } else { $base.Value }
-            }
-        }
-    }
-    
-    return $null
-}
-
-function Test-ProviderKey {
-    [CmdletBinding()]
-    param(
-        [hashtable]$ProviderProfile,
-        [string]$ApiKey,
-        [string]$BaseUrl,
-        [int]$TimeoutSec = 10,
-        [ref]$LatencyMs
-    )
-    
-    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    try {
-        $providerName = $ProviderProfile.Name.ToLowerInvariant()
-        $headers = @{
-            "Authorization" = "Bearer $ApiKey"
-            "Content-Type" = "application/json"
-        }
-        
-        switch ($providerName) {
-            { $_ -in @("openai", "kimi", "gemini") } {
-                $null = Invoke-RestMethod -Method Get -Uri "$BaseUrl/models" -Headers $headers -TimeoutSec $TimeoutSec
-                $stopwatch.Stop()
-                if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
-                return $true
-            }
-            "glm" {
-                $body = @{ model = "glm-4-flash"; messages = @(@{ role = "user"; content = "Hi" }); max_tokens = 1 } | ConvertTo-Json -Depth 4
-                $null = Invoke-RestMethod -Method Post -Uri "$BaseUrl/chat/completions" -Headers $headers -Body $body -TimeoutSec $TimeoutSec
-                $stopwatch.Stop()
-                if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
-                return $true
-            }
-            default {
-                $stopwatch.Stop()
-                if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
-                return $false
-            }
-        }
-    } catch {
-        $stopwatch.Stop()
-        if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
-        return $false
-    }
 }
 
 #endregion

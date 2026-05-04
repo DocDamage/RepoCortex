@@ -1180,7 +1180,7 @@ function Sync-LLMWorkflowPalace {
         throw "Palace index $Index out of range (0-$($palaces.Count - 1))"
     }
     
-    $toolRoot = Join-Path (Split-Path -Parent $PSScriptRoot) "tools\memorybridge"
+    $toolRoot = Join-Path (Split-Path -Parent $PSScriptRoot) "tools" "memorybridge"
     $scriptPath = Join-Path $toolRoot "sync-from-mempalace.ps1"
     
     if (-not (Test-Path -LiteralPath $scriptPath)) {
@@ -1201,7 +1201,29 @@ function Sync-LLMWorkflowPalace {
     if ($ForceResync) { $invokeArgs["ForceResync"] = $true }
     if ($Strict) { $invokeArgs["Strict"] = $true }
     
-    & $scriptPath @invokeArgs
+    $output = & $scriptPath @invokeArgs
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne 0) {
+        throw "Sync script exited with code $exitCode. Output: $output"
+    }
+    
+    # Attempt to parse structured JSON output; fall back to raw text
+    $parsed = $null
+    if ($output) {
+        try {
+            $parsed = $output | ConvertFrom-Json -ErrorAction Stop
+        } catch {
+            Write-Verbose "Sync script output is not valid JSON; returning raw text"
+        }
+    }
+    
+    return [pscustomobject]@{
+        Success = ($exitCode -eq 0)
+        ExitCode = $exitCode
+        Output = $output
+        Parsed = $parsed
+        PalaceIndex = $Index
+    }
 }
 
 function Sync-LLMWorkflowAllPalaces {
