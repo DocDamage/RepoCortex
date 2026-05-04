@@ -97,11 +97,11 @@ htmlcov/
 .nox/
 
 # =============================================================================
-# Build artifacts
+# Build artifacts (root-anchored to avoid excluding tools/build/ etc.)
 # =============================================================================
-dist/
-build/
-out/
+/dist/
+/build/
+/out/
 *.zip
 coverage/
 *.tar.gz
