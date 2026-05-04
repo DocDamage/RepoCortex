@@ -1,22 +1,34 @@
 {
   "overall": "AAA Production Release Audit - Blocker & Critical High Fixes",
+  "last_updated": "2026-05-04",
+  "note": "This file reflects the state as of the ci-fixes-attempt branch on 2026-05-04. See AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md and AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md for the full current audit.",
   "completed": [
-    "BLOCKER-B1: Version fragmentation - fix Dockerfile (0.2.0 -> 0.9.6), compatibility.lock.json (0.2.0 -> 0.9.6)"
+    "BLOCKER-B1: Version fragmentation - fix Dockerfile (0.2.0 -> 0.9.6), compatibility.lock.json (0.2.0 -> 0.9.6)",
+    "BLOCKER-D2: External CDN dependency in HTML export (DashboardViews.ps1) - FIXED in commit 00e55b5",
+    "BLOCKER-D2b: External CDN dependency in MLModelDeploymentPipeline.ps1 - FIXED in commit 00e55b5",
+    "BLOCKER-L1: API keys leaked to process env vars (HealFunctions.ps1, Dashboard.ps1) - FIXED in commit 373a15e",
+    "HIGH-A1: Module loader guard in LLMWorkflow.psm1 - FIXED in commit a091412",
+    "HIGH-B2: Dockerfile hardcoded module version path - resolved via dynamic detection",
+    "HIGH-C1: Remove exit() call from Dashboard.ps1 module context - FIXED in commit f438119",
+    "HIGH-D3: Remove duplicate function definitions from Dashboard.ps1 - FIXED in commit f438119",
+    "HIGH-E3: Throw on JSON parse error in Get-LLMWorkflowPalaces - FIXED in commit f438119",
+    "HIGH-M2: Fix Invoke-ReleaseCertification.ps1 parameter reference - FIXED in commit a091412",
+    "P0-BUILD: tools/build/Invoke-LLMBuild.ps1 missing - file existed; enriched with mojibake guard and probe-file gate",
+    "P0-ARTIFACTS: _content_probe.txt and f stale artifacts - removed via git rm",
+    "P0-MOJIBAKE: README.md encoding corruption - repaired via byte-level fix (2026-05-04)"
   ],
   "pending": [
-    "BLOCKER-D1: Hardcoded mock/demo data in DashboardViews.ps1 (Show-MCPGatewayStatus, Show-FederationStatus, Show-CrossPackGraph)",
-    "BLOCKER-D2: External CDN dependency in HTML export (DashboardViews.ps1 line 1885) - FIXED",
-    "BLOCKER-D2b: External CDN dependency in MLModelDeploymentPipeline.ps1 (lines 1778, 1808) - FIXED",
-    "BLOCKER-L1: API keys leaked to process env vars - fix HealFunctions.ps1 line 1132, Dashboard.ps1 line 383",
-    "BLOCKER-M1: Create missing required documentation files (~6 docs)",
-    "HIGH-A1: Module loader guard in LLMWorkflow.psm1",
-    "HIGH-B2: Dockerfile hardcoded module version path (line 62)",
-    "HIGH-C1: Remove exit() call from Dashboard.ps1 module context",
-    "HIGH-D3: Remove duplicate function definitions from Dashboard.ps1",
-    "HIGH-E3: Throw on JSON parse error in Get-LLMWorkflowPalaces",
-    "HIGH-M2: Fix Invoke-ReleaseCertification.ps1 parameter reference",
-    "HIGH-M3: Fix MCP governance file name references in docs",
-    "CHANGELOG: Create CHANGELOG.md",
-    "PROGRESS: Fix root PROGRESS.md shim"
+    "BLOCKER-D1: Hardcoded mock/demo data in DashboardViews.ps1 (Show-MCPGatewayStatus, Show-FederationStatus, Show-CrossPackGraph) - still open, see local audit",
+    "BLOCKER-M1: Missing required documentation files - partially addressed; verify completeness against brief",
+    "HIGH-M3: Fix MCP governance file name references in docs - open",
+    "CHANGELOG: CHANGELOG.md exists but may need content updates",
+    "RELEASE-CERT: Invoke-ReleaseCertification.ps1 -Strict full pass not yet verified",
+    "MODULE-IMPORT: Import-Module LLMWorkflow.psd1 -Force clean import in PS 5.1 and PS 7 not yet verified on this pass",
+    "DOCS-TRUTH: validate-docs-truth.ps1 full pass not yet verified",
+    "COMPAT-LOCK: validate-compatibility-lock.ps1 full pass not yet verified",
+    "TEMPLATE-DRIFT: check-template-drift.ps1 full pass not yet verified",
+    "PESTER: invoke-pester-safe.ps1 full test suite pass not yet verified",
+    "SECURITY-BASELINE: Invoke-SecurityBaseline -FailOnCritical not yet verified",
+    "TASK-PROGRESS-TRUTH: This file (task_progress.json) was stale - updated 2026-05-04 to reflect actual state"
   ]
 }

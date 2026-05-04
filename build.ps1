@@ -1,6 +1,16 @@
 #Requires -Modules @{ModuleName='InvokeBuild'; ModuleVersion='5.0.0'}
 param([switch]$CI)
 
+$script:LLMBuildScript = Join-Path $PSScriptRoot 'tools\build\Invoke-LLMBuild.ps1'
+
+function Invoke-RepoLLMBuild {
+    param([string[]]$Arguments)
+    if (-not (Test-Path -LiteralPath $script:LLMBuildScript)) {
+        throw "Missing build script: $script:LLMBuildScript"
+    }
+    & $script:LLMBuildScript @Arguments
+}
+
 # Synopsis: Run all PSScriptAnalyzer custom rules
 task Lint {
     $rules = Get-ChildItem -Path tools/build/PSScriptAnalyzer -Filter '*.psm1' -ErrorAction Ignore
@@ -25,17 +35,17 @@ task Lint {
 
 # Synopsis: Run affected-context tests via Invoke-LLMBuild
 task Test {
-    & tools/build/Invoke-LLMBuild.ps1 -Test -CI:$CI
+    Invoke-RepoLLMBuild -Arguments @('-Test', "-CI:$CI")
 }
 
-# Synopsis: Generate documentation from comment-based help
+# Synopsis: Validate documentation truth and release-facing encoding
 task Docs {
-    & tools/build/Invoke-LLMBuild.ps1 -Docs
+    Invoke-RepoLLMBuild -Arguments @('-Docs')
 }
 
 # Synopsis: Run boundary and size checks
 task Check {
-    & tools/build/Invoke-LLMBuild.ps1 -WhatIf
+    Invoke-RepoLLMBuild -Arguments @('-WhatIf')
 }
 
 # Synopsis: Full build pipeline

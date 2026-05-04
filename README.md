@@ -1,35 +1,36 @@
-﻿# CodeMunch + ContextLattice + MemPalace (All-in-One)
+ï»¿# CodeMunch + ContextLattice + MemPalace (All-in-One)
 
-[![Version](https://img.shields.io/badge/version-0.9.6-blue.svg)](https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/blob/work/VERSION)
+[![Version](https://img.shields.io/badge/version-0.9.6-blue.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Packs](https://img.shields.io/badge/domain%20packs-10-green.svg)](#domain-packs)
 [![Parsers](https://img.shields.io/badge/extraction%20parsers-30-orange.svg)](#platform-scope)
 [![PowerShell Modules](https://img.shields.io/badge/PowerShell%20modules-220-blue.svg)](#platform-scope)
 [![Golden Tasks](https://img.shields.io/badge/golden%20tasks-60-purple.svg)](#testing)
 
-> Canonical toolkit repo for the integrated CodeMunch Â· ContextLattice Â· MemPalace workflow.
+> Canonical toolkit repo for the integrated CodeMunch · ContextLattice · MemPalace workflow.
 
 ---
 
 ## Project Status
 
-**Current Version:** `0.9.6` Â· **Target:** `v1.0` Â· **Branch:** `work`
+**Current Version:** `0.9.6` · **Target:** `v1.0` · **Branch:** `ci-fixes-attempt`
 
-This repository is in active **post-0.9.6 hardening and release-state reconciliation**. All eight implementation phases are complete, and the codebase is undergoing final remediation toward v1.0 certification.
+This repository is in active **post-0.9.6 hardening and release-state reconciliation**. The implementation surface is broad, but the branch is still in remediation and should not be treated as release-ready.
 
-An [**AAA Production Release Audit**](AAA_RELEASE_AUDIT_REPORT.md) was completed on **2026-05-03**. Remediation status:
+The most recent local audit is [**AAA Production Release Audit - 2026-05-04**](AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md). The remediation sequence is tracked in [**AAA Production Release Remediation Plan - 2026-05-04**](AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md).
 
 | Severity | Original | Resolved | Remaining |
 |----------|----------|----------|-----------|
-| ðŸ”´ Blocker | 6 | 6 | 0 â€” all blockers resolved; remaining `-ErrorAction SilentlyContinue` reduction is ongoing hygiene, not a release blocker |
-| ðŸŸ  High | 15 | 15 | 0 â€” all documented high issues resolved; observability hardening is ongoing baseline work |
+| Blocker | 6 | In progress | Remaining blockers still exist on this branch; see the 2026-05-04 local audit |
+| High | 6 | In progress | Contract and validation drift are being remediated incrementally |
 
-**Resolved blockers:** version fragmentation unified (all `0.2.0` refs eliminated), mock data removed from dashboards, CDN vendoring eliminated, credential exposure vectors closed, missing documentation produced, security baseline scope bug fixed and false positives eliminated.  
-**Resolved high issues:** module-loader PSScriptRoot corruption fixed, Dockerfile/composer hardened, requirements manifest expanded, dashboard `exit()` removed, duplicate provider functions deduplicated, retrieval metrics now distinguish "no data" from "zero data", exception suppression elevated to warnings, empty catch blocks eliminated, cross-platform path separators fixed, SBOM/security reports generated, release certification alignment completed, plugin exports completed, GoldenTasks decomposed into `contexts/Governance/` (26 files, max 293 lines), docs-truth validator restored to green.
+Recently completed hardening work is summarized in [docs/implementation/PROGRESS.md](docs/implementation/PROGRESS.md), but the current branch still has open release blockers around release truth, compose wiring, retrieval realism, certification depth, and placeholder-backed released surfaces.
 
 Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) and [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md).
 
-> **Note:** This branch (`work`) is the active development line. Do not treat it as a stable release target until `Invoke-ReleaseCertification.ps1` passes all categories.
+> **Note:** This branch (`ci-fixes-attempt`) is a remediation branch, not a stable release target. Do not treat it as release-ready until the open blockers in the 2026-05-04 local audit are closed and release certification proves the runtime behavior.
+
+> **Docker Compose note:** [`docker-compose.yml`](docker-compose.yml) does not bundle a `contextlattice` service. Set `CONTEXTLATTICE_ORCHESTRATOR_URL` to a reachable external orchestrator before running the compose stack.
 
 ---
 
@@ -37,9 +38,9 @@ Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/P
 
 A unified PowerShell-native toolkit that wires together three subsystems:
 
-- **CodeMunch** â€” Project indexing, MCP wrapper setup, and searchable code context
-- **ContextLattice** â€” Project bootstrap, orchestrator connectivity, and verification
-- **MemPalace** â€” Vector storage (ChromaDB) with incremental bridge sync to ContextLattice
+- **CodeMunch** — Project indexing, MCP wrapper setup, and searchable code context
+- **ContextLattice** — Project bootstrap, orchestrator connectivity, and verification
+- **MemPalace** — Vector storage (ChromaDB) with incremental bridge sync to ContextLattice
 
 ### Why Use This Toolkit?
 
@@ -100,16 +101,16 @@ For detailed architecture, see [`docs/architecture/ARCHITECTURE.md`](docs/archit
 
 | Pack | Status | Focus |
 |------|--------|-------|
-| `godot-engine` | âœ… Promoted | Godot engine development, GDScript, scenes, signals |
-| `blender-engine` | âœ… Promoted | Blender automation, operators, geometry nodes, export workflows |
-| `rpgmaker-mz` | âœ… Promoted | RPG Maker plugin development, conflict diagnosis, notetags |
-| `voice-audio-generation` | âœ… Promoted | Voice, TTS/STS, audio generation pipelines |
-| `agent-simulation` | âœ… Promoted | Agent workflows and simulation patterns |
-| `notebook-data-workflow` | âœ… Promoted | Notebook and data workflow extraction |
-| `ui-frontend-framework` | âœ… Promoted | UI/component and design-system workflows |
-| `api-reverse-tooling` | âœ… Promoted | API discovery, reverse engineering, documentation |
-| `ml-educational-reference` | âœ… Promoted | ML educational and reference content |
-| `engine-reference` | âœ… Promoted | Cross-engine patterns and migration guidance |
+| `godot-engine` | [Promoted] | Godot engine development, GDScript, scenes, signals |
+| `blender-engine` | [Promoted] | Blender automation, operators, geometry nodes, export workflows |
+| `rpgmaker-mz` | [Promoted] | RPG Maker plugin development, conflict diagnosis, notetags |
+| `voice-audio-generation` | [Promoted] | Voice, TTS/STS, audio generation pipelines |
+| `agent-simulation` | [Promoted] | Agent workflows and simulation patterns |
+| `notebook-data-workflow` | [Promoted] | Notebook and data workflow extraction |
+| `ui-frontend-framework` | [Promoted] | UI/component and design-system workflows |
+| `api-reverse-tooling` | [Promoted] | API discovery, reverse engineering, documentation |
+| `ml-educational-reference` | [Promoted] | ML educational and reference content |
+| `engine-reference` | [Promoted] | Cross-engine patterns and migration guidance |
 
 ---
 
@@ -228,12 +229,7 @@ CI workflows:
 
 ## Security & Compliance
 
-Recent audits have produced the following artifacts:
-
-- [`security-reports/sbom-2026-05-03T04-54-46Z.json`](security-reports/sbom-2026-05-03T04-54-46Z.json)
-- [`security-reports/secret-scan-2026-05-03T04-54-46Z.json`](security-reports/secret-scan-2026-05-03T04-54-46Z.json)
-- [`security-reports/security-baseline-2026-05-03T04-54-46Z.json`](security-reports/security-baseline-2026-05-03T04-54-46Z.json)
-- [`security-reports/vulnerability-scan-2026-05-03T04-54-46Z.json`](security-reports/vulnerability-scan-2026-05-03T04-54-46Z.json)
+Current checked-in security evidence under [`security-reports/`](security-reports/) is not yet populated on this branch. Regenerate SBOM, secret-scan, security-baseline, and vulnerability-scan artifacts before treating this branch as release-ready.
 
 Run certification locally:
 
@@ -271,7 +267,7 @@ PowerShell Gallery publishing is automated on GitHub Release publish when `PSGAL
 | [`docs/releases/V1_RELEASE_CRITERIA.md`](docs/releases/V1_RELEASE_CRITERIA.md) | v1.0 release criteria |
 | [`docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md`](docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md) | Release certification checklist |
 | [`AAA_RELEASE_AUDIT_REPORT.md`](AAA_RELEASE_AUDIT_REPORT.md) | AAA production release audit (2026-05-03) |
-| [`CHANGELOG.md`](CHANGELOG.md) Â· [`docs/releases/CHANGELOG.md`](docs/releases/CHANGELOG.md) | Change history |
+| [`CHANGELOG.md`](CHANGELOG.md) · [`docs/releases/CHANGELOG.md`](docs/releases/CHANGELOG.md) | Change history |
 
 ---
 
