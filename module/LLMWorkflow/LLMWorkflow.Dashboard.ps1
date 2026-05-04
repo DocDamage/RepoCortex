@@ -648,11 +648,13 @@ function Invoke-DashboardCheck {
     if ($null -ne $providerResolved -and $providerResolved.ApiKeySet) {
         $apiKeyObj = Get-FirstEnvValue -Names $providerResolved.Profile.ApiKeyVars
         $apiKey = $apiKeyObj.Value
-        $latencyRef = [ref]0
-        $keyValid = Test-ProviderKey -ProviderProfile $providerResolved.Profile -ApiKey $apiKey -BaseUrl $providerResolved.BaseUrl -TimeoutSec $TimeoutSec -LatencyMs $latencyRef
-        $keyLatency = $latencyRef.Value
+        $keyStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $keyValid = Test-ProviderKey -ProviderName $providerResolved.Profile.Name -ApiKey $apiKey -BaseUrl $providerResolved.BaseUrl -TimeoutSec $TimeoutSec
+        $keyStopwatch.Stop()
+        $keyLatency = $keyStopwatch.ElapsedMilliseconds
     }
-    $checks.Add([pscustomobject]@{ Name = "provider_key_valid"; Ok = $keyValid; Detail = if ($keyValid) { "Key validated for $($providerResolved.Profile.Name)" } else { "Key validation failed for $($providerResolved.Profile.Name)" }; LatencyMs = $keyLatency })
+    $providerNameForDetail = if ($providerResolved) { $providerResolved.Profile.Name } else { "unknown" }
+    $checks.Add([pscustomobject]@{ Name = "provider_key_valid"; Ok = $keyValid; Detail = if ($keyValid) { "Key validated for $providerNameForDetail" } else { "Key validation failed for $providerNameForDetail" }; LatencyMs = $keyLatency })
     $providerKeyStatus = "FAIL"
     if ($keyValid) { $providerKeyStatus = "OK" }
     & $OnCheckComplete $currentCheck $totalChecks "provider_key_valid" $providerKeyStatus $checks[-1].Detail $keyLatency

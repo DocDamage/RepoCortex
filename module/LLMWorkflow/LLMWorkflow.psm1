@@ -942,6 +942,7 @@ function Resolve-ProviderProfile {
             Profile = $profile
             ApiKey = if ($apiKeyInfo) { $apiKeyInfo.Key } else { "" }
             ApiKeyVar = if ($apiKeyInfo) { $apiKeyInfo.Var } else { "" }
+            ApiKeySet = -not [string]::IsNullOrWhiteSpace($apiKeyInfo.Key)
             BaseUrl = $baseUrlInfo.Url
             BaseUrlVar = $baseUrlInfo.Var
         }
@@ -959,6 +960,7 @@ function Resolve-ProviderProfile {
                     Profile = $profile
                     ApiKey = $apiKeyInfo.Key
                     ApiKeyVar = $apiKeyInfo.Var
+                    ApiKeySet = -not [string]::IsNullOrWhiteSpace($apiKeyInfo.Key)
                     BaseUrl = $baseUrlInfo.Url
                     BaseUrlVar = $baseUrlInfo.Var
                 }
@@ -979,6 +981,7 @@ function Resolve-ProviderProfile {
                 Profile = $profile
                 ApiKey = $apiKeyInfo.Key
                 ApiKeyVar = $apiKeyInfo.Var
+                ApiKeySet = -not [string]::IsNullOrWhiteSpace($apiKeyInfo.Key)
                 BaseUrl = $baseUrlInfo.Url
                 BaseUrlVar = $baseUrlInfo.Var
             }
