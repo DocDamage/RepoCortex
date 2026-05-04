@@ -176,7 +176,7 @@ function New-RunManifest {
     # Get or generate run ID
     if ([string]::IsNullOrEmpty($RunId)) {
         try {
-            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction SilentlyContinue
+            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction Ignore
             if ($runIdCmd) {
                 $RunId = & $runIdCmd
             }
@@ -197,7 +197,7 @@ function New-RunManifest {
     # Get git commit hash if available
     $gitCommit = ""
     try {
-        $gitCmd = Get-Command git -ErrorAction SilentlyContinue
+        $gitCmd = Get-Command git -ErrorAction Ignore
         if ($gitCmd) {
             $gitCommit = & git rev-parse --short HEAD 2>$null
             if ($LASTEXITCODE -ne 0) {
@@ -1115,7 +1115,7 @@ function Write-JsonFileAtomic {
                 [System.IO.File]::Replace($tempFile, $Path, $backupPath)
                 # Clean up replace backup
                 if (Test-Path -LiteralPath $backupPath) {
-                    Remove-Item -LiteralPath $backupPath -Force -ErrorAction SilentlyContinue
+                    Remove-Item -LiteralPath $backupPath -Force -ErrorAction Stop
                 }
             }
             catch {
@@ -1138,7 +1138,7 @@ function Write-JsonFileAtomic {
                     [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
                 $fs.Flush($true)
                 $fs.Close()
-                Remove-Item -LiteralPath $syncMarker -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath $syncMarker -Force -ErrorAction Stop
             }
             catch {
                 Write-Verbose "[Journal] Directory sync failed: $_"
@@ -1148,7 +1148,7 @@ function Write-JsonFileAtomic {
     catch {
         # Cleanup temp file on failure
         if (Test-Path -LiteralPath $tempFile) {
-            Remove-Item -LiteralPath $tempFile -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $tempFile -Force -ErrorAction Stop
         }
         throw
     }
@@ -1384,7 +1384,7 @@ function Write-JournalEntry {
                 [System.IO.File]::Replace($tempPath, $journalPath, $backupPath)
                 # Clean up replace backup
                 if (Test-Path -LiteralPath $backupPath) {
-                    Remove-Item -LiteralPath $backupPath -Force -ErrorAction SilentlyContinue
+                    Remove-Item -LiteralPath $backupPath -Force -ErrorAction Stop
                 }
             }
             catch {
@@ -1405,7 +1405,7 @@ function Write-JournalEntry {
                 [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
             $fs.Flush($true)
             $fs.Close()
-            Remove-Item -LiteralPath $syncMarker -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $syncMarker -Force -ErrorAction Stop
         }
         catch {
             Write-Verbose "[Journal] Directory sync failed: $_"
@@ -1442,7 +1442,7 @@ function Write-JournalEntry {
     catch {
         # Clean up temp file on failure
         if (Test-Path -LiteralPath $tempPath) {
-            Remove-Item -LiteralPath $tempPath -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $tempPath -Force -ErrorAction Stop
         }
         
         Write-Error "[Journal] Failed to write journal entry atomically: $_"
@@ -1607,8 +1607,11 @@ function Rotate-Journal {
                 $pattern += ".gz"
             }
             
-            $existingArchives = @(Get-ChildItem -Path $ArchiveDirectory -Filter $pattern -File -ErrorAction SilentlyContinue |
-                Sort-Object -Property LastWriteTime -Descending)
+            $existingArchives = @()
+            if (Test-Path -LiteralPath $ArchiveDirectory) {
+                $existingArchives = @(Get-ChildItem -Path $ArchiveDirectory -Filter $pattern -File |
+                    Sort-Object -Property LastWriteTime -Descending)
+            }
             
             if ($existingArchives.Count -gt $MaxArchives) {
                 $toRemove = @($existingArchives | Select-Object -Skip $MaxArchives)

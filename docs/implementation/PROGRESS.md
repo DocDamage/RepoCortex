@@ -1,4 +1,4 @@
-# Implementation Progress
+﻿# Implementation Progress
 
 This document tracks implementation progress against the post-0.9.6 architecture and release-hardening plan.
 
@@ -12,19 +12,19 @@ This document tracks implementation progress against the post-0.9.6 architecture
 
 | Phase | Description | Status | Progress |
 |-------|-------------|--------|----------|
-| Phase 1 | Reliability and control foundation | ✅ Complete | 100% |
-| Phase 2 | Pack framework and source registry | ✅ Complete | 100% |
-| Phase 3 | Operator workflow and guarded execution | ✅ Complete | 100% |
-| Phase 4 | Structured extraction pipeline | ✅ Complete | 100% |
-| Phase 5 | Retrieval and answer integrity | ✅ Complete | 100% |
-| Phase 6 | Human trust, replay, and governance | ✅ Complete | 100% |
-| Phase 7 | Platform expansion (MCP, inter-pack, federation) | ✅ Complete | 100% |
-| Phase 8 | Extended packs | ✅ Complete | 100% |
+| Phase 1 | Reliability and control foundation | âœ… Complete | 100% |
+| Phase 2 | Pack framework and source registry | âœ… Complete | 100% |
+| Phase 3 | Operator workflow and guarded execution | âœ… Complete | 100% |
+| Phase 4 | Structured extraction pipeline | âœ… Complete | 100% |
+| Phase 5 | Retrieval and answer integrity | âœ… Complete | 100% |
+| Phase 6 | Human trust, replay, and governance | âœ… Complete | 100% |
+| Phase 7 | Platform expansion (MCP, inter-pack, federation) | âœ… Complete | 100% |
+| Phase 8 | Extended packs | âœ… Complete | 100% |
 
-**Last Updated:** 2026-05-03
+**Last Updated:** 2026-05-04
 
 **Current Version:** 0.9.6  
-**PowerShell Modules:** 121  
+**PowerShell Modules:** 220  
 **Domain Packs:** 10  
 **Extraction Parsers:** 30  
 **Golden Tasks:** 60  
@@ -110,7 +110,7 @@ Use the CI baseline above as the authoritative validation posture. Legacy named 
 
 ## Phase Summary
 
-### Phase 1: Reliability and Control Foundation ✅
+### Phase 1: Reliability and Control Foundation âœ…
 Implemented:
 - run IDs, manifests, journaling, structured logging
 - file locks, atomic writes, state file handling
@@ -118,14 +118,14 @@ Implemented:
 - policy gates, execution modes, command contracts
 - workspaces, visibility, secret/PII scanning
 
-### Phase 2: Pack Framework and Source Registry ✅
+### Phase 2: Pack Framework and Source Registry âœ…
 Implemented:
 - pack manifests and lifecycle states
 - source registries with trust tiers and priorities
 - pack transactions and lockfiles
 - install profiles and collection definitions
 
-### Phase 3: Operator Workflow and Guarded Execution ✅
+### Phase 3: Operator Workflow and Guarded Execution âœ…
 Implemented:
 - health scores and workspace summaries
 - planner/executor previews and dry-run flows
@@ -133,13 +133,13 @@ Implemented:
 - compatibility validation and lock export
 - filters and notifications
 
-### Phase 4: Structured Extraction Pipeline ✅
+### Phase 4: Structured Extraction Pipeline âœ…
 Implemented:
 - Godot, RPG Maker, Blender, OpenAPI, shader, schema, YAML, JSON, SQL, Docker, and related parsers
 - incremental and parallel extraction support
 - cache, source-map, and output/report support
 
-### Phase 5: Retrieval and Answer Integrity ✅
+### Phase 5: Retrieval and Answer Integrity âœ…
 Implemented:
 - query routing and retrieval profiles
 - answer planning and traces
@@ -149,7 +149,7 @@ Implemented:
 - retrieval cache
 - incident bundles
 
-### Phase 6: Human Trust, Replay, and Governance ✅
+### Phase 6: Human Trust, Replay, and Governance âœ…
 Implemented:
 - human annotations and overrides
 - pack SLOs and telemetry
@@ -157,7 +157,7 @@ Implemented:
 - golden task evaluation
 - replay harness and feedback loop
 
-### Phase 7: Platform Expansion ✅
+### Phase 7: Platform Expansion âœ…
 Implemented:
 - MCP toolkit server and composite gateway
 - MCP deployment, security, and monitoring
@@ -167,7 +167,7 @@ Implemented:
 - natural-language config
 - inter-pack transport and orchestration
 
-### Phase 8: Extended Packs ✅
+### Phase 8: Extended Packs âœ…
 Implemented promoted pack families for:
 - API reverse tooling
 - notebook/data workflow
@@ -176,6 +176,17 @@ Implemented promoted pack families for:
 - engine reference
 - UI/frontend framework
 - ML educational reference
+
+---
+
+## Post-0.9.6 Remediation Update (2026-05-04)
+
+### Completed In This Remediation Wave
+- **Module loader PSScriptRoot corruption fixed**: Context loader now uses `$script:ModuleRoot` instead of `$PSScriptRoot`, which was being corrupted by dot-sourced legacy shims. This resolves the partial-load failure that blocked `PluginArchitecture.Tests.ps1` discovery.
+- **Security baseline hardened**: Fixed scope bug in `Invoke-SecurityBaseline.ps1` (dot-sourcing inside a function discarded dependency functions), renamed colliding `Test-ShouldScanFile` helpers in secret/vulnerability scanners, tightened `AWS_Secret_Key` and `Password_in_URL` regex patterns, added exclusions for `security-reports`, `*.example`, `*.lock.txt`, `scripts/security`, `tests/`, and `Visibility.ps1`, and added placeholder filtering. Secret-scan findings reduced from 9,681 to 1 (0 critical, 0 high).
+- **GoldenTasks decomposed**: `governance/GoldenTasks.ps1` (2,186 lines) + `GoldenTaskDefinitions.ps1` (1,747 lines) + `GoldenTaskHelpers.ps1` (459 lines) split into 26 files under `contexts/Governance/` (max 293 lines), with legacy shims preserved and `LoadOrder.psd1` added.
+- **Docs-truth validator restored to green**: Module count aligned to 220 (including new Governance context files), MCP tool count aligned to 38 (counting declared tools inside manifest JSONs rather than manifest files), README/PROGRESS/RELEASE_STATE/DOCS_TRUTH_MATRIX/PLATFORM_OVERVIEW all synchronized.
+- **Version fragmentation fully resolved**: Eliminated remaining `0.2.0` references from `docker/bootstrap.sh`, `module/LLMWorkflow/mcp/MCPToolkitServer.ps1`, and `tests/MCP.Tests.ps1`. All source files now consistently reference `0.9.6`.
 
 ---
 

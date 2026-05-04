@@ -43,7 +43,7 @@ Describe 'DashboardViews hardening' {
     }
 
     Context 'Show-CrossPackGraph' {
-        It 'Uses known relationships when pipeline scan throws unexpectedly' {
+        It 'Returns empty edges when pipeline scan throws unexpectedly' {
             $projectRoot = Join-Path $TestDrive 'proj-graph-fallback'
             $manifestDir = Join-Path $projectRoot 'packs/manifests'
             $pipelinesDir = Join-Path $projectRoot '.llm-workflow/interpack/pipelines'
@@ -60,12 +60,13 @@ Describe 'DashboardViews hardening' {
             $json = Show-CrossPackGraph -ProjectRoot $projectRoot -OutputFormat JSON
             $data = $json | ConvertFrom-Json
 
-            @($data.edges).Count | Should -Be 2
+            @($data.nodes).Count | Should -BeGreaterThan 0
+            @($data.edges).Count | Should -Be 0
         }
     }
 
     Context 'Show-MCPGatewayStatus' {
-        It 'Falls back to demo gateway data when command probe throws' {
+        It 'Returns empty gateway state when command probe throws' {
             Mock Get-Command {
                 throw [System.InvalidOperationException]::new('status command probe failed')
             } -ParameterFilter { $Name -eq 'Get-MCPCompositeGatewayStatus' }
@@ -73,13 +74,14 @@ Describe 'DashboardViews hardening' {
             $json = Show-MCPGatewayStatus -OutputFormat JSON
             $data = $json | ConvertFrom-Json
 
-            $data.gatewayStatus.isRunning | Should -Be $true
-            @($data.circuitBreakers).Count | Should -BeGreaterThan 0
+            $data.gatewayStatus.isRunning | Should -Be $false
+            @($data.circuitBreakers).Count | Should -Be 0
+            $data.gatewayStatus.routeCount | Should -Be 0
         }
     }
 
     Context 'Show-FederationStatus' {
-        It 'Falls back to demo federation data when command probe throws' {
+        It 'Returns empty federation state when command probe throws' {
             Mock Get-Command {
                 throw [System.InvalidOperationException]::new('federation command probe failed')
             } -ParameterFilter { $Name -eq 'Get-MemoryFederations' }
@@ -87,8 +89,9 @@ Describe 'DashboardViews hardening' {
             $json = Show-FederationStatus -OutputFormat JSON
             $data = $json | ConvertFrom-Json
 
-            $data.summary.totalNodes | Should -BeGreaterThan 0
-            @($data.nodes).Count | Should -BeGreaterThan 0
+            $data.summary.totalNodes | Should -Be 0
+            @($data.nodes).Count | Should -Be 0
+            $data.summary.activeNodes | Should -Be 0
         }
     }
 }

@@ -1,0 +1,35 @@
+﻿Set-StrictMode -Version Latest
+
+#region ANSI Escape Codes
+$script:Ansi = @{
+    Reset = "$([char]0x1B)[0m"
+    Bold = "$([char]0x1B)[1m"
+    Dim = "$([char]0x1B)[2m"
+    Italic = "$([char]0x1B)[3m"
+    Underline = "$([char]0x1B)[4m"
+    Black = "$([char]0x1B)[30m"
+    Red = "$([char]0x1B)[31m"
+    Green = "$([char]0x1B)[32m"
+    Yellow = "$([char]0x1B)[33m"
+    Blue = "$([char]0x1B)[34m"
+    Magenta = "$([char]0x1B)[35m"
+    Cyan = "$([char]0x1B)[36m"
+    White = "$([char]0x1B)[37m"
+    BrightRed = "$([char]0x1B)[91m"
+    BrightGreen = "$([char]0x1B)[92m"
+    BrightYellow = "$([char]0x1B)[93m"
+    BrightBlue = "$([char]0x1B)[94m"
+    BgBlack = "$([char]0x1B)[40m"
+    BgRed = "$([char]0x1B)[41m"
+    BgGreen = "$([char]0x1B)[42m"
+    BgYellow = "$([char]0x1B)[43m"
+    BgBlue = "$([char]0x1B)[44m"
+    BgCyan = "$([char]0x1B)[46m"
+    Clear = "$([char]0x1B)[2J"
+    ClearLine = "$([char]0x1B)[2K"
+    CursorHome = "$([char]0x1B)[H"
+    CursorUp = "$([char]0x1B)[A"
+    CursorHide = "$([char]0x1B)[?25l"
+    CursorShow = "$([char]0x1B)[?25h"
+}
+#endregion

@@ -7,7 +7,7 @@ Use it to answer one question:
 
 **What still has to happen before this repo can be called release-ready with a straight face?**
 
-**Last Updated:** 2026-05-03
+**Last Updated:** 2026-05-04
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](./LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
@@ -45,6 +45,10 @@ Several important cleanup and foundation tasks are already done or materially un
 - recent asset-ingestion additions shipped with regression tests instead of relying on later cleanup
 - 6 Primitive test suites hardened for Pester v5 and PS 5.1
 - docs-truth validator restored to green; README/PROGRESS/CHANGELOG metrics aligned
+- security baseline scope bug fixed, false positives eliminated, and gate now passes `-FailOnCritical` cleanly
+- `GoldenTasks.ps1` decomposed into `contexts/Governance/` (26 files, max 293 lines) with legacy shim preservation
+- module loader PSScriptRoot corruption fixed; context loader now uses `$script:ModuleRoot`
+- version fragmentation fully resolved (all remaining `0.2.0` references eliminated)
 
 That is real progress.
 It also means the remaining work is now less about expansion and more about hardening the surfaces that already exist.

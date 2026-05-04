@@ -18,7 +18,12 @@
         'New-AnswerPlan', 'Add-PlanEvidence', 'Test-AnswerPlanCompleteness',
         'New-AnswerTrace', 'Add-TraceEvidence', 'Export-AnswerTrace',
         'Get-CachedRetrieval', 'Invoke-CacheInvalidation', 'Invoke-CacheMaintenance', 'Clear-RetrievalCache',
-        'Invoke-LLMWorkflowHeal', 'Show-LLMWorkflowDashboard', 'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins', 'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
+        'Invoke-LLMWorkflowHeal', 'Test-LLMWorkflowIssue', 'Repair-LLMWorkflowIssue',
+        'Get-LLMWorkflowRepairHistory', 'Clear-LLMWorkflowRepairHistory', 'Export-LLMWorkflowRepairHistory',
+        'Show-LLMWorkflowDashboard',
+        'Show-PackHealthDashboard', 'Show-RetrievalActivityDashboard', 'Show-CrossPackGraph',
+        'Show-MCPGatewayStatus', 'Show-FederationStatus', 'Export-DashboardHTML',
+        'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins', 'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
         'Get-GoldenTasks', 'Test-GoldenTaskCompleteness', 'Invoke-PackGoldenTasks', 'Test-GoldenTaskResult',
         'Get-TelemetryLog', 'Clear-TelemetryLog',
         'New-IngestionJob', 'Start-IngestionJob', 'Get-IngestionJob', 'Stop-IngestionJob', 'Remove-IngestionJob',
@@ -27,7 +32,9 @@
         'Invoke-StructuredExtraction', 'Invoke-BatchExtraction', 'Export-ExtractionReport',
         'New-PackSnapshot', 'Export-PackSnapshot', 'Import-PackSnapshot', 'Restore-FromSnapshot',
         'New-FederatedMemoryNode', 'Register-FederatedNode', 'New-SharedMemorySpace',
-        'Start-InteractiveConfig', 'ConvertFrom-NaturalLanguageConfig'
+        'Start-InteractiveConfig', 'ConvertFrom-NaturalLanguageConfig',
+        # Game team
+        'New-LLMWorkflowGamePreset', 'Get-LLMWorkflowGameTemplates', 'Export-LLMWorkflowAssetManifest', 'Invoke-LLMWorkflowGameUp'
     )
     AliasesToExport = @('llmup', 'llmdown', 'llmcheck', 'llmver', 'llmupdate', 'llmplugins', 'llmpalaces', 'llmsync', 'llmdashboard', 'llmheal')
     CmdletsToExport = @()

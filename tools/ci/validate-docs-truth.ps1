@@ -92,13 +92,25 @@ $parserCount = (Get-ChildItem -Path (Join-Path $repoRoot "module\LLMWorkflow\ing
         ($_.Name.EndsWith("Parser.ps1") -or $_.Name.EndsWith("Extractor.ps1"))
     }).Count
 
-$goldenTaskCount = (Select-String -Path (Join-Path $repoRoot "module\LLMWorkflow\governance\GoldenTaskDefinitions.ps1") -Pattern '-TaskId "gt-').Count
+$goldenTaskCount = @(Select-String -Path (Join-Path $repoRoot "module\LLMWorkflow\contexts\Governance\internal\Get-Predefined*Tasks.ps1") -Pattern '-TaskId "gt-').Count
 
-$mcpToolCount = (
+$mcpManifestFiles = @(
     @(Get-ChildItem -Path (Join-Path $repoRoot "packs\mcp-toolkits") -Filter "*.json" -Recurse -ErrorAction SilentlyContinue) +
     @(Get-ChildItem -Path (Join-Path $repoRoot "packs\mcp") -Filter "*.json" -Recurse -ErrorAction SilentlyContinue) +
     @(Get-ChildItem -Path (Join-Path $repoRoot "packs\registries") -Filter "*mcp*.json" -Recurse -ErrorAction SilentlyContinue)
-).Count
+)
+$mcpToolCount = 0
+foreach ($manifestFile in $mcpManifestFiles) {
+    try {
+        $manifestContent = Get-Content -LiteralPath $manifestFile.FullName -Raw | ConvertFrom-Json
+        if ($manifestContent.mcpToolkitManifest.tools) {
+            $mcpToolCount += $manifestContent.mcpToolkitManifest.tools.Count
+        }
+    }
+    catch {
+        # Skip malformed manifests
+    }
+}
 if ($mcpToolCount -eq 0) { $mcpToolCount = 5 }  # fallback baseline
 
 $manifest = Import-PowerShellDataFile -Path (Join-Path $repoRoot "module\LLMWorkflow\LLMWorkflow.psd1")

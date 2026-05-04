@@ -45,8 +45,19 @@ function Test-PSVersionRequirement {
     return $true
 }
 
+#===============================================================================
+# Load Modular Monolith Shared Kernel (v1.0 architecture)
+# Sources cross-cutting utilities before any context or legacy components.
+#===============================================================================
+$sharedDir = Join-Path $script:ModuleRoot 'contexts/_shared'
+if (Test-Path -LiteralPath $sharedDir) {
+    Get-ChildItem -Path $sharedDir -Filter '*.ps1' -File | ForEach-Object {
+        . $_.FullName
+    }
+}
+
 # Source core infrastructure components (Phase 1 priorities)
-$CoreDirectory = Join-Path $PSScriptRoot "core"
+$CoreDirectory = Join-Path $script:ModuleRoot "core"
 
 $CoreFiles = @(
     # Type converters (canonical helper) - MUST BE FIRST for other core components
@@ -272,7 +283,7 @@ function Get-LLMWorkflowVersion {
     [OutputType([pscustomobject])]
     param()
 
-    $manifestPath = Join-Path $PSScriptRoot "LLMWorkflow.psd1"
+    $manifestPath = Join-Path $script:ModuleRoot "LLMWorkflow.psd1"
     $manifest = Import-PowerShellDataFile -Path $manifestPath
     $available = @(Get-Module -ListAvailable -Name LLMWorkflow | Sort-Object -Property Version -Descending)
     $latestInstalled = if ($available.Count -gt 0) { [string]$available[0].Version } else { "" }
@@ -305,8 +316,8 @@ function Install-LLMWorkflow {
         [switch]$SkipUserEnvPersist
     )
 
-    $scriptPath = Join-Path (Join-Path $PSScriptRoot "scripts") "install-global-llm-workflow.ps1"
-    $toolkitSource = Join-Path (Join-Path $PSScriptRoot "templates") "tools"
+    $scriptPath = Join-Path (Join-Path $script:ModuleRoot "scripts") "install-global-llm-workflow.ps1"
+    $toolkitSource = Join-Path (Join-Path $script:ModuleRoot "templates") "tools"
 
     if (-not (Test-Path -LiteralPath $scriptPath)) {
         throw "Missing script: $scriptPath"
@@ -378,7 +389,7 @@ function Uninstall-LLMWorkflow {
     }
 
     if (-not $KeepModuleFiles) {
-        Remove-Module LLMWorkflow -ErrorAction SilentlyContinue
+        Remove-Module LLMWorkflow -ErrorAction Ignore
         $moduleRoots = @($env:PSModulePath -split [IO.Path]::PathSeparator | Where-Object { $_ -and $_ -like "$HOME*" })
         $removedAny = $false
         foreach ($root in $moduleRoots) {
@@ -501,7 +512,7 @@ function Update-LLMWorkflow {
         }
     } finally {
         if (Test-Path -LiteralPath $tempRoot) {
-            Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction Stop
         }
     }
 
@@ -603,7 +614,7 @@ function Test-LLMWorkflowSetup {
         & $addCheck -Name "glm_base_url" -Status "warn" -Details "GLM provider not configured."
     }
 
-    $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+    $pythonCmd = Get-Command python -ErrorAction Ignore
     if ($pythonCmd) {
         & $addCheck -Name "python_command" -Status "pass" -Details $pythonCmd.Source
         $probe = "import importlib.util; print(bool(importlib.util.find_spec(r'chromadb')))"
@@ -618,7 +629,7 @@ function Test-LLMWorkflowSetup {
         & $addCheck -Name "python_command" -Status "fail" -Details "python is not on PATH"
     }
 
-    $codemunchCmd = Get-Command codemunch-pro -ErrorAction SilentlyContinue
+    $codemunchCmd = Get-Command codemunch-pro -ErrorAction Ignore
     if ($codemunchCmd) {
         & $addCheck -Name "codemunch_command" -Status "pass" -Details $codemunchCmd.Source
     } else {
@@ -700,7 +711,7 @@ function Invoke-LLMWorkflowUp {
 
     # Handle Game Team preset
     if ($GameTeam -or $JamMode) {
-        $gamePresetPath = Join-Path $PSScriptRoot "LLMWorkflow.GameFunctions.ps1"
+        $gamePresetPath = Join-Path $script:ModuleRoot "LLMWorkflow.GameFunctions.ps1"
         if (Test-Path -LiteralPath $gamePresetPath) {
             . $gamePresetPath
             
@@ -721,8 +732,8 @@ function Invoke-LLMWorkflowUp {
         }
     }
 
-    $scriptPath = Join-Path (Join-Path $PSScriptRoot "scripts") "bootstrap-llm-workflow.ps1"
-    $toolkitSource = Join-Path (Join-Path $PSScriptRoot "templates") "tools"
+    $scriptPath = Join-Path (Join-Path $script:ModuleRoot "scripts") "bootstrap-llm-workflow.ps1"
+    $toolkitSource = Join-Path (Join-Path $script:ModuleRoot "templates") "tools"
 
     if (-not (Test-Path -LiteralPath $scriptPath)) {
         throw "Missing script: $scriptPath"
@@ -1307,7 +1318,7 @@ function Sync-LLMWorkflowPalace {
         throw "Palace index $Index out of range (0-$($palaces.Count - 1))"
     }
     
-    $toolRoot = Join-Path (Split-Path -Parent $PSScriptRoot) "tools" "memorybridge"
+    $toolRoot = Join-Path (Split-Path -Parent $script:ModuleRoot) "tools" "memorybridge"
     $scriptPath = Join-Path $toolRoot "sync-from-mempalace.ps1"
     
     if (-not (Test-Path -LiteralPath $scriptPath)) {
@@ -1455,13 +1466,13 @@ function Sync-LLMWorkflowAllPalaces {
 }
 
 # Source plugin functions
-$PluginFunctionsPath = Join-Path $PSScriptRoot "LLMWorkflow.PluginFunctions.ps1"
+$PluginFunctionsPath = Join-Path $script:ModuleRoot "LLMWorkflow.PluginFunctions.ps1"
 if (Test-Path -LiteralPath $PluginFunctionsPath) {
     . $PluginFunctionsPath
 }
 
-# Source dashboard functions
-$DashboardPath = Join-Path $PSScriptRoot "LLMWorkflow.Dashboard.ps1"
+# Source dashboard functions (legacy shim path preserved for backward compatibility)
+$DashboardPath = Join-Path $script:ModuleRoot "LLMWorkflow.Dashboard.ps1"
 function Show-LLMWorkflowDashboard {
     <#
     .SYNOPSIS
@@ -1472,7 +1483,7 @@ function Show-LLMWorkflowDashboard {
     .PARAMETER ProjectRoot
         Path to project root (default: current directory).
     .PARAMETER Provider
-        Provider to check (auto, openai, kimi, gemini, glm).
+        Provider to check (auto, openai, claude, kimi, gemini, glm, ollama).
     .PARAMETER CheckContext
         Include ContextLattice connectivity checks.
     .PARAMETER TimeoutSec
@@ -1492,40 +1503,78 @@ function Show-LLMWorkflowDashboard {
     [OutputType([object])]
     param(
         [string]$ProjectRoot = ".",
-        [ValidateSet("auto", "openai", "kimi", "gemini", "glm")]
+        [ValidateSet("auto", "openai", "claude", "kimi", "gemini", "glm", "ollama")]
         [string]$Provider = "auto",
         [switch]$CheckContext,
         [int]$TimeoutSec = 10,
         [switch]$NoInteractive,
         [int]$RefreshInterval = 0
     )
-    
-    if (-not (Test-Path -LiteralPath $DashboardPath)) {
-        throw "Dashboard script not found: $DashboardPath"
-    }
-    
-    & $DashboardPath -ProjectRoot $ProjectRoot -Provider $Provider -CheckContext:$CheckContext -TimeoutSec $TimeoutSec -NoInteractive:$NoInteractive -RefreshInterval $RefreshInterval
+
+    Invoke-LLMWorkflowDashboardMain -ProjectRoot $ProjectRoot -Provider $Provider -CheckContext:$CheckContext -TimeoutSec $TimeoutSec -NoInteractive:$NoInteractive -RefreshInterval $RefreshInterval
 }
 
 # Source game team functions
-$GameFunctionsPath = Join-Path $PSScriptRoot "LLMWorkflow.GameFunctions.ps1"
+$GameFunctionsPath = Join-Path $script:ModuleRoot "LLMWorkflow.GameFunctions.ps1"
 if (Test-Path -LiteralPath $GameFunctionsPath) {
     . $GameFunctionsPath
-    Write-Verbose "[DEBUG] After GameFunctions dot-source: $(@(Get-Command New-LLMWorkflowGamePreset -ErrorAction SilentlyContinue).Count)"
 }
 
 # Source dashboard views
-$DashboardViewsPath = Join-Path $PSScriptRoot "DashboardViews.ps1"
+$DashboardViewsPath = Join-Path $script:ModuleRoot "DashboardViews.ps1"
 if (Test-Path -LiteralPath $DashboardViewsPath) {
     . $DashboardViewsPath
-    Write-Verbose "[DEBUG] After DashboardViews dot-source: $(@(Get-Command Show-PackHealthDashboard -ErrorAction SilentlyContinue).Count)"
 }
 
 # Source heal functions
-$HealFunctionsPath = Join-Path $PSScriptRoot "LLMWorkflow.HealFunctions.ps1"
+$HealFunctionsPath = Join-Path $script:ModuleRoot "LLMWorkflow.HealFunctions.ps1"
 if (Test-Path -LiteralPath $HealFunctionsPath) {
     . $HealFunctionsPath
-    Write-Verbose "[DEBUG] After HealFunctions dot-source: $(@(Get-Command Test-LLMWorkflowIssue -ErrorAction SilentlyContinue).Count)"
+}
+
+#===============================================================================
+# Load Modular Monolith Contexts (v1.0 architecture)
+# Sources bounded contexts in dependency order. Legacy files above act as
+# shims during transition. Context files override shim definitions.
+#===============================================================================
+$ContextRoot = Join-Path $script:ModuleRoot 'contexts'
+if (Test-Path -LiteralPath $ContextRoot) {
+    $contextLoadOrder = @('_shared', 'Workflow', 'Telemetry', 'Retrieval', 'Ingestion',
+                          'GameAssets', 'Governance', 'MCP', 'Federation', 'Platform', 'Healing')
+    foreach ($ctxName in $contextLoadOrder) {
+        $ctxDir = Join-Path $ContextRoot $ctxName
+        if (Test-Path -LiteralPath $ctxDir) {
+            # Load internal helpers first, then public APIs
+            $internalDir = Join-Path $ctxDir 'internal'
+            $apiDir = Join-Path $ctxDir 'api'
+            if (Test-Path -LiteralPath $internalDir) {
+                foreach ($ctxFile in (Get-ChildItem -Path $internalDir -Filter '*.ps1' -File)) {
+                    if (Test-PSVersionRequirement -FilePath $ctxFile.FullName) {
+                        . $ctxFile.FullName
+                    } else {
+                        Write-Verbose "Skipping PS 7-only script: $($ctxFile.Name)"
+                    }
+                }
+            }
+            if (Test-Path -LiteralPath $apiDir) {
+                foreach ($ctxFile in (Get-ChildItem -Path $apiDir -Filter '*.ps1' -File)) {
+                    if (Test-PSVersionRequirement -FilePath $ctxFile.FullName) {
+                        . $ctxFile.FullName
+                    } else {
+                        Write-Verbose "Skipping PS 7-only script: $($ctxFile.Name)"
+                    }
+                }
+            }
+            # Also load any .ps1 files directly in the context root (fallback)
+            foreach ($ctxFile in (Get-ChildItem -Path $ctxDir -Filter '*.ps1' -File)) {
+                if (Test-PSVersionRequirement -FilePath $ctxFile.FullName) {
+                    . $ctxFile.FullName
+                } else {
+                    Write-Verbose "Skipping PS 7-only script: $($ctxFile.Name)"
+                }
+            }
+        }
+    }
 }
 
 Set-Alias -Name llmup -Value Invoke-LLMWorkflowUp
@@ -1552,7 +1601,7 @@ $criticalFunctions = @(
     'New-LLMWorkflowGamePreset'
 )
 $missingCritical = $criticalFunctions | Where-Object {
-    $null -eq (Get-Command -Name $_ -ErrorAction SilentlyContinue)
+    $null -eq (Get-Command -Name $_ -ErrorAction Ignore)
 }
 if (@($missingCritical).Count -gt 0) {
     throw "LLMWorkflow module partial-load detected. Missing critical function(s): $($missingCritical -join ', ')"
@@ -1597,3 +1646,5 @@ Export-ModuleMember -Function @(
     # Game team
     'New-LLMWorkflowGamePreset', 'Get-LLMWorkflowGameTemplates', 'Export-LLMWorkflowAssetManifest', 'Invoke-LLMWorkflowGameUp'
 ) -Alias llmup, llmdown, llmcheck, llmver, llmupdate, llmplugins, llmpalaces, llmsync, llmdashboard, llmheal
+
+

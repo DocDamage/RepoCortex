@@ -1,0 +1,29 @@
+@{
+    Files = @(
+        'internal/_Constants.ps1'
+        'internal/Logging.ps1'
+        'internal/Ansi.ps1'
+        'internal/PackDiscovery.ps1'
+        'internal/Health.ps1'
+        'internal/Retrieval.ps1'
+        'internal/Graph.ps1'
+        'internal/Gateway.ps1'
+        'internal/Federation.ps1'
+        'internal/HtmlSectionHelpers.ps1'
+        'internal/HtmlConverters.ps1'
+        'internal/DashboardConstants.ps1'
+        'internal/DashboardUtils.ps1'
+        'internal/DashboardRendering.ps1'
+        'internal/DashboardEnvironment.ps1'
+        'internal/DashboardPython.ps1'
+        'internal/DashboardChecks.ps1'
+        'api/Show-PackHealthDashboard.ps1'
+        'api/Show-RetrievalActivityDashboard.ps1'
+        'api/Show-CrossPackGraph.ps1'
+        'api/Show-MCPGatewayStatus.ps1'
+        'api/Show-FederationStatus.ps1'
+        'api/Export-DashboardHTML.ps1'
+        'api/Show-LLMWorkflowDashboard.ps1'
+    )
+    DependsOn = @('_shared', 'Workflow')
+}

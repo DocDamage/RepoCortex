@@ -268,7 +268,7 @@ function Test-CommandContract {
     if (-not $SkipPolicyCheck) {
         if ([string]::IsNullOrEmpty($ExecutionMode)) {
             # Import ExecutionMode module function if available
-            if (Get-Command Get-CurrentExecutionMode -ErrorAction SilentlyContinue) {
+            if (Get-Command Get-CurrentExecutionMode -ErrorAction Ignore) {
                 $ExecutionMode = Get-CurrentExecutionMode
             }
             else {
@@ -277,7 +277,7 @@ function Test-CommandContract {
         }
         
         # Check policy permission
-        if (Get-Command Test-PolicyPermission -ErrorAction SilentlyContinue) {
+        if (Get-Command Test-PolicyPermission -ErrorAction Ignore) {
             $allowed = Test-PolicyPermission -Command $Contract.name -Mode $ExecutionMode
             if (-not $allowed) {
                 $errors.Add("Policy blocks command '$($Contract.name)' in mode '$ExecutionMode'")
@@ -405,7 +405,7 @@ function Invoke-WithContract {
     
     # Auto-detect execution mode
     if ([string]::IsNullOrEmpty($ExecutionMode)) {
-        if (Get-Command Get-CurrentExecutionMode -ErrorAction SilentlyContinue) {
+        if (Get-Command Get-CurrentExecutionMode -ErrorAction Ignore) {
             $ExecutionMode = Get-CurrentExecutionMode
         }
         else {
@@ -432,7 +432,7 @@ function Invoke-WithContract {
     }
     
     # Step 2: Policy check (checked BEFORE locks per Invariant 3.6)
-    if (Get-Command Test-PolicyPermission -ErrorAction SilentlyContinue) {
+    if (Get-Command Test-PolicyPermission -ErrorAction Ignore) {
         $policyAllowed = Test-PolicyPermission -Command $Contract.name -Mode $ExecutionMode
         if (-not $policyAllowed) {
             return [PSCustomObject]@{
@@ -454,7 +454,7 @@ function Invoke-WithContract {
     
     # Step 3: Check confirmation requirements
     if ($Contract.safetyLevels -contains "destructive") {
-        if (Get-Command Test-RequiresConfirmation -ErrorAction SilentlyContinue) {
+        if (Get-Command Test-RequiresConfirmation -ErrorAction Ignore) {
             $needsConfirm = Test-RequiresConfirmation -Command $Contract.name
             if ($needsConfirm -and -not $DryRun) {
                 $confirmed = $PSCmdlet.ShouldProcess($Contract.name, "Execute destructive command")

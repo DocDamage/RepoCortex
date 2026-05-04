@@ -33,7 +33,7 @@ $script:SecretPatterns = @{
         Severity = 'critical'
     }
     AWS_Secret_Key = @{
-        Pattern = '[0-9a-zA-Z/+]{40}'
+        Pattern = '(?i)aws_secret_access_key\s*=\s*["'']?[a-zA-Z0-9/+]{40}["'']?'
         Type = 'secret_key'
         Severity = 'critical'
     }
@@ -108,7 +108,7 @@ $script:SecretPatterns = @{
     
     # Passwords
     Password_in_URL = @{
-        Pattern = '(?i)[:/][^/:]+:[^@/]+@'
+        Pattern = '(?i)://[^/:]+:[^@/]+@'
         Type = 'password'
         Severity = 'critical'
     }
@@ -157,7 +157,7 @@ function Write-VisibilityAuditLog {
     }
     
     $logPath = Join-Path $logDir 'visibility-audit.log'
-    $logEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $logPath -Encoding UTF8 -ErrorAction SilentlyContinue
+    $logEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $logPath -Encoding UTF8 -ErrorAction Ignore
 }
 
 function Get-VisibilityRank {

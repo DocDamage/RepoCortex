@@ -50,7 +50,7 @@ $script:ValidTrustTiers = @(
     'Quarantined'
 )
 
-if (-not (Get-Command ConvertTo-LLMHashtable -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command ConvertTo-LLMHashtable -ErrorAction Ignore)) {
     function ConvertTo-LLMHashtable {
         [CmdletBinding()]
         param([Parameter(ValueFromPipeline = $true)]$InputObject)
@@ -87,7 +87,7 @@ if (-not (Get-Command ConvertTo-LLMHashtable -ErrorAction SilentlyContinue)) {
     }
 }
 
-if (-not (Get-Command ConvertFrom-LLMJsonToHashtable -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command ConvertFrom-LLMJsonToHashtable -ErrorAction Ignore)) {
     function ConvertFrom-LLMJsonToHashtable {
         [CmdletBinding()]
         param([Parameter(Mandatory)][string]$Json)

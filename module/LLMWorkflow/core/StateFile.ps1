@@ -71,7 +71,7 @@ function Get-StateDirectory {
         [string]$ProjectRoot = "."
     )
 
-    $resolvedRoot = Resolve-Path -Path $ProjectRoot -ErrorAction SilentlyContinue
+    $resolvedRoot = Resolve-Path -Path $ProjectRoot -ErrorAction Ignore
     if (-not $resolvedRoot) {
         $resolvedRoot = $ProjectRoot
     }
@@ -172,7 +172,7 @@ function Read-StateFile {
     )
 
     # Resolve path
-    $resolvedPath = Resolve-Path -Path $Path -ErrorAction SilentlyContinue
+    $resolvedPath = Resolve-Path -Path $Path -ErrorAction Ignore
     if (-not $resolvedPath) {
         $resolvedPath = $Path
     }
@@ -349,7 +349,7 @@ function Write-StateFile {
         [hashtable]$Metadata = @{}
     )
 
-    $resolvedPath = Resolve-Path -Path $Path -ErrorAction SilentlyContinue
+    $resolvedPath = Resolve-Path -Path $Path -ErrorAction Ignore
     if (-not $resolvedPath) {
         $resolvedPath = $Path
     }
@@ -424,7 +424,7 @@ function Write-StateFile {
     catch {
         # Clean up temp file
         if (Test-Path -LiteralPath $tempPath) {
-            Remove-Item -LiteralPath $tempPath -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $tempPath -Force -ErrorAction Stop
         }
 
         throw "Failed to write state file: $_"
@@ -505,7 +505,7 @@ function Update-StateFile {
         [object]$DefaultValue = @{}
     )
 
-    $resolvedPath = Resolve-Path -Path $Path -ErrorAction SilentlyContinue
+    $resolvedPath = Resolve-Path -Path $Path -ErrorAction Ignore
     if (-not $resolvedPath) {
         $resolvedPath = $Path
     }
@@ -651,7 +651,7 @@ function Test-StateVersion {
         [int]$ExactVersion = 0
     )
 
-    $resolvedPath = Resolve-Path -Path $Path -ErrorAction SilentlyContinue
+    $resolvedPath = Resolve-Path -Path $Path -ErrorAction Ignore
     if (-not $resolvedPath) {
         $resolvedPath = $Path
     }
@@ -742,7 +742,7 @@ function Backup-StateFile {
         [string]$BackupDirectory = ""
     )
 
-    $resolvedPath = Resolve-Path -Path $Path -ErrorAction SilentlyContinue
+    $resolvedPath = Resolve-Path -Path $Path -ErrorAction Ignore
     if (-not $resolvedPath) {
         $resolvedPath = $Path
     }
@@ -1051,7 +1051,7 @@ function Initialize-StateFile {
         [switch]$Overwrite
     )
 
-    $resolvedPath = Resolve-Path -Path $Path -ErrorAction SilentlyContinue
+    $resolvedPath = Resolve-Path -Path $Path -ErrorAction Ignore
     if (-not $resolvedPath) {
         $resolvedPath = $Path
     }

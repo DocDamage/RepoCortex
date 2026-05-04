@@ -47,7 +47,7 @@
 These definitions are used to keep counts consistent across README, PROGRESS, and canonical docs.
 
 - **PowerShell Module**: A `.ps1` file under `module/LLMWorkflow/` that exports functions and is not a test file or template helper.
-  - Current count: **121**
+  - Current count: **220**
 - **Domain Pack**: A JSON manifest under `packs/manifests/` with a matching source registry.
   - Current count: **10**
 - **Extraction Parser**: A parser or extractor module under `module/LLMWorkflow/ingestion/parsers/` whose filename ends in `Parser.ps1` or `Extractor.ps1`.
@@ -55,7 +55,7 @@ These definitions are used to keep counts consistent across README, PROGRESS, an
 - **Golden Task**: A predefined evaluation scenario declared in `module/LLMWorkflow/governance/GoldenTaskDefinitions.ps1`.
   - Current count: **60**
 - **MCP Tool**: A declared tool in an MCP toolkit server manifest.
-  - Current count: **55**
+  - Current count: **38**
 
 ## Change Log
 

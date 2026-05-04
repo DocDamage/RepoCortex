@@ -140,3 +140,7 @@ deep_audit_results.txt
 temp_*.json
 temp_*.txt
 test_results.txt
+
+# Security baseline generated reports
+security-reports/
+

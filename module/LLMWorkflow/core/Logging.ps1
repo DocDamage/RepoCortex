@@ -289,7 +289,7 @@ function Write-StructuredLog {
             finally {
                 # Cleanup temp file if it still exists
                 if (Test-Path -LiteralPath $tempFile) {
-                    Remove-Item -LiteralPath $tempFile -Force -ErrorAction SilentlyContinue
+                    Remove-Item -LiteralPath $tempFile -Force -ErrorAction Stop
                 }
             }
         }

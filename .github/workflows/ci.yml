@@ -39,24 +39,8 @@ jobs:
         shell: pwsh
         run: |
           Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
-          # Check for ERROR severity issues (fail build)
-          $errors = Invoke-ScriptAnalyzer -Path . -Recurse -ExcludeRule PSUseSingularNouns -Severity Error
-          # Check for WARNING severity issues (display but do not fail)
-          $warnings = Invoke-ScriptAnalyzer -Path . -Recurse -ExcludeRule PSUseSingularNouns -Severity Warning
-          
-          # Display warnings if any
-          if ($warnings) {
-            Write-Output "::warning::PSScriptAnalyzer warnings found:"
-            $warnings | Format-Table -AutoSize | Out-String | Write-Output
-          }
-          
-          # Display and fail on errors if any
-          if ($errors) {
-            Write-Output "::error::PSScriptAnalyzer errors found:"
-            $errors | Format-Table -AutoSize | Out-String | Write-Output
-            throw "PSScriptAnalyzer found errors that must be fixed"
-          }
-          
+          Install-Module InvokeBuild -Force -Scope CurrentUser
+          & .\tools\build\Invoke-LLMBuild.ps1 -Lint
           Write-Output "PSScriptAnalyzer linting complete. No errors found."
 
   windows-ci:

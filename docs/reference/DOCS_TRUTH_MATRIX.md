@@ -1,4 +1,4 @@
-# Documentation Truth Matrix
+﻿# Documentation Truth Matrix
 
 This document maps what each top-level document claims about release state and metrics, and identifies any drift from the single source of truth.
 
@@ -32,7 +32,7 @@ To keep numbers consistent, use the following counting rules and scripts.
     }).Count
 ```
 
-**Current Count**: `121`
+**Current Count**: `220`
 
 ### Domain Packs
 **Rule**: Count JSON files under `packs/manifests/` that have a matching `.sources.json` registry under `packs/registries/`.
@@ -71,7 +71,7 @@ To keep numbers consistent, use the following counting rules and scripts.
 ### MCP Tools
 **Rule**: Sum of tools declared across all MCP toolkit server manifests and gateway registries.
 
-**Current Count**: `55`
+**Current Count**: `38`
 
 ---
 
@@ -79,10 +79,10 @@ To keep numbers consistent, use the following counting rules and scripts.
 
 | Document | Version Claimed | Modules Claimed | Packs Claimed | Parsers Claimed | Golden Tasks Claimed | Status |
 |----------|-----------------|-----------------|---------------|-----------------|----------------------|--------|
-| [`README.md`](../../README.md) | 0.9.6 | 121 | 10 | 30 | 60 | ✅ truth |
-| [`PROGRESS.md`](../../docs/implementation/PROGRESS.md) | 0.9.6 | 121 | 10 | 30 | 60 | ✅ truth |
-| [`RELEASE_STATE.md`](../../docs/releases/RELEASE_STATE.md) | 0.9.6 | 121 | 10 | 30 | 60 | ✅ truth |
-| [`CHANGELOG.md`](../../docs/releases/CHANGELOG.md) | 0.9.6 | 121 | 10 | 30 | 60 | ✅ truth |
+| [`README.md`](../../README.md) | 0.9.6 | 220 | 10 | 30 | 60 | âœ… truth |
+| [`PROGRESS.md`](../../docs/implementation/PROGRESS.md) | 0.9.6 | 220 | 10 | 30 | 60 | âœ… truth |
+| [`RELEASE_STATE.md`](../../docs/releases/RELEASE_STATE.md) | 0.9.6 | 220 | 10 | 30 | 60 | âœ… truth |
+| [`CHANGELOG.md`](../../docs/releases/CHANGELOG.md) | 0.9.6 | 220 | 10 | 30 | 60 | âœ… truth |
 
 ## Known Drift
 
@@ -103,10 +103,10 @@ To keep numbers consistent, use the following counting rules and scripts.
 
 ## Resolution Plan
 
-1. ✅ Reconciled 2026-04-14: `VERSION`, `README.md`, `docs/implementation/PROGRESS.md`, `docs/releases/CHANGELOG.md`, `RELEASE_STATE.md`, and `LLMWorkflow.psd1` all aligned to `0.9.6`.
-2. Metrics verified: 121 PowerShell modules, 10 domain packs, 30 extraction parsers, 60 golden tasks, 5 benchmark suites.
-3. ✅ CI validation added (`tools/ci/validate-docs-truth.ps1`) to catch future drift automatically.
-4. ✅ Remediation documentation sync completed on 2026-04-14 across `README.md`, `PROGRESS.md`, `TECHNICAL_DEBT_AUDIT.md`, `REMAINING_WORK.md`, `CHANGELOG.md`, and strategic execution plan docs.
+1. âœ… Reconciled 2026-04-14: `VERSION`, `README.md`, `docs/implementation/PROGRESS.md`, `docs/releases/CHANGELOG.md`, `RELEASE_STATE.md`, and `LLMWorkflow.psd1` all aligned to `0.9.6`.
+2. Metrics verified: 220 PowerShell modules, 10 domain packs, 30 extraction parsers, 60 golden tasks, 38enchmark suites.
+3. âœ… CI validation added (`tools/ci/validate-docs-truth.ps1`) to catch future drift automatically.
+4. âœ… Remediation documentation sync completed on 2026-04-14 across `README.md`, `PROGRESS.md`, `TECHNICAL_DEBT_AUDIT.md`, `REMAINING_WORK.md`, `CHANGELOG.md`, and strategic execution plan docs.
 
 
 

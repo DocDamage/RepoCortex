@@ -1,8 +1,8 @@
-# LLM Workflow Platform — Overview
+﻿# LLM Workflow Platform â€” Overview
 
 **Version:** 0.9.6  
 **Last Updated:** 2026-04-13  
-**Total Functions:** 800+ | **Modules:** 121 | **Domain Packs:** 10
+**Total Functions:** 800+ | **Modules:** 220 | **Domain Packs:** 10
 
 ## Related Docs
 - [Architecture](./ARCHITECTURE.md)
@@ -18,16 +18,16 @@
 
 The **LLM Workflow Platform** is a comprehensive, enterprise-grade system for structured knowledge management, AI-assisted development, and domain-specific tool integration. It unifies three core capabilities:
 
-- **CodeMunch Pro** — Project indexing and MCP wrapper for AI tool integration
-- **ContextLattice** — Project bootstrap and connectivity verification
-- **MemPalace** — Incremental memory bridge with persistent context across sessions
+- **CodeMunch Pro** â€” Project indexing and MCP wrapper for AI tool integration
+- **ContextLattice** â€” Project bootstrap and connectivity verification
+- **MemPalace** â€” Incremental memory bridge with persistent context across sessions
 
 ### Platform Scale
 
 | Metric | Count |
 |--------|-------|
 | **Domain Packs** | 10 |
-| **PowerShell Modules** | 121 |
+| **PowerShell Modules** | 220 |
 | **Exported Functions** | 800+ |
 | **Extraction Parsers** | 30 |
 | **Retrieval Profiles** | 25+ |
@@ -52,66 +52,66 @@ The **LLM Workflow Platform** is a comprehensive, enterprise-grade system for st
 ### Layer Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 7: MCP & External Integration                            │
-│  ├── MCPToolkitServer.ps1 (MCP wrapper)                         │
-│  ├── MCPCompositeGateway.ps1 (multi-provider)                   │
-│  └── ExternalIngestion.ps1 (API ingestion)                      │
-├─────────────────────────────────────────────────────────────────┤
-│  LAYER 6: Governance & Trust                                    │
-│  ├── HumanAnnotations.ps1 (7 annotation types)                  │
-│  ├── GoldenTasks.ps1 (10 predefined tasks)                      │
-│  ├── ReplayHarness.ps1 (regression testing)                     │
-│  ├── PackSLOs.ps1 (telemetry & SLOs)                            │
-│  └── HumanReviewGates.ps1 (approval workflows)                  │
-├─────────────────────────────────────────────────────────────────┤
-│  LAYER 5: Retrieval & Answer Integrity                          │
-│  ├── QueryRouter.ps1 (intent detection)                         │
-│  ├── RetrievalProfiles.ps1 (25+ profiles)                       │
-│  ├── AnswerPlan.ps1 (planning & tracing)                        │
-│  ├── CrossPackArbitration.ps1 (dispute resolution)              │
-│  ├── ConfidencePolicy.ps1 (4-factor scoring)                    │
-│  ├── EvidencePolicy.ps1 (authority validation)                  │
-│  ├── CaveatRegistry.ps1 (known falsehoods)                      │
-│  ├── RetrievalCache.ps1 (LRU caching)                           │
-│  └── IncidentBundle.ps1 (root cause analysis)                   │
-├─────────────────────────────────────────────────────────────────┤
-│  LAYER 4: Structured Extraction (25 Parsers)                    │
-│  ├── GDScriptParser.ps1 (Godot)                                 │
-│  ├── GodotSceneParser.ps1 (.tscn/.tres)                         │
-│  ├── RPGMakerPluginParser.ps1 (MZ plugins)                      │
-│  ├── BlenderPythonParser.ps1 (Blender addons)                   │
-│  ├── GeometryNodesParser.ps1 (node trees)                       │
-│  ├── ShaderParser.ps1 (shaders)                                 │
-│  ├── NotebookParser.ps1 (Jupyter)                               │
-│  ├── OpenAPIExtractor.ps1 (API specs)                           │
-│  ├── VoiceModelExtractor.ps1 (TTS configs)                      │
-│  ├── TrafficCaptureParser.ps1 (HAR/mitmproxy)                   │
-│  └── ... 15 more domain-specific parsers                        │
-├─────────────────────────────────────────────────────────────────┤
-│  LAYER 3: Workflow & Operations                                 │
-│  ├── Planner.ps1 (execution plans)                              │
-│  ├── HealthScore.ps1 (0-100 scoring)                            │
-│  ├── GitHooks.ps1 (pre-commit/push)                             │
-│  ├── Compatibility.ps1 (semver & drift)                         │
-│  ├── Filters.ps1 (include/exclude patterns)                     │
-│  └── Notifications.ps1 (webhooks)                               │
-├─────────────────────────────────────────────────────────────────┤
-│  LAYER 2: Pack Framework                                        │
-│  ├── PackManifest.ps1 (lifecycle management)                    │
-│  ├── SourceRegistry.ps1 (trust tiers)                           │
-│  └── PackTransaction.ps1 (build/promote/rollback)               │
-├─────────────────────────────────────────────────────────────────┤
-│  LAYER 1: Core Infrastructure                                   │
-│  ├── Journal.ps1 (checkpoint entries)                           │
-│  ├── FileLock.ps1 (cross-platform locking)                      │
-│  ├── AtomicWrite.ps1 (state safety)                             │
-│  ├── Config*.ps1 (5-level precedence)                           │
-│  ├── Policy.ps1 (safety gates)                                  │
-│  ├── ExecutionMode.ps1 (7 modes)                                │
-│  ├── Workspace.ps1 (multi-tenancy)                              │
-│  └── Visibility.ps1 (secret scanning)                           │
-└─────────────────────────────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  LAYER 7: MCP & External Integration                            â”‚
+â”‚  â”œâ”€â”€ MCPToolkitServer.ps1 (MCP wrapper)                         â”‚
+â”‚  â”œâ”€â”€ MCPCompositeGateway.ps1 (multi-provider)                   â”‚
+â”‚  â””â”€â”€ ExternalIngestion.ps1 (API ingestion)                      â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  LAYER 6: Governance & Trust                                    â”‚
+â”‚  â”œâ”€â”€ HumanAnnotations.ps1 (7 annotation types)                  â”‚
+â”‚  â”œâ”€â”€ GoldenTasks.ps1 (10 predefined tasks)                      â”‚
+â”‚  â”œâ”€â”€ ReplayHarness.ps1 (regression testing)                     â”‚
+â”‚  â”œâ”€â”€ PackSLOs.ps1 (telemetry & SLOs)                            â”‚
+â”‚  â””â”€â”€ HumanReviewGates.ps1 (approval workflows)                  â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  LAYER 5: Retrieval & Answer Integrity                          â”‚
+â”‚  â”œâ”€â”€ QueryRouter.ps1 (intent detection)                         â”‚
+â”‚  â”œâ”€â”€ RetrievalProfiles.ps1 (25+ profiles)                       â”‚
+â”‚  â”œâ”€â”€ AnswerPlan.ps1 (planning & tracing)                        â”‚
+â”‚  â”œâ”€â”€ CrossPackArbitration.ps1 (dispute resolution)              â”‚
+â”‚  â”œâ”€â”€ ConfidencePolicy.ps1 (4-factor scoring)                    â”‚
+â”‚  â”œâ”€â”€ EvidencePolicy.ps1 (authority validation)                  â”‚
+â”‚  â”œâ”€â”€ CaveatRegistry.ps1 (known falsehoods)                      â”‚
+â”‚  â”œâ”€â”€ RetrievalCache.ps1 (LRU caching)                           â”‚
+â”‚  â””â”€â”€ IncidentBundle.ps1 (root cause analysis)                   â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  LAYER 4: Structured Extraction (25 Parsers)                    â”‚
+â”‚  â”œâ”€â”€ GDScriptParser.ps1 (Godot)                                 â”‚
+â”‚  â”œâ”€â”€ GodotSceneParser.ps1 (.tscn/.tres)                         â”‚
+â”‚  â”œâ”€â”€ RPGMakerPluginParser.ps1 (MZ plugins)                      â”‚
+â”‚  â”œâ”€â”€ BlenderPythonParser.ps1 (Blender addons)                   â”‚
+â”‚  â”œâ”€â”€ GeometryNodesParser.ps1 (node trees)                       â”‚
+â”‚  â”œâ”€â”€ ShaderParser.ps1 (shaders)                                 â”‚
+â”‚  â”œâ”€â”€ NotebookParser.ps1 (Jupyter)                               â”‚
+â”‚  â”œâ”€â”€ OpenAPIExtractor.ps1 (API specs)                           â”‚
+â”‚  â”œâ”€â”€ VoiceModelExtractor.ps1 (TTS configs)                      â”‚
+â”‚  â”œâ”€â”€ TrafficCaptureParser.ps1 (HAR/mitmproxy)                   â”‚
+â”‚  â””â”€â”€ ... 15 more domain-specific parsers                        â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  LAYER 3: Workflow & Operations                                 â”‚
+â”‚  â”œâ”€â”€ Planner.ps1 (execution plans)                              â”‚
+â”‚  â”œâ”€â”€ HealthScore.ps1 (0-100 scoring)                            â”‚
+â”‚  â”œâ”€â”€ GitHooks.ps1 (pre-commit/push)                             â”‚
+â”‚  â”œâ”€â”€ Compatibility.ps1 (semver & drift)                         â”‚
+â”‚  â”œâ”€â”€ Filters.ps1 (include/exclude patterns)                     â”‚
+â”‚  â””â”€â”€ Notifications.ps1 (webhooks)                               â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  LAYER 2: Pack Framework                                        â”‚
+â”‚  â”œâ”€â”€ PackManifest.ps1 (lifecycle management)                    â”‚
+â”‚  â”œâ”€â”€ SourceRegistry.ps1 (trust tiers)                           â”‚
+â”‚  â””â”€â”€ PackTransaction.ps1 (build/promote/rollback)               â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚  LAYER 1: Core Infrastructure                                   â”‚
+â”‚  â”œâ”€â”€ Journal.ps1 (checkpoint entries)                           â”‚
+â”‚  â”œâ”€â”€ FileLock.ps1 (cross-platform locking)                      â”‚
+â”‚  â”œâ”€â”€ AtomicWrite.ps1 (state safety)                             â”‚
+â”‚  â”œâ”€â”€ Config*.ps1 (5-level precedence)                           â”‚
+â”‚  â”œâ”€â”€ Policy.ps1 (safety gates)                                  â”‚
+â”‚  â”œâ”€â”€ ExecutionMode.ps1 (7 modes)                                â”‚
+â”‚  â”œâ”€â”€ Workspace.ps1 (multi-tenancy)                              â”‚
+â”‚  â””â”€â”€ Visibility.ps1 (secret scanning)                           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### Component Interactions
@@ -265,11 +265,11 @@ All packs support 5 install profiles:
 ### 4.2 Retrieval with Answer Integrity
 
 **Answer Modes:**
-- `direct` — High confidence, answer directly
-- `caveat` — Medium confidence, include warnings
-- `dispute` — Multiple conflicting sources, surface dispute
-- `abstain` — Low confidence, decline to answer
-- `escalate` — Needs human review
+- `direct` â€” High confidence, answer directly
+- `caveat` â€” Medium confidence, include warnings
+- `dispute` â€” Multiple conflicting sources, surface dispute
+- `abstain` â€” Low confidence, decline to answer
+- `escalate` â€” Needs human review
 
 **Confidence Factors (4-factor scoring):**
 1. Relevance score
@@ -290,26 +290,26 @@ Add-DisputeClaim -DisputeSet $dispute -ClaimSource "godot-engine" -ClaimContent 
 
 ### 4.4 MCP Toolkit Integration
 
-- **MCPToolkitServer.ps1** — MCP server wrapper for CodeMunch
-- **MCPCompositeGateway.ps1** — Multi-provider gateway (OpenAI, Claude, Kimi, Gemini, GLM, Ollama)
-- **NaturalLanguageConfig.ps1** — Natural language configuration interface
-- **FederatedMemory.ps1** — Cross-system memory federation
+- **MCPToolkitServer.ps1** â€” MCP server wrapper for CodeMunch
+- **MCPCompositeGateway.ps1** â€” Multi-provider gateway (OpenAI, Claude, Kimi, Gemini, GLM, Ollama)
+- **NaturalLanguageConfig.ps1** â€” Natural language configuration interface
+- **FederatedMemory.ps1** â€” Cross-system memory federation
 
 ### 4.5 Inter-Pack Asset Pipelines
 
 | Pipeline | Source Pack | Target Pack | Transport |
 |----------|-------------|-------------|-----------|
-| Blender → Godot | blender-engine | godot-engine | godot-blender-exporter |
-| Notebook → Python | notebook-data-workflow | godot-engine | NotebookParser.ps1 |
-| Voice → Animation | voice-audio-generation | blender-engine | lip-sync pipeline |
-| ML Model → Godot | ml-educational-reference | godot-engine | ONNX runtime |
+| Blender â†’ Godot | blender-engine | godot-engine | godot-blender-exporter |
+| Notebook â†’ Python | notebook-data-workflow | godot-engine | NotebookParser.ps1 |
+| Voice â†’ Animation | voice-audio-generation | blender-engine | lip-sync pipeline |
+| ML Model â†’ Godot | ml-educational-reference | godot-engine | ONNX runtime |
 
 ### 4.6 Federated Team Memory
 
-- **Multi-Palace Sync** — Sync multiple memory stores
-- **ChromaDB Bridge** — Local vector storage
-- **ContextLattice API** — Remote memory service
-- **Workspace Isolation** — Private/public separation
+- **Multi-Palace Sync** â€” Sync multiple memory stores
+- **ChromaDB Bridge** â€” Local vector storage
+- **ContextLattice API** â€” Remote memory service
+- **Workspace Isolation** â€” Private/public separation
 
 ### 4.7 Performance Benchmarking
 
@@ -619,10 +619,10 @@ if (Test-Regression -Baseline $before -Current $after) {
 - **Architecture Details:** [docs/ARCHITECTURE.md](../../docs/architecture/ARCHITECTURE.md)
 - **Troubleshooting:** [docs/TROUBLESHOOTING.md](../../docs/operations/TROUBLESHOOTING.md)
 - **Canonical Documents:**
-  - [Part 1 — Core Architecture](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_1_Core_Architecture_and_Operations.md)
-  - [Part 2 — RPG Maker MZ](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_2_RPGMaker_MZ_Pack_and_Acceptance.md)
-  - [Part 3 — Godot, Blender, Inter-Pack](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_3_Godot_Blender_InterPack_and_Roadmap.md)
-  - [Part 4 — Future Pack Intake](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_4_Future_Pack_Intake_and_Source_Candidates.md)
+  - [Part 1 â€” Core Architecture](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_1_Core_Architecture_and_Operations.md)
+  - [Part 2 â€” RPG Maker MZ](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_2_RPGMaker_MZ_Pack_and_Acceptance.md)
+  - [Part 3 â€” Godot, Blender, Inter-Pack](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_3_Godot_Blender_InterPack_and_Roadmap.md)
+  - [Part 4 â€” Future Pack Intake](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_4_Future_Pack_Intake_and_Source_Candidates.md)
 
 ---
 

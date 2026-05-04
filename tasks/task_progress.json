@@ -1,8 +1,9 @@
 {
   "overall": "AAA Production Release Audit - Blocker & Critical High Fixes",
-  "completed": [],
+  "completed": [
+    "BLOCKER-B1: Version fragmentation - fix Dockerfile (0.2.0 -> 0.9.6), compatibility.lock.json (0.2.0 -> 0.9.6)"
+  ],
   "pending": [
-    "BLOCKER-B1: Version fragmentation - fix Dockerfile (0.2.0 -> 0.9.6), compatibility.lock.json (0.2.0 -> 0.9.6)",
     "BLOCKER-D1: Hardcoded mock/demo data in DashboardViews.ps1 (Show-MCPGatewayStatus, Show-FederationStatus, Show-CrossPackGraph)",
     "BLOCKER-D2: External CDN dependency in HTML export (DashboardViews.ps1 line 1885) - FIXED",
     "BLOCKER-D2b: External CDN dependency in MLModelDeploymentPipeline.ps1 (lines 1778, 1808) - FIXED",

@@ -14,7 +14,7 @@
     Prerequisite   : PowerShell 5.1+
     Copyright      : (c) 2026 LLM Workflow Project
     License        : MIT
-    Version        : 0.2.0
+    Version        : 0.9.6
 #>
 
 Set-StrictMode -Version Latest
@@ -58,7 +58,7 @@ $script:ServerCapabilities = @{
 # Server information
 $script:ServerInfo = @{
     name = 'llm-workflow-mcp-server'
-    version = '0.2.0'
+    version = '0.9.6'
 }
 
 # Default configuration
@@ -87,7 +87,7 @@ $script:DefaultConfig = @{
 .PARAMETER Name
     The server name. Default: 'llm-workflow-mcp-server'.
 .PARAMETER Version
-    The server version. Default: '0.2.0'.
+    The server version. Default: '0.9.6'.
 .PARAMETER ToolDefinitions
     Hashtable of tool definitions with schema, handler references, and metadata.
 .PARAMETER ExecutionMode
@@ -111,7 +111,7 @@ function New-MCPToolkitServer {
         [string]$Name = 'llm-workflow-mcp-server',
         
         [Parameter()]
-        [string]$Version = '0.2.0',
+        [string]$Version = '0.9.6',
         
         [Parameter()]
         [hashtable]$ToolDefinitions = @{},

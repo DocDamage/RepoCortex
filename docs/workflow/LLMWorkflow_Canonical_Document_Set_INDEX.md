@@ -1,4 +1,4 @@
-# LLM Workflow — Canonical Document Set (v3)
+﻿# LLM Workflow â€” Canonical Document Set (v3)
 
 This is the active canonical document set for the LLM Workflow platform.
 
@@ -10,11 +10,11 @@ This is the active canonical document set for the LLM Workflow platform.
 
 Use the files in this order:
 
-1. **[Part 1 — Core Architecture and Operations](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_1_Core_Architecture_and_Operations.md)**
-2. **[Part 2 — RPG Maker MZ Pack and Acceptance](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_2_RPGMaker_MZ_Pack_and_Acceptance.md)**
-3. **[Part 3 — Godot, Blender, Inter-Pack, and Roadmap](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_3_Godot_Blender_InterPack_and_Roadmap.md)**
-4. **[Part 4 — Future Pack Intake and Source Candidates](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_4_Future_Pack_Intake_and_Source_Candidates.md)**
-5. **[Appendage A — Godot Pack Additional Candidate Repositories](../../docs/reference/Godot_Pack_Appendage_Additional_Candidate_Repositories_v2.md)**
+1. **[Part 1 â€” Core Architecture and Operations](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_1_Core_Architecture_and_Operations.md)**
+2. **[Part 2 â€” RPG Maker MZ Pack and Acceptance](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_2_RPGMaker_MZ_Pack_and_Acceptance.md)**
+3. **[Part 3 â€” Godot, Blender, Inter-Pack, and Roadmap](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_3_Godot_Blender_InterPack_and_Roadmap.md)**
+4. **[Part 4 â€” Future Pack Intake and Source Candidates](../../docs/workflow/LLMWorkflow_Canonical_Document_Set_Part_4_Future_Pack_Intake_and_Source_Candidates.md)**
+5. **[Appendage A â€” Godot Pack Additional Candidate Repositories](../../docs/reference/Godot_Pack_Appendage_Additional_Candidate_Repositories_v2.md)**
 
 ## Purpose of Part 4
 
@@ -38,28 +38,28 @@ It exists so that:
 
 ## Canonical editing rule
 
-- Edit **Part 1–3** only when changing active architecture or active pack specs.
+- Edit **Part 1â€“3** only when changing active architecture or active pack specs.
 - Edit **Part 4** when evaluating new repos, future packs, or intake candidates outside the active worked-example packs.
 - Edit **Appendage A** when expanding the Godot repo candidate set, routing rules, extraction targets, or evaluation tasks before those changes are promoted into Part 3.
 - When candidate or appendage material becomes fully adopted, move it into the appropriate active part and mark the source entry as promoted/superseded.
 
 ## Candidate status meanings
 
-- **Adopt now** — strong enough to add to the future-pack intake registry immediately
-- **Conditional** — useful, but only if that domain becomes an actual toolkit target
-- **Hold / Skip** — not worth adding now, duplicate, too educational, too stale, or wrong layer
+- **Adopt now** â€” strong enough to add to the future-pack intake registry immediately
+- **Conditional** â€” useful, but only if that domain becomes an actual toolkit target
+- **Hold / Skip** â€” not worth adding now, duplicate, too educational, too stale, or wrong layer
 
 ## Implementation Status
 
 | Phase | Description | Status | Module Location |
 |-------|-------------|--------|-----------------|
-| Phase 1 | Reliability & Control Foundation | ✅ Complete | `module/LLMWorkflow/core/` (16 files, 100+ functions) |
-| Phase 2 | Pack Framework & Source Registry | ✅ Complete | `module/LLMWorkflow/pack/` (3 files, 27 functions) |
-| Phase 3 | Operator Workflow & Guarded Execution | ✅ Complete | `module/LLMWorkflow/workflow/` (6 files, 52 functions) |
-| Phase 4 | Structured Extraction Pipeline | ✅ Complete | `module/LLMWorkflow/extraction/` (7 files, 69 functions) |
-| Phase 5 | Retrieval & Answer Integrity | ✅ Complete | `module/LLMWorkflow/retrieval/` (9 files, 140+ functions) |
-| Phase 6 | Human Trust & Governance | ✅ Complete | `module/LLMWorkflow/governance/` (5 files, 85+ functions) |
-| Phase 7 | Platform Expansion (MCP, Inter-Pack) | ✅ Complete | `module/LLMWorkflow/mcp/`, `module/LLMWorkflow/interpack/`, `module/LLMWorkflow/snapshot/` (11 files, 250+ functions) |
+| Phase 1 | Reliability & Control Foundation | âœ… Complete | `module/LLMWorkflow/core/` (16 files, 100+ functions) |
+| Phase 2 | Pack Framework & Source Registry | âœ… Complete | `module/LLMWorkflow/pack/` (3 files, 27 functions) |
+| Phase 3 | Operator Workflow & Guarded Execution | âœ… Complete | `module/LLMWorkflow/workflow/` (6 files, 52 functions) |
+| Phase 4 | Structured Extraction Pipeline | âœ… Complete | `module/LLMWorkflow/extraction/` (7 files, 69 functions) |
+| Phase 5 | Retrieval & Answer Integrity | âœ… Complete | `module/LLMWorkflow/retrieval/` (9 files, 140+ functions) |
+| Phase 6 | Human Trust & Governance | âœ… Complete | `module/LLMWorkflow/governance/` (5 files, 85+ functions) |
+| Phase 7 | Platform Expansion (MCP, Inter-Pack) | âœ… Complete | `module/LLMWorkflow/mcp/`, `module/LLMWorkflow/interpack/`, `module/LLMWorkflow/snapshot/` (11 files, 250+ functions) |
 
 **Current Version:** 0.9.6  
 **Total Functions:** 850+  
@@ -70,70 +70,70 @@ It exists so that:
 
 | Pack ID | Domain | Status | Collections |
 |---------|--------|--------|-------------|
-| `rpgmaker-mz` | game-dev | ✅ Complete | 8 collections |
-| `godot-engine` | game-dev | ✅ Complete | 7 collections |
-| `blender-engine` | 3d-graphics | ✅ Complete | 6 collections |
-| `api-reverse-tooling` | security-dev | ✅ Complete | 5 collections |
-| `notebook-data-workflow` | data-science | ✅ Complete | 6 collections |
-| `agent-simulation` | ai-agents | ✅ Complete | 5 collections |
-| `voice-audio-generation` | audio-ai | ✅ Complete | 4 collections |
-| `engine-reference` | reference | ✅ Complete | 4 collections |
-| `ui-frontend-framework` | frontend | ✅ Complete | 5 collections |
-| `ml-educational-reference` | ml-education | ✅ Complete | 4 collections |
+| `rpgmaker-mz` | game-dev | âœ… Complete | 8 collections |
+| `godot-engine` | game-dev | âœ… Complete | 7 collections |
+| `blender-engine` | 3d-graphics | âœ… Complete | 6 collections |
+| `api-reverse-tooling` | security-dev | âœ… Complete | 5 collections |
+| `notebook-data-workflow` | data-science | âœ… Complete | 6 collections |
+| `agent-simulation` | ai-agents | âœ… Complete | 5 collections |
+| `voice-audio-generation` | audio-ai | âœ… Complete | 4 collections |
+| `engine-reference` | reference | âœ… Complete | 4 collections |
+| `ui-frontend-framework` | frontend | âœ… Complete | 5 collections |
+| `ml-educational-reference` | ml-education | âœ… Complete | 4 collections |
 
 ### Phase 4 Extraction Parsers
 
 | Parser | File Types | Functions | Status |
 |--------|------------|-----------|--------|
-| GDScript Parser | `.gd` | 12 | ✅ Implemented |
-| Godot Scene Parser | `.tscn`, `.tres` | 9 | ✅ Implemented |
-| RPG Maker Plugin Parser | `.js` (plugins) | 12 | ✅ Implemented |
-| Blender Python Parser | `.py` (addons) | 12 | ✅ Implemented |
-| Geometry Nodes Parser | Node trees | 8 | ✅ Implemented |
-| Shader Parser | `.gdshader`, `.shader` | 20 | ✅ Implemented |
-| API Reverse Parser | `.http`, `.rest` | 10 | ✅ Implemented |
-| Notebook Parser | `.ipynb`, `.nb` | 8 | ✅ Implemented |
-| Agent Simulation Parser | `.agent`, `.sim` | 6 | ✅ Implemented |
-| Voice/Audio Parser | `.voice`, `.audio` | 6 | ✅ Implemented |
-| Pipeline Orchestrator | All types | 8 | ✅ Implemented |
+| GDScript Parser | `.gd` | 12 | âœ… Implemented |
+| Godot Scene Parser | `.tscn`, `.tres` | 9 | âœ… Implemented |
+| RPG Maker Plugin Parser | `.js` (plugins) | 12 | âœ… Implemented |
+| Blender Python Parser | `.py` (addons) | 12 | âœ… Implemented |
+| Geometry Nodes Parser | Node trees | 8 | âœ… Implemented |
+| Shader Parser | `.gdshader`, `.shader` | 20 | âœ… Implemented |
+| API Reverse Parser | `.http`, `.rest` | 10 | âœ… Implemented |
+| Notebook Parser | `.ipynb`, `.nb` | 8 | âœ… Implemented |
+| Agent Simulation Parser | `.agent`, `.sim` | 6 | âœ… Implemented |
+| Voice/Audio Parser | `.voice`, `.audio` | 6 | âœ… Implemented |
+| Pipeline Orchestrator | All types | 8 | âœ… Implemented |
 
 ### Phase 5 Retrieval & Answer Integrity
 
 | Module | Purpose | Functions | Status |
 |--------|---------|-----------|--------|
-| QueryRouter.ps1 | Query routing and intent detection | 10 | ✅ Implemented |
-| RetrievalProfiles.ps1 | Profile management (7 profiles) | 10 | ✅ Implemented |
-| AnswerPlan.ps1 | Answer planning and tracing | 12 | ✅ Implemented |
-| CrossPackArbitration.ps1 | Cross-pack arbitration | 15 | ✅ Implemented |
-| ConfidencePolicy.ps1 | Confidence and abstain policy | 8 | ✅ Implemented |
-| EvidencePolicy.ps1 | Evidence validation and policy | 10 | ✅ Implemented |
-| CaveatRegistry.ps1 | Known caveats and falsehoods | 14 | ✅ Implemented |
-| RetrievalCache.ps1 | Cache and invalidation | 20 | ✅ Implemented |
-| IncidentBundle.ps1 | Answer incident tracking | 15 | ✅ Implemented |
+| QueryRouter.ps1 | Query routing and intent detection | 10 | âœ… Implemented |
+| RetrievalProfiles.ps1 | Profile management (7 profiles) | 10 | âœ… Implemented |
+| AnswerPlan.ps1 | Answer planning and tracing | 12 | âœ… Implemented |
+| CrossPackArbitration.ps1 | Cross-pack arbitration | 15 | âœ… Implemented |
+| ConfidencePolicy.ps1 | Confidence and abstain policy | 8 | âœ… Implemented |
+| EvidencePolicy.ps1 | Evidence validation and policy | 10 | âœ… Implemented |
+| CaveatRegistry.ps1 | Known caveats and falsehoods | 14 | âœ… Implemented |
+| RetrievalCache.ps1 | Cache and invalidation | 20 | âœ… Implemented |
+| IncidentBundle.ps1 | Answer incident tracking | 15 | âœ… Implemented |
 
 ### Phase 6 Human Trust & Governance
 
 | Module | Purpose | Functions | Status |
 |--------|---------|-----------|--------|
-| HumanAnnotations.ps1 | Annotations and overrides | 12 | ✅ Implemented |
-| GoldenTasks.ps1 | Golden task evals (10 tasks) | 10 | ✅ Implemented |
-| ReplayHarness.ps1 | Replay and regression testing | 12 | ✅ Implemented |
-| PackSLOs.ps1 | SLOs and telemetry | 12 | ✅ Implemented |
-| HumanReviewGates.ps1 | Review gates and approvals | 22 | ✅ Implemented |
+| HumanAnnotations.ps1 | Annotations and overrides | 12 | âœ… Implemented |
+| GoldenTasks.ps1 | Golden task evals (10 tasks) | 10 | âœ… Implemented |
+| ReplayHarness.ps1 | Replay and regression testing | 12 | âœ… Implemented |
+| PackSLOs.ps1 | SLOs and telemetry | 12 | âœ… Implemented |
+| HumanReviewGates.ps1 | Review gates and approvals | 22 | âœ… Implemented |
 
 ### Phase 7 MCP & Inter-Pack Integration
 
 | Module | Purpose | Functions | Status |
 |--------|---------|-----------|--------|
-| McpToolkitServer.ps1 | MCP-native toolkit server | 25 | ✅ Implemented |
-| McpCompositeGateway.ps1 | MCP composite gateway | 20 | ✅ Implemented |
-| InterPackTransport.ps1 | Inter-pack transport layer | 18 | ✅ Implemented |
-| ProvenanceTracker.ps1 | Cross-pack provenance tracking | 15 | ✅ Implemented |
-| SnapshotManager.ps1 | Snapshot and rollback | 22 | ✅ Implemented |
+| McpToolkitServer.ps1 | MCP-native toolkit server | 25 | âœ… Implemented |
+| McpCompositeGateway.ps1 | MCP composite gateway | 20 | âœ… Implemented |
+| InterPackTransport.ps1 | Inter-pack transport layer | 18 | âœ… Implemented |
+| ProvenanceTracker.ps1 | Cross-pack provenance tracking | 15 | âœ… Implemented |
+| SnapshotManager.ps1 | Snapshot and rollback | 22 | âœ… Implemented |
 
 ## Current note
 
-**All Phases Complete (1-7):** The platform now supports 10 domain packs with 121 PowerShell modules and 800+ functions. MCP integration is fully deployed with `godot-mcp` and `blender-mcp` servers operational. Inter-pack pipelines are active for Blender→Godot, AI generation workflows, voice animation pipelines, and ML deployment chains.
+**All Phases Complete (1-7):** The platform now supports 10 domain packs with 220 PowerShell Modules and 800+ functions. MCP integration is fully deployed with `godot-mcp` and `blender-mcp` servers operational. Inter-pack pipelines are active for Blenderâ†’Godot, AI generation workflows, voice animation pipelines, and ML deployment chains.
 
 **Appendage A Complete:** All 15 extended Godot sources have been integrated into the godot-engine pack, bringing the total to 43 sources. This includes testing frameworks (gdUnit4), AI behavior systems (LimboAI, FSM), dialogue systems (Dialogic, DialogueQuest), quest/inventory systems, rollback networking, editor VCS, signal visualization, save systems, RPG data frameworks (Pandora), chunk streaming (chunx), alternate voxel terrain, and platform-service integration.
 

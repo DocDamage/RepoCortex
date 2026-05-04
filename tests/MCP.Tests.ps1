@@ -72,7 +72,7 @@ Describe "MCPToolkitServer Module Tests" {
             
             $config | Should -Not -BeNullOrEmpty
             $config.name | Should -Be "llm-workflow-mcp-server"
-            $config.version | Should -Be "0.2.0"
+            $config.version | Should -Be "0.9.6"
             $config.executionMode | Should -Be "mcp-readonly"
             $config.transport | Should -Be "stdio"
             $config.port | Should -Be 8080

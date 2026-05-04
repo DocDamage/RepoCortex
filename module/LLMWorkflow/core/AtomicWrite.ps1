@@ -173,7 +173,7 @@ function Sync-Directory {
             $syncMarker = Join-Path $Path ".sync.$(Get-Random)"
             [System.IO.File]::WriteAllText($syncMarker, [string]::Empty)
             Sync-File -Path $syncMarker | Out-Null
-            Remove-Item -LiteralPath $syncMarker -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $syncMarker -Force -ErrorAction Stop
         }
         else {
             # Unix: Can open the directory and call fsync
@@ -377,7 +377,7 @@ function Write-AtomicFile {
                 [System.IO.File]::Replace($tempPath, $resolvedPath, $backupForReplace)
                 # Clean up the backup created by Replace
                 if (Test-Path -LiteralPath $backupForReplace) {
-                    Remove-Item -LiteralPath $backupForReplace -Force -ErrorAction SilentlyContinue
+                    Remove-Item -LiteralPath $backupForReplace -Force -ErrorAction Stop
                 }
                 Write-Verbose "[AtomicWrite] Atomically replaced file: $resolvedPath"
             }
@@ -514,8 +514,11 @@ function Backup-File {
         Copy-Item -LiteralPath $resolvedPath -Destination $backupPath -Force
 
         # Clean up old backups (ensure array, handle empty/null)
-        $allBackups = Get-ChildItem -Path $BackupDirectory -Filter "$fileName.*.bak" -File -ErrorAction SilentlyContinue |
-            Sort-Object -Property LastWriteTime -Descending
+        $allBackups = @()
+        if (Test-Path -LiteralPath $BackupDirectory) {
+            $allBackups = Get-ChildItem -Path $BackupDirectory -Filter "$fileName.*.bak" -File |
+                Sort-Object -Property LastWriteTime -Descending
+        }
         $oldBackups = @()
         if ($allBackups) {
             if ($allBackups -is [array]) {
@@ -912,8 +915,11 @@ function Invoke-AtomicRollback {
         $fileName = [System.IO.Path]::GetFileName($resolvedPath)
         
         # Search for timestamped backups first (most recent)
-        $timestampedBackups = @(Get-ChildItem -Path $dir -Filter "$fileName.*.bak" -File -ErrorAction SilentlyContinue |
-            Sort-Object -Property LastWriteTime -Descending)
+        $timestampedBackups = @()
+        if (Test-Path -LiteralPath $dir) {
+            $timestampedBackups = @(Get-ChildItem -Path $dir -Filter "$fileName.*.bak" -File |
+                Sort-Object -Property LastWriteTime -Descending)
+        }
         
         if ($timestampedBackups.Count -gt 0) {
             $BackupPath = $timestampedBackups[0].FullName
@@ -973,7 +979,7 @@ function Invoke-AtomicRollback {
 
             # Remove backup if not keeping it
             if (-not $KeepBackup) {
-                Remove-Item -LiteralPath $BackupPath -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath $BackupPath -Force -ErrorAction Stop
             }
 
             Write-Verbose "[AtomicWrite] Rolled back '$resolvedPath' from '$BackupPath'"
@@ -1178,7 +1184,7 @@ function Add-JsonLine {
     }
     finally {
         if ($lockAcquired -and (Test-Path -LiteralPath $lockFile)) {
-            Remove-Item -LiteralPath $lockFile -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $lockFile -Force -ErrorAction Stop
         }
     }
 }

@@ -17,7 +17,7 @@
 Set-StrictMode -Version Latest
 
 # Global in-memory trace log for debugging/dashboarding
-if (-not (Get-Variable -Name "TelemetryTraceLog" -Scope Script -ErrorAction SilentlyContinue)) {
+if (-not (Get-Variable -Name "TelemetryTraceLog" -Scope Script -ErrorAction Ignore)) {
     $script:TelemetryTraceLog = [System.Collections.ArrayList]::new()
 }
 
@@ -50,9 +50,9 @@ function Write-FunctionTelemetry {
         [hashtable]$Attributes = @{}
     )
 
-    $newSpanCmd = Get-Command New-Span -ErrorAction SilentlyContinue
-    $startSpanCmd = Get-Command Start-Span -ErrorAction SilentlyContinue
-    $stopSpanCmd = Get-Command Stop-Span -ErrorAction SilentlyContinue
+    $newSpanCmd = Get-Command New-Span -ErrorAction Ignore
+    $startSpanCmd = Get-Command Start-Span -ErrorAction Ignore
+    $stopSpanCmd = Get-Command Stop-Span -ErrorAction Ignore
 
     $spanResult = $null
 

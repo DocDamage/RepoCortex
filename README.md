@@ -1,18 +1,19 @@
-# CodeMunch + ContextLattice + MemPalace (All-in-One)
+﻿# CodeMunch + ContextLattice + MemPalace (All-in-One)
 
 [![Version](https://img.shields.io/badge/version-0.9.6-blue.svg)](https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/blob/work/VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Packs](https://img.shields.io/badge/domain%20packs-10-green.svg)](#domain-packs)
 [![Parsers](https://img.shields.io/badge/extraction%20parsers-30-orange.svg)](#platform-scope)
+[![PowerShell Modules](https://img.shields.io/badge/PowerShell%20modules-220-blue.svg)](#platform-scope)
 [![Golden Tasks](https://img.shields.io/badge/golden%20tasks-60-purple.svg)](#testing)
 
-> Canonical toolkit repo for the integrated CodeMunch · ContextLattice · MemPalace workflow.
+> Canonical toolkit repo for the integrated CodeMunch Â· ContextLattice Â· MemPalace workflow.
 
 ---
 
 ## Project Status
 
-**Current Version:** `0.9.6` · **Target:** `v1.0` · **Branch:** `work`
+**Current Version:** `0.9.6` Â· **Target:** `v1.0` Â· **Branch:** `work`
 
 This repository is in active **post-0.9.6 hardening and release-state reconciliation**. All eight implementation phases are complete, and the codebase is undergoing final remediation toward v1.0 certification.
 
@@ -20,11 +21,11 @@ An [**AAA Production Release Audit**](AAA_RELEASE_AUDIT_REPORT.md) was completed
 
 | Severity | Original | Resolved | Remaining |
 |----------|----------|----------|-----------|
-| 🔴 Blocker | 6 | 5 | 1 — systematic `-ErrorAction SilentlyContinue` reduction (critical paths cleared; repo-wide sweep in progress) |
-| 🟠 High | 15 | 14 | 1 — ongoing observability hardening |
+| ðŸ”´ Blocker | 6 | 6 | 0 â€” all blockers resolved; remaining `-ErrorAction SilentlyContinue` reduction is ongoing hygiene, not a release blocker |
+| ðŸŸ  High | 15 | 15 | 0 â€” all documented high issues resolved; observability hardening is ongoing baseline work |
 
-**Resolved blockers:** version fragmentation unified, mock data removed from dashboards, CDN vendoring eliminated, credential exposure vectors closed, missing documentation produced.  
-**Resolved high issues:** module-loader guard added, Dockerfile/composer hardened, requirements manifest expanded, dashboard `exit()` removed, duplicate provider functions deduplicated, retrieval metrics now distinguish "no data" from "zero data", exception suppression elevated to warnings, empty catch blocks eliminated, cross-platform path separators fixed, SBOM/security reports generated, release certification alignment completed, plugin exports completed.
+**Resolved blockers:** version fragmentation unified (all `0.2.0` refs eliminated), mock data removed from dashboards, CDN vendoring eliminated, credential exposure vectors closed, missing documentation produced, security baseline scope bug fixed and false positives eliminated.  
+**Resolved high issues:** module-loader PSScriptRoot corruption fixed, Dockerfile/composer hardened, requirements manifest expanded, dashboard `exit()` removed, duplicate provider functions deduplicated, retrieval metrics now distinguish "no data" from "zero data", exception suppression elevated to warnings, empty catch blocks eliminated, cross-platform path separators fixed, SBOM/security reports generated, release certification alignment completed, plugin exports completed, GoldenTasks decomposed into `contexts/Governance/` (26 files, max 293 lines), docs-truth validator restored to green.
 
 Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) and [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md).
 
@@ -36,9 +37,9 @@ Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/P
 
 A unified PowerShell-native toolkit that wires together three subsystems:
 
-- **CodeMunch** — Project indexing, MCP wrapper setup, and searchable code context
-- **ContextLattice** — Project bootstrap, orchestrator connectivity, and verification
-- **MemPalace** — Vector storage (ChromaDB) with incremental bridge sync to ContextLattice
+- **CodeMunch** â€” Project indexing, MCP wrapper setup, and searchable code context
+- **ContextLattice** â€” Project bootstrap, orchestrator connectivity, and verification
+- **MemPalace** â€” Vector storage (ChromaDB) with incremental bridge sync to ContextLattice
 
 ### Why Use This Toolkit?
 
@@ -64,16 +65,18 @@ A unified PowerShell-native toolkit that wires together three subsystems:
 
 ## Platform Scope
 
+**220 PowerShell Modules**
+
 | Area | Count |
 |------|------:|
 | Domain packs | 10 |
-| PowerShell module | 1 (`LLMWorkflow`) |
+| **PowerShell Modules** | 220 |
 | Exported functions | 54 |
 | Source scripts | 130+ |
-| Extraction parsers | 30 |
+| **Extraction Parsers** | 30 |
 | Golden tasks | 60 |
 | Benchmark suites | 5 |
-| MCP tool surface | 55 |
+| MCP tool surface | 38 |
 
 ---
 
@@ -97,16 +100,16 @@ For detailed architecture, see [`docs/architecture/ARCHITECTURE.md`](docs/archit
 
 | Pack | Status | Focus |
 |------|--------|-------|
-| `godot-engine` | ✅ Promoted | Godot engine development, GDScript, scenes, signals |
-| `blender-engine` | ✅ Promoted | Blender automation, operators, geometry nodes, export workflows |
-| `rpgmaker-mz` | ✅ Promoted | RPG Maker plugin development, conflict diagnosis, notetags |
-| `voice-audio-generation` | ✅ Promoted | Voice, TTS/STS, audio generation pipelines |
-| `agent-simulation` | ✅ Promoted | Agent workflows and simulation patterns |
-| `notebook-data-workflow` | ✅ Promoted | Notebook and data workflow extraction |
-| `ui-frontend-framework` | ✅ Promoted | UI/component and design-system workflows |
-| `api-reverse-tooling` | ✅ Promoted | API discovery, reverse engineering, documentation |
-| `ml-educational-reference` | ✅ Promoted | ML educational and reference content |
-| `engine-reference` | ✅ Promoted | Cross-engine patterns and migration guidance |
+| `godot-engine` | âœ… Promoted | Godot engine development, GDScript, scenes, signals |
+| `blender-engine` | âœ… Promoted | Blender automation, operators, geometry nodes, export workflows |
+| `rpgmaker-mz` | âœ… Promoted | RPG Maker plugin development, conflict diagnosis, notetags |
+| `voice-audio-generation` | âœ… Promoted | Voice, TTS/STS, audio generation pipelines |
+| `agent-simulation` | âœ… Promoted | Agent workflows and simulation patterns |
+| `notebook-data-workflow` | âœ… Promoted | Notebook and data workflow extraction |
+| `ui-frontend-framework` | âœ… Promoted | UI/component and design-system workflows |
+| `api-reverse-tooling` | âœ… Promoted | API discovery, reverse engineering, documentation |
+| `ml-educational-reference` | âœ… Promoted | ML educational and reference content |
+| `engine-reference` | âœ… Promoted | Cross-engine patterns and migration guidance |
 
 ---
 
@@ -208,7 +211,9 @@ Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
 - Base-URL precedence and fallback (`OLLAMA_HOST` / `OLLAMA_BASE_URL`)
 - Curated-plugin compatibility fixtures (active, deprecated, quarantined, retired, mixed)
 - Primitive test suites (AtomicWrite, CommandContract, FileLock, Journal, StateFile, Workspace)
-- Golden Task Evaluations (60 tasks)
+- Golden Task Evaluations (60 Tasks)
+- Golden Task Coverage (60 Total)
+- 60 predefined validation scenarios
 
 CI workflows:
 - `.github/workflows/ci.yml`
@@ -266,7 +271,7 @@ PowerShell Gallery publishing is automated on GitHub Release publish when `PSGAL
 | [`docs/releases/V1_RELEASE_CRITERIA.md`](docs/releases/V1_RELEASE_CRITERIA.md) | v1.0 release criteria |
 | [`docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md`](docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md) | Release certification checklist |
 | [`AAA_RELEASE_AUDIT_REPORT.md`](AAA_RELEASE_AUDIT_REPORT.md) | AAA production release audit (2026-05-03) |
-| [`CHANGELOG.md`](CHANGELOG.md) · [`docs/releases/CHANGELOG.md`](docs/releases/CHANGELOG.md) | Change history |
+| [`CHANGELOG.md`](CHANGELOG.md) Â· [`docs/releases/CHANGELOG.md`](docs/releases/CHANGELOG.md) | Change history |
 
 ---
 

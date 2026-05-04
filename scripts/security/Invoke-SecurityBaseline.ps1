@@ -72,31 +72,6 @@ function Test-PromotionGate {
     }
 }
 
-function Import-SecurityScript {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    $scriptDir = $PSScriptRoot
-    if ([string]::IsNullOrEmpty($scriptDir)) {
-        $scriptDir = Join-Path (Get-Location).Path 'scripts' 'security'
-    }
-
-    $scriptPath = Join-Path $scriptDir $Name
-    if (Test-Path -LiteralPath $scriptPath) {
-        . $scriptPath
-        return $true
-    }
-
-    return $false
-}
-
-#endregion
-
-#region Public Functions
-
 function Invoke-SecurityBaseline {
     <#
     .SYNOPSIS
@@ -147,11 +122,19 @@ function Invoke-SecurityBaseline {
         New-Item -ItemType Directory -Path $OutputPath -Force | Out-Null
     }
 
-    # Ensure dependent functions are available
+    # Resolve script directory (same dir as this file, or fallback when dot-sourced)
+    $scriptDir = $PSScriptRoot
+    if ([string]::IsNullOrEmpty($scriptDir)) {
+        $scriptDir = Join-Path (Join-Path (Get-Location).Path 'scripts') 'security'
+    }
+
+    # Inline dot-source dependency scripts at this scope so their functions persist
     $scriptsToImport = @('Invoke-SecretScan.ps1', 'Invoke-SBOMBuild.ps1', 'Invoke-VulnerabilityScan.ps1')
     foreach ($scriptName in $scriptsToImport) {
-        $imported = Import-SecurityScript -Name $scriptName
-        if (-not $imported) {
+        $scriptPath = Join-Path $scriptDir $scriptName
+        if (Test-Path -LiteralPath $scriptPath) {
+            . $scriptPath
+        } else {
             Write-Warning "[Invoke-SecurityBaseline] Could not import $scriptName"
         }
     }

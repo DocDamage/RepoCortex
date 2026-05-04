@@ -1,4 +1,4 @@
-# LLM Workflow — Canonical Architecture, Pack Framework, and Delivery Plan
+﻿# LLM Workflow â€” Canonical Architecture, Pack Framework, and Delivery Plan
 
 ## Status
 
@@ -112,29 +112,29 @@ In addition to core provenance fields, include when applicable:
 
 Supported `authorityRole` values:
 
-- `core-engine` — Godot engine source code and official documentation
-- `private-project` — user's own game project code and scenes
-- `exemplar-pattern` — community plugins, templates, and demo projects
-- `language-binding` — gdext, godot-cpp, godot-python bindings and API patterns
-- `mcp-integration` — godot-mcp and AI-assisted development tooling
-- `visual-system` — ocean, voxel, terrain, pixel renderer, shader libraries
-- `physics-extension` — godot-jolt and other physics replacements
-- `deployment-tooling` — GodotSteam, godot-ci, export pipeline tooling
-- `reverse-format` — gdsdecomp and Godot reverse-engineering tools
-- `starter-template` — game starter kits and project templates
-- `curated-index` — awesome-godot and similar resource lists
-- `testing-framework` — gdUnit4 and testing/QA tooling
-- `ai-behavior-system` — LimboAI, Godot-FiniteStateMachine behavior frameworks
-- `dialogue-system` — Dialogic, DialogueQuest narrative frameworks
-- `quest-system` — quest/progression frameworks
-- `inventory-system` — item/inventory/equipment systems
-- `networking-system` — rollback netcode and multiplayer systems
-- `editor-tooling` — editor VCS, Git integration plugins
-- `debug-visualization` — signal visualization and debugging tools
-- `save-system` — save/load convenience plugins
-- `rpg-data-framework` — RPG data model frameworks (Pandora)
-- `world-streaming-system` — chunk/open-world streaming systems (chunx)
-- `platform-service-integration` — platform service/achievement plugins (GamePush)
+- `core-engine` â€” Godot engine source code and official documentation
+- `private-project` â€” user's own game project code and scenes
+- `exemplar-pattern` â€” community plugins, templates, and demo projects
+- `language-binding` â€” gdext, godot-cpp, godot-python bindings and API patterns
+- `mcp-integration` â€” godot-mcp and AI-assisted development tooling
+- `visual-system` â€” ocean, voxel, terrain, pixel renderer, shader libraries
+- `physics-extension` â€” godot-jolt and other physics replacements
+- `deployment-tooling` â€” GodotSteam, godot-ci, export pipeline tooling
+- `reverse-format` â€” gdsdecomp and Godot reverse-engineering tools
+- `starter-template` â€” game starter kits and project templates
+- `curated-index` â€” awesome-godot and similar resource lists
+- `testing-framework` â€” gdUnit4 and testing/QA tooling
+- `ai-behavior-system` â€” LimboAI, Godot-FiniteStateMachine behavior frameworks
+- `dialogue-system` â€” Dialogic, DialogueQuest narrative frameworks
+- `quest-system` â€” quest/progression frameworks
+- `inventory-system` â€” item/inventory/equipment systems
+- `networking-system` â€” rollback netcode and multiplayer systems
+- `editor-tooling` â€” editor VCS, Git integration plugins
+- `debug-visualization` â€” signal visualization and debugging tools
+- `save-system` â€” save/load convenience plugins
+- `rpg-data-framework` â€” RPG data model frameworks (Pandora)
+- `world-streaming-system` â€” chunk/open-world streaming systems (chunx)
+- `platform-service-integration` â€” platform service/achievement plugins (GamePush)
 
 Examples:
 - Godot engine source/docs -> `core-engine`
@@ -162,55 +162,55 @@ Examples:
 
 ### 25.5 Source priority order
 
-#### P0 — Core engine and documentation
+#### P0 â€” Core engine and documentation
 Promote these ahead of community repos:
 
 - Godot Engine source code (official repository)
 - Official Godot documentation and API reference
 - Official demo projects (`godotengine/godot-demo-projects`)
 
-#### P1 — Strong workflow/tooling references
+#### P1 â€” Strong workflow/tooling references
 Examples:
 
-- `Coding-Solo/godot-mcp` — MCP server for AI-assisted Godot dev
-- `abarichello/godot-ci` — CI/CD export and deployment pipelines
-- `godotengine/godot-vscode-plugin` — VS Code editor integration
-- `GodotSteam/GodotSteam` — Steam platform integration
+- `Coding-Solo/godot-mcp` â€” MCP server for AI-assisted Godot dev
+- `abarichello/godot-ci` â€” CI/CD export and deployment pipelines
+- `godotengine/godot-vscode-plugin` â€” VS Code editor integration
+- `GodotSteam/GodotSteam` â€” Steam platform integration
 
-#### P2 — High-value language bindings and extensions
+#### P2 â€” High-value language bindings and extensions
 Use reputable, well-documented binding libraries:
 
-- `godot-rust/gdext` — Rust bindings for Godot 4
-- `godotengine/godot-cpp` — Official C++ bindings
-- `godot-jolt/godot-jolt` — Jolt physics engine integration
-- `MikeSchulze/gdUnit4` — Testing framework for Godot 4
-- `limbonaut/limboai` — AI behavior trees and state machines
-- `dialogic-godot/dialogic` — Dialogue and narrative framework
-- `shomykohai/quest-system` — Quest/progression framework
-- `expressobits/inventory-system` — Inventory/RPG systems
-- `maximkulkin/godot-rollback-netcode` — Rollback networking
-- `godotengine/godot-git-plugin` — Editor VCS integration
-- `bitbrain/pandora` — RPG data management framework
-- `SlashScreen/chunx` — Chunk/open-world streaming
+- `godot-rust/gdext` â€” Rust bindings for Godot 4
+- `godotengine/godot-cpp` â€” Official C++ bindings
+- `godot-jolt/godot-jolt` â€” Jolt physics engine integration
+- `MikeSchulze/gdUnit4` â€” Testing framework for Godot 4
+- `limbonaut/limboai` â€” AI behavior trees and state machines
+- `dialogic-godot/dialogic` â€” Dialogue and narrative framework
+- `shomykohai/quest-system` â€” Quest/progression framework
+- `expressobits/inventory-system` â€” Inventory/RPG systems
+- `maximkulkin/godot-rollback-netcode` â€” Rollback networking
+- `godotengine/godot-git-plugin` â€” Editor VCS integration
+- `bitbrain/pandora` â€” RPG data management framework
+- `SlashScreen/chunx` â€” Chunk/open-world streaming
 
-#### P3 — Visual/terrain/rendering systems
-- `2Retr0/GodotOceanWaves` — FFT ocean wave rendering
-- `Zylann/godot_voxel` — Voxel terrain module
-- `Zylann/godot_heightmap_plugin` — HeightMap terrain
-- `bukkbeek/GodotPixelRenderer` — 3D to pixel art toolkit
-- `Syntaxxor/godot-voxel-terrain` — Alternate voxel terrain
-- `GamePushService/GamePush-Godot-plugin` — Platform services
-- `HexagonNico/Godot-FiniteStateMachine` — Lightweight FSM
-- `Ericdowney/SignalVisualizer` — Signal debugging
-- `AdamKormos/SaveMadeEasy` — Save/load convenience
-- `hohfchns/DialogueQuest` — Lightweight dialogue system
+#### P3 â€” Visual/terrain/rendering systems
+- `2Retr0/GodotOceanWaves` â€” FFT ocean wave rendering
+- `Zylann/godot_voxel` â€” Voxel terrain module
+- `Zylann/godot_heightmap_plugin` â€” HeightMap terrain
+- `bukkbeek/GodotPixelRenderer` â€” 3D to pixel art toolkit
+- `Syntaxxor/godot-voxel-terrain` â€” Alternate voxel terrain
+- `GamePushService/GamePush-Godot-plugin` â€” Platform services
+- `HexagonNico/Godot-FiniteStateMachine` â€” Lightweight FSM
+- `Ericdowney/SignalVisualizer` â€” Signal debugging
+- `AdamKormos/SaveMadeEasy` â€” Save/load convenience
+- `hohfchns/DialogueQuest` â€” Lightweight dialogue system
 
-#### P4 — Community patterns and templates
-- `godotengine/awesome-godot` — Curated plugin/resource index (source registry seed)
-- `KenneyNL/Starter-Kit-3D-Platformer` — 3D platformer starter kit
+#### P4 â€” Community patterns and templates
+- `godotengine/awesome-godot` â€” Curated plugin/resource index (source registry seed)
+- `KenneyNL/Starter-Kit-3D-Platformer` â€” 3D platformer starter kit
 - Community plugins discovered through awesome-godot
 
-#### P5 — Private project ingestion
+#### P5 â€” Private project ingestion
 The user's own game projects, scripts, scenes, and shaders. Often the most valuable source during actual development.
 
 ### 25.6 Required extraction outputs for Godot Engine
@@ -500,7 +500,7 @@ Some Godot sources are valuable but must remain scoped correctly:
 
 
 
-#### P0 — Core engine (implemented)
+#### P0 â€” Core engine (implemented)
 
 | Source | Notes |
 |--------|-------|
@@ -508,81 +508,81 @@ Some Godot sources are valuable but must remain scoped correctly:
 | Official API documentation | Class reference, tutorials, best practices |
 | `godotengine/godot-demo-projects` | Official demos covering 2D, 3D, networking, shaders |
 
-#### P1 — Workflow / tooling
+#### P1 â€” Workflow / tooling
 
 | Source | Trust | Stars | License | Notes |
 |--------|-------|-------|---------|-------|
 | `Coding-Solo/godot-mcp` | Medium-High | 3k | MIT | MCP server: launch editor, run projects, create scenes, capture debug |
 | `abarichello/godot-ci` | Medium-High | 1.1k | MIT | Docker + GitHub Actions/GitLab CI for automated exports |
-| `godotengine/godot-vscode-plugin` | Medium-High | — | MIT | VS Code GDScript support, debugging, scene tree |
+| `godotengine/godot-vscode-plugin` | Medium-High | â€” | MIT | VS Code GDScript support, debugging, scene tree |
 | `GodotSteam/GodotSteam` | High | 3.7k | MIT | Steamworks API bindings (moved to Codeberg) |
-| `hhyyrylainen/GodotPckTool` | Medium-High | — | MIT | PCK file extraction/creation tool |
-| `godotengine/godot-blender-exporter` | High | — | MIT | Official Blender-to-Godot scene exporter |
+| `hhyyrylainen/GodotPckTool` | Medium-High | â€” | MIT | PCK file extraction/creation tool |
+| `godotengine/godot-blender-exporter` | High | â€” | MIT | Official Blender-to-Godot scene exporter |
 
-#### P2 — Language bindings and engine extensions
+#### P2 â€” Language bindings and engine extensions
 
 | Source | Trust | Stars | License | Key value |
 |--------|-------|-------|---------|-----------|
 | `godot-rust/gdext` | Medium-High | 4.7k | MPL-2.0 | Rust bindings for Godot 4; type-safe, high-performance GDExtension |
-| `godotengine/godot-cpp` | High | — | MIT | Official C++ bindings for GDExtension |
-| `godot-jolt/godot-jolt` | Medium-High | — | MIT | Jolt physics engine integration; drop-in physics replacement |
-| `godotjs/GodotJS` | Medium | — | MIT | V8/QuickJS support for Godot 4.x |
-| `migueldeicaza/SwiftGodot` | Medium-High | — | MIT | Swift bindings for Godot |
+| `godotengine/godot-cpp` | High | â€” | MIT | Official C++ bindings for GDExtension |
+| `godot-jolt/godot-jolt` | Medium-High | â€” | MIT | Jolt physics engine integration; drop-in physics replacement |
+| `godotjs/GodotJS` | Medium | â€” | MIT | V8/QuickJS support for Godot 4.x |
+| `migueldeicaza/SwiftGodot` | Medium-High | â€” | MIT | Swift bindings for Godot |
 
-#### P2 — High-value gameplay systems / tooling (Appendage A complete)
-
-| Source | Trust | Stars | License | Key value |
-|--------|-------|-------|---------|-----------|
-| `MikeSchulze/gdUnit4` | Medium-High | — | MIT | Embedded Godot testing framework |
-| `limbonaut/limboai` | Medium-High | — | MIT | AI behavior trees + state machines |
-| `dialogic-godot/dialogic` | Medium-High | — | MIT | Dialogue/narrative framework |
-| `shomykohai/quest-system` | Medium | — | MIT | Quest/progression framework |
-| `expressobits/inventory-system` | Medium | — | MIT | Modular inventory/RPG system |
-| `maximkulkin/godot-rollback-netcode` | Medium | — | MIT | Rollback/prediction networking |
-| `godotengine/godot-git-plugin` | Medium-High | — | MIT | Editor VCS integration |
-| `bitbrain/pandora` | Medium | — | MIT | RPG data-management framework |
-| `SlashScreen/chunx` | Medium | — | MIT | Chunk/open-world streaming |
-
-#### P3 — Visual / terrain / rendering systems
+#### P2 â€” High-value gameplay systems / tooling (Appendage A complete)
 
 | Source | Trust | Stars | License | Key value |
 |--------|-------|-------|---------|-----------|
-| `2Retr0/GodotOceanWaves` | Medium | — | — | FFT-based ocean wave rendering |
-| `Zylann/godot_voxel` | Medium-High | — | — | Voxel terrain module: smooth/blocky, LOD, infinite terrain |
-| `Zylann/godot_heightmap_plugin` | Medium | — | MIT | HeightMap terrain with texture painting, LOD, grass |
-| `bukkbeek/GodotPixelRenderer` | Medium | — | — | 3D to pixel art rendering toolkit |
-| `ahopness/GodotRetro` | Medium | — | — | Retro shader pack (PS1/VHS/CRT effects) |
-| `2Retr0/GodotGrass` | Medium | — | — | Per-blade Ghost of Tsushima style grass |
-| `Syntaxxor/godot-voxel-terrain` | Medium | — | MIT | Alternate voxel terrain implementation |
+| `MikeSchulze/gdUnit4` | Medium-High | â€” | MIT | Embedded Godot testing framework |
+| `limbonaut/limboai` | Medium-High | â€” | MIT | AI behavior trees + state machines |
+| `dialogic-godot/dialogic` | Medium-High | â€” | MIT | Dialogue/narrative framework |
+| `shomykohai/quest-system` | Medium | â€” | MIT | Quest/progression framework |
+| `expressobits/inventory-system` | Medium | â€” | MIT | Modular inventory/RPG system |
+| `maximkulkin/godot-rollback-netcode` | Medium | â€” | MIT | Rollback/prediction networking |
+| `godotengine/godot-git-plugin` | Medium-High | â€” | MIT | Editor VCS integration |
+| `bitbrain/pandora` | Medium | â€” | MIT | RPG data-management framework |
+| `SlashScreen/chunx` | Medium | â€” | MIT | Chunk/open-world streaming |
 
-#### P3 — Debugging / auxiliary systems / specialized workflows (Appendage A complete)
+#### P3 â€” Visual / terrain / rendering systems
 
 | Source | Trust | Stars | License | Key value |
 |--------|-------|-------|---------|-----------|
-| `Ericdowney/SignalVisualizer` | Medium | — | MIT | Signal graph visualization/debugging |
-| `AdamKormos/SaveMadeEasy` | Medium | — | MIT | Save/load convenience plugin |
-| `hohfchns/DialogueQuest` | Medium | — | MIT | Lightweight dialogue system |
-| `GamePushService/GamePush-Godot-plugin` | Medium | — | MIT | Backend/platform service integration |
-| `HexagonNico/Godot-FiniteStateMachine` | Medium | — | MIT | Lightweight FSM framework |
+| `2Retr0/GodotOceanWaves` | Medium | â€” | â€” | FFT-based ocean wave rendering |
+| `Zylann/godot_voxel` | Medium-High | â€” | â€” | Voxel terrain module: smooth/blocky, LOD, infinite terrain |
+| `Zylann/godot_heightmap_plugin` | Medium | â€” | MIT | HeightMap terrain with texture painting, LOD, grass |
+| `bukkbeek/GodotPixelRenderer` | Medium | â€” | â€” | 3D to pixel art rendering toolkit |
+| `ahopness/GodotRetro` | Medium | â€” | â€” | Retro shader pack (PS1/VHS/CRT effects) |
+| `2Retr0/GodotGrass` | Medium | â€” | â€” | Per-blade Ghost of Tsushima style grass |
+| `Syntaxxor/godot-voxel-terrain` | Medium | â€” | MIT | Alternate voxel terrain implementation |
 
-#### P4 — Community patterns and templates
+#### P3 â€” Debugging / auxiliary systems / specialized workflows (Appendage A complete)
+
+| Source | Trust | Stars | License | Key value |
+|--------|-------|-------|---------|-----------|
+| `Ericdowney/SignalVisualizer` | Medium | â€” | MIT | Signal graph visualization/debugging |
+| `AdamKormos/SaveMadeEasy` | Medium | â€” | MIT | Save/load convenience plugin |
+| `hohfchns/DialogueQuest` | Medium | â€” | MIT | Lightweight dialogue system |
+| `GamePushService/GamePush-Godot-plugin` | Medium | â€” | MIT | Backend/platform service integration |
+| `HexagonNico/Godot-FiniteStateMachine` | Medium | â€” | MIT | Lightweight FSM framework |
+
+#### P4 â€” Community patterns and templates
 
 | Source | Trust | Stars | License | Key value |
 |--------|-------|-------|---------|-----------|
 | `godotengine/awesome-godot` | Medium-High | 9.7k | CC-BY-4.0 | Curated index: games, plugins, templates, tutorials |
-| `KenneyNL/Starter-Kit-3D-Platformer` | Medium | — | — | 3D platformer starter kit with Kenney assets |
-| `touilleMan/godot-python` | Low-Medium | — | MIT | Python bindings (Godot 3 era, less maintained) |
-| `borndotcom/react-native-godot` | Low | — | — | Embed Godot in React Native (niche) |
-| `CraterCrash/godot-orchestrator` | Medium-High | — | MIT | Advanced visual scripting for Godot 4 |
-| `godot-extended-libraries/godot-next` | Medium | — | MIT | Basic node extension library (QoL) |
-| `edbeeching/godot_rl_agents` | Medium | — | MIT | Reinforcement Learning / NPC AI framework |
-| `godotengine/godot-proposals` | Medium-High | — | — | Engine roadmap and feature proposal context |
+| `KenneyNL/Starter-Kit-3D-Platformer` | Medium | â€” | â€” | 3D platformer starter kit with Kenney assets |
+| `touilleMan/godot-python` | Low-Medium | â€” | MIT | Python bindings (Godot 3 era, less maintained) |
+| `borndotcom/react-native-godot` | Low | â€” | â€” | Embed Godot in React Native (niche) |
+| `CraterCrash/godot-orchestrator` | Medium-High | â€” | MIT | Advanced visual scripting for Godot 4 |
+| `godot-extended-libraries/godot-next` | Medium | â€” | MIT | Basic node extension library (QoL) |
+| `edbeeching/godot_rl_agents` | Medium | â€” | MIT | Reinforcement Learning / NPC AI framework |
+| `godotengine/godot-proposals` | Medium-High | â€” | â€” | Engine roadmap and feature proposal context |
 
-#### P5 — Reverse engineering / specialized
+#### P5 â€” Reverse engineering / specialized
 
 | Source | Trust | Stars | License | Key value |
 |--------|-------|-------|---------|-----------|
-| `GDRETools/gdsdecomp` | Medium | — | — | Godot PCK decompiler, GDScript bytecode RE |
+| `GDRETools/gdsdecomp` | Medium | â€” | â€” | Godot PCK decompiler, GDScript bytecode RE |
 
 ### 25.12 Repo-by-repo extraction target matrix
 
@@ -868,45 +868,45 @@ Default trust: **high**
 
 Supported `authorityRole` values:
 
-- `core-blender` — Blender API, official documentation, and source
-- `mcp-integration` — blender-mcp and AI-assisted modeling tools
-- `ai-agent-control` — BlenderGPT and LLM-to-bpy translation patterns
-- `synth-proc` — BlenderProc and procedural rendering pipelines
-- `gis-context` — BlenderGIS and geospatial modeling rules
-- `pipeline-tool` — BlenderTools and engine export addons
-- `curated-index` — awesome-blender and discovery layers
-- `format-converter` — mmd_tools and interop extensions
-- `private-project` — user's own Blender scripts, node graphs, export helpers, and asset workflows
+- `core-blender` â€” Blender API, official documentation, and source
+- `mcp-integration` â€” blender-mcp and AI-assisted modeling tools
+- `ai-agent-control` â€” BlenderGPT and LLM-to-bpy translation patterns
+- `synth-proc` â€” BlenderProc and procedural rendering pipelines
+- `gis-context` â€” BlenderGIS and geospatial modeling rules
+- `pipeline-tool` â€” BlenderTools and engine export addons
+- `curated-index` â€” awesome-blender and discovery layers
+- `format-converter` â€” mmd_tools and interop extensions
+- `private-project` â€” user's own Blender scripts, node graphs, export helpers, and asset workflows
 
 ### 26.5 Source priority order
 
-#### P0 — Core Blender API and official references
+#### P0 â€” Core Blender API and official references
 Promote these ahead of community repos:
 
 - official Blender Python API reference
 - official Blender documentation
 - official source and examples where practical
 
-#### P1 — AI workflow and tooling
+#### P1 â€” AI workflow and tooling
 Examples:
 
 - `ahujasid/blender-mcp`
 - `gd3kr/BlenderGPT`
 
-#### P2 — Synthetic data and procedural logic
+#### P2 â€” Synthetic data and procedural logic
 Examples:
 
 - `DLR-RM/BlenderProc`
 - `domlysz/BlenderGIS`
 
-#### P3 — Discovery, pipelines, and specialized conversion
+#### P3 â€” Discovery, pipelines, and specialized conversion
 Examples:
 
 - `agmmnn/awesome-blender`
 - `EpicGamesExt/BlenderTools`
 - `sugiany/blender_mmd_tools`
 
-#### P4 — Private project ingestion
+#### P4 â€” Private project ingestion
 The user's own Blender scripts, Geometry Nodes graphs, shader logic, export helpers, and asset-derivation metadata. These are often the most valuable source during real production work.
 
 ### 26.5.1 Blender version-boundary rules
@@ -941,27 +941,27 @@ A retrieval answer should not recommend a Blender workflow pattern while omittin
 
 
 
-#### P1 — AI Workflow & Tooling
+#### P1 â€” AI Workflow & Tooling
 
 | Source | Trust | Stars | License | Notes |
 |--------|-------|-------|---------|-------|
-| `ahujasid/blender-mcp` | Medium-High | — | MIT | MCP server for Blender: programmatic tool access |
-| `gd3kr/BlenderGPT` | Medium-High | — | MIT | GPT-4 control logic for Blender operators |
+| `ahujasid/blender-mcp` | Medium-High | â€” | MIT | MCP server for Blender: programmatic tool access |
+| `gd3kr/BlenderGPT` | Medium-High | â€” | MIT | GPT-4 control logic for Blender operators |
 
-#### P2 — Synthetic Data & Procedural Logic
-
-| Source | Trust | Stars | License | Key value |
-|--------|-------|-------|---------|-----------|
-| `DLR-RM/BlenderProc` | Medium-High | — | MIT | Photorealistic pipeline for synthetic data generation |
-| `domlysz/BlenderGIS` | Medium-High | — | MIT | Geospatial bridge for Blender modeling |
-
-#### P3 — Discovery & Pipelines
+#### P2 â€” Synthetic Data & Procedural Logic
 
 | Source | Trust | Stars | License | Key value |
 |--------|-------|-------|---------|-----------|
-| `agmmnn/awesome-blender` | Medium | — | — | Master registry for addon discovery |
-| `EpicGamesExt/BlenderTools` | Medium | — | MIT | Game dev pipeline (Unreal focus but good patterns) |
-| `sugiany/blender_mmd_tools` | Medium | — | MIT | MikuMikuDance format interop patterns |
+| `DLR-RM/BlenderProc` | Medium-High | â€” | MIT | Photorealistic pipeline for synthetic data generation |
+| `domlysz/BlenderGIS` | Medium-High | â€” | MIT | Geospatial bridge for Blender modeling |
+
+#### P3 â€” Discovery & Pipelines
+
+| Source | Trust | Stars | License | Key value |
+|--------|-------|-------|---------|-----------|
+| `agmmnn/awesome-blender` | Medium | â€” | â€” | Master registry for addon discovery |
+| `EpicGamesExt/BlenderTools` | Medium | â€” | MIT | Game dev pipeline (Unreal focus but good patterns) |
+| `sugiany/blender_mmd_tools` | Medium | â€” | MIT | MikuMikuDance format interop patterns |
 
 ### 26.6 Extraction outputs for Blender Engine
 
@@ -1390,46 +1390,46 @@ The provenance tracking system ensures that any artifact in a target pack can be
 
 ## 28. Final priority call (REVISED)
 
-### ✅ All Phases 1-7 Complete
+### âœ… All Phases 1-7 Complete
 
 What is complete now:
 
-- **Phase 1** — Operational core is implemented (`module/LLMWorkflow/core/`) with state integrity, operator trust, and safe operation policies
-- **Phase 2** — Pack manifest, source registry, and lifecycle management implemented for 10 domain packs
-- **Phase 3** — Operator workflow and guarded execution with transaction discipline
-- **Phase 4** — Structured extraction pipeline with parsers for GDScript, scenes, shaders, APIs, notebooks, and more
-- **Phase 5** — Retrieval and answer integrity with query routing, cross-pack arbitration, and confidence policies
-- **Phase 6** — Human trust and governance with annotations, golden tasks, and review gates
-- **Phase 7** — Platform expansion with MCP integration, inter-pack pipelines, and snapshot management
+- **Phase 1** â€” Operational core is implemented (`module/LLMWorkflow/core/`) with state integrity, operator trust, and safe operation policies
+- **Phase 2** â€” Pack manifest, source registry, and lifecycle management implemented for 10 domain packs
+- **Phase 3** â€” Operator workflow and guarded execution with transaction discipline
+- **Phase 4** â€” Structured extraction pipeline with parsers for GDScript, scenes, shaders, APIs, notebooks, and more
+- **Phase 5** â€” Retrieval and answer integrity with query routing, cross-pack arbitration, and confidence policies
+- **Phase 6** â€” Human trust and governance with annotations, golden tasks, and review gates
+- **Phase 7** â€” Platform expansion with MCP integration, inter-pack pipelines, and snapshot management
 
 The platform now supports **10 domain packs**:
-1. `rpgmaker-mz` — RPG Maker MZ game development
-2. `godot-engine` — Godot Engine game development
-3. `blender-engine` — Blender 3D asset creation
-4. `api-reverse-tooling` — API reverse engineering
-5. `notebook-data-workflow` — Data science and ML workflows
-6. `agent-simulation` — AI agent and simulation frameworks
-7. `voice-audio-generation` — Voice and audio AI generation
-8. `engine-reference` — Cross-engine reference materials
-9. `ui-frontend-framework` — UI and frontend development
-10. `ml-educational-reference` — Machine learning education
+1. `rpgmaker-mz` â€” RPG Maker MZ game development
+2. `godot-engine` â€” Godot Engine game development
+3. `blender-engine` â€” Blender 3D asset creation
+4. `api-reverse-tooling` â€” API reverse engineering
+5. `notebook-data-workflow` â€” Data science and ML workflows
+6. `agent-simulation` â€” AI agent and simulation frameworks
+7. `voice-audio-generation` â€” Voice and audio AI generation
+8. `engine-reference` â€” Cross-engine reference materials
+9. `ui-frontend-framework` â€” UI and frontend development
+10. `ml-educational-reference` â€” Machine learning education
 
 ### MCP Toolkit Servers Deployed
 
-- `godot-mcp` — AI-assisted Godot editor control (✅ Operational)
-- `blender-mcp` — AI-assisted Blender modeling control (✅ Operational)
-- Composite gateway for multi-tool orchestration (✅ Implemented)
+- `godot-mcp` â€” AI-assisted Godot editor control (âœ… Operational)
+- `blender-mcp` â€” AI-assisted Blender modeling control (âœ… Operational)
+- Composite gateway for multi-tool orchestration (âœ… Implemented)
 
 ### Inter-Pack Pipelines Operational
 
-1. **Blender -> Godot Scene Pipeline** — Asset export with provenance tracking
-2. **AI Generation Pipeline** — Procedural asset generation across packs
-3. **Voice Animation Pipeline** — TTS to lip-sync animation workflow
-4. **ML Deployment Pipeline** — Model training to runtime inference
+1. **Blender -> Godot Scene Pipeline** â€” Asset export with provenance tracking
+2. **AI Generation Pipeline** â€” Procedural asset generation across packs
+3. **Voice Animation Pipeline** â€” TTS to lip-sync animation workflow
+4. **ML Deployment Pipeline** â€” Model training to runtime inference
 
 ### Current Statistics
 
-- **121 PowerShell modules** across all phases
+- **220 PowerShell Modules** across all phases
 - **800+ total functions**
 - **Version 0.9.6**
 - **All retrieval profiles** (7 profiles) operational

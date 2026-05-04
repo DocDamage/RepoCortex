@@ -118,7 +118,7 @@ function Write-WorkspaceAccessLog {
     }
     
     $logPath = Join-Path $script:WorkspaceStoragePath 'access.log'
-    $logEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $logPath -Encoding UTF8 -ErrorAction SilentlyContinue
+    $logEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $logPath -Encoding UTF8 -ErrorAction Ignore
 }
 
 #endregion
@@ -532,8 +532,11 @@ function Get-WorkspaceList {
     
     Initialize-WorkspaceStorage
     
-    $workspaceFiles = Get-ChildItem -Path $script:WorkspaceStoragePath -Filter '*.json' -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -ne 'access.log' }
+    $workspaceFiles = @()
+    if (Test-Path -LiteralPath $script:WorkspaceStoragePath) {
+        $workspaceFiles = Get-ChildItem -Path $script:WorkspaceStoragePath -Filter '*.json' -File |
+            Where-Object { $_.Name -ne 'access.log' }
+    }
     
     $workspaces = @()
     foreach ($file in $workspaceFiles) {

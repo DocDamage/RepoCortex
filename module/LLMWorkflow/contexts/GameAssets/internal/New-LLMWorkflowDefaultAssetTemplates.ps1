@@ -1,0 +1,160 @@
+﻿Set-StrictMode -Version Latest
+
+function New-LLMWorkflowDefaultAssetTemplates {
+    [CmdletBinding()]
+    param()
+
+    return [ordered]@{
+        art = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "art"
+            assetKind = "sprite|texture|material|model|ui|concept"
+            engineFamily = "cross-engine"
+            format = "png|jpg|webp|psd|fbx|obj|blend"
+            dimensions = ""
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            priority = "p0|p1|p2"
+            assignedTo = ""
+            createdDate = ""
+            modifiedDate = ""
+            source = "original|fab|itchio|kenney|custom|unknown"
+            sourceUrl = ""
+            license = "original|CC0|CC-BY|CC-BY-SA|CC-BY-NC|proprietary|unknown"
+            licenseUrl = ""
+            author = ""
+            notes = ""
+        }
+        spritesheets = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "spritesheets"
+            assetKind = "spritesheet|atlas|aseprite"
+            engineFamily = "cross-engine"
+            format = "png|webp|ase|aseprite|json"
+            frameSize = ""
+            dimensions = ""
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|fab|itchio|custom|unknown"
+            license = "original|CC0|CC-BY|CC-BY-SA|proprietary|unknown"
+            notes = ""
+        }
+        tilemaps = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "tilemaps"
+            assetKind = "tilemap|tileset|autotile"
+            engineFamily = "cross-engine"
+            format = "tmx|tsx|json|png"
+            tileSize = ""
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|fab|itchio|custom|unknown"
+            license = "original|CC0|CC-BY|CC-BY-SA|proprietary|unknown"
+            notes = ""
+        }
+        sfx = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "sfx"
+            assetKind = "sfx|voice|foley|ui"
+            engineFamily = "cross-engine"
+            format = "wav|mp3|ogg|flac"
+            duration = ""
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|freesound|custom|unknown"
+            license = "original|CC0|CC-BY|proprietary|unknown"
+            notes = ""
+        }
+        music = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "music"
+            assetKind = "music|stem|ambient"
+            engineFamily = "cross-engine"
+            format = "wav|mp3|ogg|flac"
+            duration = ""
+            loopable = $false
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|composer|custom|unknown"
+            license = "original|CC0|CC-BY|proprietary|unknown"
+            notes = ""
+        }
+        plugins = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "plugins"
+            assetKind = "plugin|editor-plugin|runtime-plugin"
+            engineFamily = "plugin"
+            targetEngine = "RPGMaker|Godot|Unreal|Unity|Generic"
+            format = "js|uplugin|gdextension|dll|py|cs"
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|marketplace|custom|unknown"
+            license = "original|MIT|Apache-2.0|GPL|proprietary|unknown"
+            notes = ""
+        }
+        engineAsset = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "rpgmaker|unreal|epic|shared"
+            assetKind = "plugin|project|map|texture|mesh|bundle|sample"
+            engineFamily = "rpgmaker|unreal|epic|cross-engine"
+            format = "uasset|umap|uproject|js|png|fbx|zip"
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|fab|epic|marketplace|custom|unknown"
+            license = "original|CC0|CC-BY|CC-BY-SA|proprietary|unknown"
+            notes = ""
+        }
+        shared = [ordered]@{
+            id = ""
+            name = ""
+            fileName = ""
+            path = ""
+            category = "shared"
+            assetKind = "archive|manifest|reference|bundle"
+            engineFamily = "cross-engine"
+            format = "zip|7z|rar|json|csv|txt"
+            fileSize = ""
+            fileSizeBytes = 0
+            tags = @()
+            status = "todo|wip|review|done"
+            source = "original|fab|marketplace|custom|unknown"
+            license = "original|CC0|CC-BY|CC-BY-SA|proprietary|unknown"
+            notes = ""
+        }
+    }
+}

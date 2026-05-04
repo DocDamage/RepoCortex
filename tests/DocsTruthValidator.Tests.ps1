@@ -50,8 +50,8 @@ BeforeAll {
             $_.Name -notlike '*.Tests.ps1' -and
             ($_.Name.EndsWith('Parser.ps1') -or $_.Name.EndsWith('Extractor.ps1'))
         }).Count
-    $script:ExpectedGoldenTasks = (Select-String -Path (Join-Path $script:ProjectRoot 'module\LLMWorkflow\governance\GoldenTaskDefinitions.ps1') -Pattern '-TaskId "gt-').Count
-    $script:ExpectedMcpTools = 55
+    $script:ExpectedGoldenTasks = @(Select-String -Path (Join-Path $script:ProjectRoot 'module\LLMWorkflow\contexts\Governance\internal\Get-Predefined*Tasks.ps1') -Pattern '-TaskId "gt-').Count
+    $script:ExpectedMcpTools = 38
 }
 
 Describe 'validate-docs-truth.ps1' {

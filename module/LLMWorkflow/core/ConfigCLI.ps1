@@ -389,7 +389,7 @@ function Register-LLMConfigAlias {
     $functionName = 'Invoke-LLMConfig'
 
     # Remove existing alias if present
-    if (Get-Alias -Name $aliasName -ErrorAction SilentlyContinue) {
+    if (Get-Alias -Name $aliasName -ErrorAction Ignore) {
         Remove-Alias -Name $aliasName -Force
     }
 

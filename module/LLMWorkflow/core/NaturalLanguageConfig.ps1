@@ -14,8 +14,11 @@
     Confidence threshold for auto-acceptance: 0.7
 #>
 
-Import-Module (Join-Path $script:ModulePath 'ConfigSchema.ps1') -Force -ErrorAction SilentlyContinue
-Import-Module (Join-Path $script:ModulePath 'ConfigPath.ps1') -Force -ErrorAction SilentlyContinue
+# Dot-source essential dependencies (loaded by module loader in correct order)
+$schemaPath = Join-Path $script:ModulePath 'ConfigSchema.ps1'
+$pathUtilPath = Join-Path $script:ModulePath 'ConfigPath.ps1'
+if (Test-Path -LiteralPath $schemaPath) { . $schemaPath }
+if (Test-Path -LiteralPath $pathUtilPath) { . $pathUtilPath }
 
 Set-StrictMode -Version Latest
 

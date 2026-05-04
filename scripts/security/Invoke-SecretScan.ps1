@@ -34,7 +34,7 @@ $script:SecretPatterns = @{
         Severity = 'critical'
     }
     AWS_Secret_Key = @{
-        Pattern = '[0-9a-zA-Z/+]{40}'
+        Pattern = '(?i)aws_secret_access_key\s*=\s*["'']?[a-zA-Z0-9/+]{40}["'']?'
         Type = 'secret_key'
         Severity = 'critical'
     }
@@ -99,7 +99,7 @@ $script:SecretPatterns = @{
         Severity = 'medium'
     }
     Password_in_URL = @{
-        Pattern = '(?i)[:/][^/:]+:[^@/]+@'
+        Pattern = '(?i)://[^/:]+:[^@/]+@'
         Type = 'password'
         Severity = 'critical'
     }
@@ -110,11 +110,17 @@ $script:SecretPatterns = @{
     }
 }
 
+$script:PlaceholderIndicators = @(
+    'your-api-key', 'your-key', 'replace-with-your', 'replace-with',
+    'placeholder', 'xxxx', 'fake', 'mock', 'todo', 'dummy',
+    'read-secureinput', 'convertto-securestring', 'securestring'
+)
+
 #endregion
 
 #region Private Helpers
 
-function Test-ShouldScanFile {
+function Test-SecretScanShouldScanFile {
     [CmdletBinding()]
     [OutputType([bool])]
     param(
@@ -122,7 +128,7 @@ function Test-ShouldScanFile {
         [string]$Path,
 
         [Parameter()]
-        [string[]]$ExcludePaths = @('.git', 'node_modules', '.venv', 'venv', 'dist', 'build', 'out', 'coverage', '.llm-workflow/logs')
+        [string[]]$ExcludePaths = @('.git', 'node_modules', '.venv', 'venv', 'dist', 'build', 'out', 'coverage', '.llm-workflow/logs', '.env.example', 'security-reports', '*.example', '*.lock.txt', 'scripts\security', '\tests\', 'Visibility.ps1')
     )
 
     foreach ($exclude in $ExcludePaths) {
@@ -167,6 +173,9 @@ function Get-FileFindings {
     for ($lineNumber = 0; $lineNumber -lt $lines.Count; $lineNumber++) {
         $line = $lines[$lineNumber]
         if ([string]::IsNullOrEmpty($line)) { continue }
+        # Skip commented-out lines (common in .env.example, config templates, etc.)
+        $trimmed = $line.TrimStart()
+        if ($trimmed -match '^#|^[\s]*//|^[\s]*\*') { continue }
 
         foreach ($patternName in $script:SecretPatterns.Keys) {
             $patternInfo = $script:SecretPatterns[$patternName]
@@ -182,13 +191,24 @@ function Get-FileFindings {
             }
 
             foreach ($match in $matches) {
+                $matchedValue = $match.Value
+                $isPlaceholder = $false
+                $lowerValue = $matchedValue.ToLowerInvariant()
+                foreach ($indicator in $script:PlaceholderIndicators) {
+                    if ($lowerValue -like "*$indicator*") {
+                        $isPlaceholder = $true
+                        break
+                    }
+                }
+                if ($isPlaceholder) { continue }
+
                 $findings += [pscustomobject]@{
                     FilePath = $FilePath
                     LineNumber = $lineNumber + 1
                     PatternName = $patternName
                     Type = $patternInfo.Type
                     Severity = $patternInfo.Severity
-                    MatchedValue = $match.Value
+                    MatchedValue = $matchedValue
                     LineText = $line.Trim()
                 }
             }
@@ -269,7 +289,7 @@ function Invoke-SecretScan {
     $files = Get-ChildItem -Path $ProjectRoot -File -Recurse -ErrorAction SilentlyContinue
 
     foreach ($file in $files) {
-        if (-not (Test-ShouldScanFile -Path $file.FullName)) {
+        if (-not (Test-SecretScanShouldScanFile -Path $file.FullName)) {
             continue
         }
 

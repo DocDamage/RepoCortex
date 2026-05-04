@@ -120,7 +120,7 @@ function Write-PackAccessLog {
     }
     
     $logPath = Join-Path $logDir 'pack-access.log'
-    $logEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $logPath -Encoding UTF8 -ErrorAction SilentlyContinue
+    $logEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $logPath -Encoding UTF8 -ErrorAction Ignore
 }
 
 #endregion

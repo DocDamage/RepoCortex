@@ -1,0 +1,32 @@
+@{
+    Files = @(
+        'internal/_Constants.ps1'
+        'internal/_Helpers.ps1'
+        'internal/_Reporting.ps1'
+        'internal/_Execution.ps1'
+        'internal/Extract-ResponseProperties.ps1'
+        'internal/Get-PredefinedRPGMakerTasks.ps1'
+        'internal/Get-PredefinedGodotTasks.ps1'
+        'internal/Get-PredefinedBlenderTasks.ps1'
+        'internal/Get-PredefinedApiReverseTasks.ps1'
+        'internal/Get-PredefinedNotebookDataTasks.ps1'
+        'internal/Get-PredefinedAgentSimTasks.ps1'
+        'api/New-GoldenTask.ps1'
+        'api/Test-PropertyBasedExpectation.ps1'
+        'api/Test-GoldenTaskResult.ps1'
+        'api/Invoke-GoldenTask.ps1'
+        'api/Get-GoldenTaskScore.ps1'
+        'api/Export-GoldenTaskReport.ps1'
+        'api/Invoke-PackGoldenTasks.ps1'
+        'api/Get-GoldenTaskResults.ps1'
+        'api/New-GoldenTaskSuite.ps1'
+        'api/Export-GoldenTaskSuite.ps1'
+        'api/Import-GoldenTaskSuite.ps1'
+        'api/Export-GoldenTaskResults.ps1'
+        'api/Get-GoldenTaskMetrics.ps1'
+        'api/Invoke-GoldenTaskSuite.ps1'
+        'api/Compare-GoldenTaskRuns.ps1'
+        'api/Get-PredefinedGoldenTasks.ps1'
+    )
+    DependsOn = @('_shared', 'Workflow', 'Retrieval')
+}

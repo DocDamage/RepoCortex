@@ -57,7 +57,7 @@ echo "[llm-workflow] Setting up PowerShell module..."
 
 MODULE_BASE="/root/.local/share/powershell/Modules"
 MODULE_NAME="LLMWorkflow"
-MODULE_VERSION="0.2.0"
+MODULE_VERSION="0.9.6"
 MODULE_PATH="$MODULE_BASE/$MODULE_NAME/$MODULE_VERSION"
 
 if [ -d "$MODULE_PATH" ]; then

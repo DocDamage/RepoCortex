@@ -112,7 +112,7 @@ function Get-LockDirectory {
         [string]$ProjectRoot = "."
     )
 
-    $resolvedRoot = Resolve-Path -Path $ProjectRoot -ErrorAction SilentlyContinue
+    $resolvedRoot = Resolve-Path -Path $ProjectRoot -ErrorAction Ignore
     if (-not $resolvedRoot) {
         $resolvedRoot = $ProjectRoot
     }
@@ -363,7 +363,7 @@ function Lock-File {
             try {
                 if (Test-Path -LiteralPath $lockPath) {
                     # Lock was recreated by another process, retry
-                    Remove-Item -LiteralPath $tempLockPath -Force -ErrorAction SilentlyContinue
+                    Remove-Item -LiteralPath $tempLockPath -Force -ErrorAction Stop
                     Write-Verbose "[FileLock] Lock file appeared during creation, retrying"
                     Start-Sleep -Milliseconds 50
                     continue
@@ -375,7 +375,7 @@ function Lock-File {
             catch [System.IO.IOException] {
                 # Another process got there first
                 if (Test-Path -LiteralPath $tempLockPath) {
-                    Remove-Item -LiteralPath $tempLockPath -Force -ErrorAction SilentlyContinue
+                    Remove-Item -LiteralPath $tempLockPath -Force -ErrorAction Stop
                 }
                 
                 if ($TimeoutSeconds -eq 0) {
@@ -394,7 +394,7 @@ function Lock-File {
         catch {
             # Clean up temp file if it exists
             if (-not [string]::IsNullOrWhiteSpace($tempLockPath) -and (Test-Path -LiteralPath $tempLockPath)) {
-                Remove-Item -LiteralPath $tempLockPath -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath $tempLockPath -Force -ErrorAction Stop
             }
             
             if ($_.Exception -is [System.IO.IOException] -and $_.Exception.Message -like "*Cannot create a file*") {
@@ -1051,7 +1051,7 @@ function Send-LockHeartbeat {
         
         # Atomic replace
         [System.IO.File]::Replace($tempPath, $lockPath, "$lockPath.bak")
-        Remove-Item -LiteralPath "$lockPath.bak" -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath "$lockPath.bak" -Force -ErrorAction Stop
         
         Write-Verbose "[FileLock] Heartbeat sent for lock '$Name'"
         return $true
