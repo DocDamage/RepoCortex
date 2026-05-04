@@ -14,7 +14,11 @@ ENV PYTHON_VERSION=3.11.4 `
 USER ContainerAdministrator
 RUN powershell -Command `
     $ErrorActionPreference = 'Stop'; `
-    Invoke-WebRequest -Uri "https://www.python.org/ftp/python/$env:PYTHON_VERSION/python-$env:PYTHON_VERSION-amd64.exe" -OutFile "python-installer.exe"; `
+    $url = "https://www.python.org/ftp/python/$env:PYTHON_VERSION/python-$env:PYTHON_VERSION-amd64.exe"; `
+    Invoke-WebRequest -Uri $url -OutFile "python-installer.exe"; `
+    $expectedHash = '47be821c0f1825d90fc40f83a3ee3d3a691a3e16c8e21ac0cd56371362aaad50'; `
+    $actualHash = (Get-FileHash -Algorithm SHA256 -Path "python-installer.exe").Hash; `
+    if ($actualHash -ne $expectedHash) { throw "SHA256 mismatch for Python installer: expected $expectedHash, got $actualHash" }; `
     Start-Process -FilePath "python-installer.exe" -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1" -Wait; `
     Remove-Item -Force "python-installer.exe"; `
     python -m pip install --upgrade pip setuptools wheel
@@ -22,8 +26,10 @@ RUN powershell -Command `
 # Stage 2: Install Python dependencies
 FROM base AS python-deps
 
-# Install chromadb and codemunch-pro
-RUN python -m pip install chromadb>=0.5.0 codemunch-pro
+COPY requirements.lock.txt C:/tmp/requirements.lock.txt
+
+# Install from lock file with hash verification
+RUN python -m pip install -r C:/tmp/requirements.lock.txt --require-hashes
 
 # Verify installations
 RUN python -c "import chromadb; print('ChromaDB:', chromadb.__version__)" && `
@@ -49,13 +55,15 @@ COPY module/ C:/llm-workflow/module/
 COPY tools/ C:/llm-workflow/tools/
 COPY docker/ C:/llm-workflow/docker/
 
-# Install PowerShell module
+# Install PowerShell module (dynamically resolve version from manifest)
 RUN pwsh -NoProfile -Command `
-    "$ModulePath = 'C:\\Users\\ContainerAdministrator\\Documents\\PowerShell\\Modules\\LLMWorkflow\\0.2.0'; `
+    "$manifest = Import-PowerShellDataFile 'C:\\llm-workflow\\module\\LLMWorkflow\\LLMWorkflow.psd1'; `
+    $moduleVersion = $manifest.ModuleVersion; `
+    $ModulePath = 'C:\\Users\\ContainerAdministrator\\Documents\\PowerShell\\Modules\\LLMWorkflow\\' + $moduleVersion; `
     New-Item -ItemType Directory -Path $ModulePath -Force | Out-Null; `
     Copy-Item -Path 'C:\\llm-workflow\\module\\LLMWorkflow\\*' -Destination $ModulePath -Recurse -Force; `
     Import-Module LLMWorkflow -Force; `
-    Write-Host 'Module installed'"
+    Write-Host \"Module v$moduleVersion installed\""
 
 # Copy entrypoint script
 COPY docker/entrypoint.ps1 C:/llm-workflow/entrypoint.ps1
@@ -75,5 +83,5 @@ CMD ["llmup"]
 # Labels
 LABEL org.opencontainers.image.title="LLM Workflow Toolkit (Windows)" `
       org.opencontainers.image.description="All-in-one workflow toolkit for Windows containers" `
-      org.opencontainers.image.version="0.2.0" `
+      org.opencontainers.image.version="0.9.6" `
       org.opencontainers.image.source="https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one"

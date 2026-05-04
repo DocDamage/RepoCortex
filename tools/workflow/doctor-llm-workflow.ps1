@@ -32,9 +32,12 @@ function Import-EnvFile {
     [CmdletBinding()]
     param([string]$Path)
 
+    $secrets = @{}
     if (-not (Test-Path -LiteralPath $Path)) {
-        return
+        return $secrets
     }
+
+    $sensitiveKeyPatterns = @('KEY', 'SECRET', 'TOKEN', 'PASSWORD', 'API_KEY')
 
     foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
         $line = $rawLine.Trim()
@@ -52,9 +55,22 @@ function Import-EnvFile {
                     $value = $value.Substring(1, $value.Length - 2)
                 }
             }
+            $isSensitive = $false
+            foreach ($pattern in $sensitiveKeyPatterns) {
+                if ($name -match $pattern) {
+                    $isSensitive = $true
+                    break
+                }
+            }
+            if ($isSensitive) {
+                $secrets[$name] = $value
+                Write-Verbose "Skipping process-scoped env var for sensitive key: $name"
+                continue
+            }
             [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
         }
     }
+    return $secrets
 }
 
 function Test-PythonImport {
@@ -285,8 +301,11 @@ function Test-ProviderKey {
 }
 
 $projectPath = (Resolve-Path -LiteralPath $ProjectRoot).Path
-Import-EnvFile -Path (Join-Path $projectPath ".env")
-Import-EnvFile -Path (Join-Path $projectPath ".contextlattice" "orchestrator.env")
+$script:DoctorEnvSecrets = @{}
+$envFileSecrets = Import-EnvFile -Path (Join-Path $projectPath ".env")
+foreach ($kvp in $envFileSecrets.GetEnumerator()) { $script:DoctorEnvSecrets[$kvp.Key] = $kvp.Value }
+$orchSecrets = Import-EnvFile -Path (Join-Path $projectPath ".contextlattice" "orchestrator.env")
+foreach ($kvp in $orchSecrets.GetEnumerator()) { $script:DoctorEnvSecrets[$kvp.Key] = $kvp.Value }
 
 $checks = New-Object System.Collections.Generic.List[object]
 
@@ -415,7 +434,8 @@ if ($null -eq $providerResolved) {
 }
 
 $ctxUrl = $env:CONTEXTLATTICE_ORCHESTRATOR_URL
-$ctxKeySet = -not [string]::IsNullOrWhiteSpace($env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY)
+$ctxKey = if ($script:DoctorEnvSecrets.ContainsKey('CONTEXTLATTICE_ORCHESTRATOR_API_KEY')) { $script:DoctorEnvSecrets['CONTEXTLATTICE_ORCHESTRATOR_API_KEY'] } else { $null }
+$ctxKeySet = -not [string]::IsNullOrWhiteSpace($ctxKey)
 $checks.Add([pscustomobject]@{
     Name = "contextlattice_env"
     Ok = (-not [string]::IsNullOrWhiteSpace($ctxUrl)) -and $ctxKeySet
@@ -459,7 +479,8 @@ if ($CheckContext) {
         $statusOk = $false
         $statusDetail = ""
         try {
-            $headers = @{ "x-api-key" = $env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY }
+            $ctxApiKey = if ($script:DoctorEnvSecrets.ContainsKey('CONTEXTLATTICE_ORCHESTRATOR_API_KEY')) { $script:DoctorEnvSecrets['CONTEXTLATTICE_ORCHESTRATOR_API_KEY'] } else { $null }
+            $headers = @{ "x-api-key" = $ctxApiKey }
             $status = Invoke-RestMethod -Method Get -Uri "$base/status" -Headers $headers -TimeoutSec $TimeoutSec
             $statusStopwatch.Stop()
             $statusOk = $true

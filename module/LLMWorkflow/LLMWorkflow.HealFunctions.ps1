@@ -7,8 +7,8 @@ Set-StrictMode -Version Latest
 # Configuration and Constants
 #===============================================================================
 
-$script:HealHistoryPath = Join-Path $HOME ".llm-workflow" "heal-history.jsonl"
-$script:HealLogPath = Join-Path $HOME ".llm-workflow" "heal-log.txt"
+$script:HealHistoryPath = Join-Path (Join-Path $HOME ".llm-workflow") "heal-history.jsonl"
+$script:HealLogPath = Join-Path (Join-Path $HOME ".llm-workflow") "heal-log.txt"
 $script:MaxHistoryEntries = 1000
 
 # Issue categories
@@ -28,12 +28,8 @@ enum IssueType {
     TemplateDrift
     MissingContextLatticeApiKey
     MissingContextLatticeUrl
-    InvalidProviderConfig
-    MissingCodeMunch
     MissingBridgeConfig
     CorruptedBridgeConfig
-    PythonModuleMissing
-    EnvFileIncomplete
 }
 
 #===============================================================================
@@ -405,11 +401,12 @@ function Find-PythonInstallation {
     # Common Windows Python locations
     $isWindowsPlatform = ($PSVersionTable.PSVersion.Major -ge 6 -and $IsWindows) -or ($PSVersionTable.PSVersion.Major -lt 6 -and $env:OS -eq 'Windows_NT')
     if ($isWindowsPlatform) {
+        $systemDrive = if ($env:SystemDrive) { $env:SystemDrive } else { 'C:' }
         # Search common install roots via environment variables and wildcards
         $searchRoots = @(
             (Join-Path $env:ProgramFiles 'Python*'),
             (Join-Path ${env:ProgramFiles(x86)} 'Python*'),
-            'C:\Python*'
+            (Join-Path $systemDrive 'Python*')
         ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 
         foreach ($rootPattern in $searchRoots) {
@@ -433,13 +430,13 @@ function Find-PythonInstallation {
         }
         
         # Microsoft Store Python
-        $storePath = "$env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe"
+        $storePath = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\python.exe'
         if (Test-Path $storePath) {
             $possiblePaths += $storePath
         }
         
         # Py launcher (use WINDIR/SystemRoot instead of hardcoded C:\Windows)
-        $windowsDir = if ($env:SystemRoot) { $env:SystemRoot } elseif ($env:WINDIR) { $env:WINDIR } else { 'C:\Windows' }
+        $windowsDir = if ($env:SystemRoot) { $env:SystemRoot } elseif ($env:WINDIR) { $env:WINDIR } else { Join-Path $systemDrive 'Windows' }
         $pyPath = Join-Path $windowsDir 'py.exe'
         if (Test-Path $pyPath) {
             $possiblePaths += $pyPath
@@ -509,19 +506,22 @@ function Read-SecureInput {
     Write-Host $Prompt -NoNewline
     $secure = Read-Host -AsSecureString
     
-    # PSCore 7+ cross-platform plain-text conversion (avoids deprecated Marshal APIs on Linux/macOS)
+    # PowerShell 7+ cross-platform plain-text conversion
     if ($PSVersionTable.PSVersion.Major -ge 7) {
         return (ConvertFrom-SecureString -AsPlainText $secure)
     }
     
-    # Windows PowerShell 5.1 fallback using BSTR (Windows-only, safe on this platform)
-    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
-    try {
-        $plain = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-        return $plain
-    } finally {
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+    # Windows PowerShell 5.1 fallback using BSTR (Windows-only)
+    if ($PSVersionTable.PSVersion.Major -lt 6 -and $env:OS -eq 'Windows_NT') {
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+        try {
+            return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+        } finally {
+            [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+        }
     }
+    
+    throw "SecureString plaintext conversion requires PowerShell 7+ on non-Windows platforms."
 }
 
 function Invoke-WhatIfMessage {
@@ -722,7 +722,8 @@ function Test-LLMWorkflowIssue {
                 $envContent = Get-Content -LiteralPath $envFile -Raw
                 $hasKeyInEnv = $envContent -match "CONTEXTLATTICE_ORCHESTRATOR_API_KEY\s*="
             }
-            $detected = [string]::IsNullOrWhiteSpace($key) -and -not $hasKeyInEnv
+            $hasKeyInScriptScope = $null -ne $script:LLMWorkflowContextLatticeApiKey
+            $detected = [string]::IsNullOrWhiteSpace($key) -and -not $hasKeyInEnv -and -not $hasKeyInScriptScope
             return @{
                 Detected = $detected
                 Category = [IssueCategory]::CRITICAL
@@ -730,6 +731,7 @@ function Test-LLMWorkflowIssue {
                 Details = @{ 
                     InEnvironment = -not [string]::IsNullOrWhiteSpace($key)
                     InEnvFile = $hasKeyInEnv
+                    InScriptScope = $hasKeyInScriptScope
                 }
                 CanFix = $detected
                 FixDescription = "Prompt for API key with masking"
@@ -738,12 +740,18 @@ function Test-LLMWorkflowIssue {
         
         "MissingContextLatticeUrl" {
             $url = [Environment]::GetEnvironmentVariable("CONTEXTLATTICE_ORCHESTRATOR_URL")
-            $detected = [string]::IsNullOrWhiteSpace($url)
+            $envFile = Join-Path $projectPath ".env"
+            $hasUrlInEnv = $false
+            if (Test-Path -LiteralPath $envFile) {
+                $envContent = Get-Content -LiteralPath $envFile -Raw
+                $hasUrlInEnv = $envContent -match "CONTEXTLATTICE_ORCHESTRATOR_URL\s*="
+            }
+            $detected = [string]::IsNullOrWhiteSpace($url) -and -not $hasUrlInEnv
             return @{
                 Detected = $detected
                 Category = [IssueCategory]::WARNING
                 Message = if ($detected) { "ContextLattice URL not configured (will use default)" } else { "ContextLattice URL: $url" }
-                Details = @{ CurrentValue = $url }
+                Details = @{ CurrentValue = $url; InEnvFile = $hasUrlInEnv }
                 CanFix = $detected
                 FixDescription = "Set default ContextLattice URL"
             }
@@ -897,8 +905,13 @@ function Repair-LLMWorkflowIssue {
                         
                         # Add to PATH for current session
                         $pythonDir = Split-Path -Parent $selected.Path
-                        $env:PATH = "$pythonDir;$env:PATH"
-                        $changes += "Added Python directory to PATH for current session"
+                        $pathEntries = $env:PATH -split [System.IO.Path]::PathSeparator
+                        if ($pathEntries -notcontains $pythonDir) {
+                            $env:PATH = "$pythonDir$([System.IO.Path]::PathSeparator)$env:PATH"
+                            $changes += "Added Python directory to PATH for current session"
+                        } else {
+                            $changes += "Python directory already in PATH"
+                        }
                         
                         # Suggest permanent addition
                         if ($Interactive -and -not $Force) {
@@ -921,7 +934,10 @@ function Repair-LLMWorkflowIssue {
                             if ($choice -match '^\d+$' -and [int]$choice -lt $foundPythons.Count) {
                                 $selected = $foundPythons[[int]$choice]
                                 $pythonDir = Split-Path -Parent $selected.Path
-                                $env:PATH = "$pythonDir;$env:PATH"
+                                $pathEntries = $env:PATH -split [System.IO.Path]::PathSeparator
+                                if ($pathEntries -notcontains $pythonDir) {
+                                    $env:PATH = "$pythonDir$([System.IO.Path]::PathSeparator)$env:PATH"
+                                }
                                 $changes += "Selected and configured: $($selected.Path)"
                                 $success = $true
                                 $message = "Configured Python: $($selected.Path)"
@@ -933,7 +949,10 @@ function Repair-LLMWorkflowIssue {
                             # Auto-select first one
                             $selected = $foundPythons[0]
                             $pythonDir = Split-Path -Parent $selected.Path
-                            $env:PATH = "$pythonDir;$env:PATH"
+                            $pathEntries = $env:PATH -split [System.IO.Path]::PathSeparator
+                            if ($pathEntries -notcontains $pythonDir) {
+                                $env:PATH = "$pythonDir$([System.IO.Path]::PathSeparator)$env:PATH"
+                            }
                             $changes += "Auto-selected: $($selected.Path)"
                             $success = $true
                             $message = "Configured Python: $($selected.Path)"
@@ -1143,7 +1162,7 @@ except Exception as e:
                             # on the same machine, creating a credential leakage surface.
                             if ($apiKey -ne "your-api-key-here") {
                                 # Store in module script scope only - not leaked to process env
-                                $global:LLMWorkflowContextLatticeApiKey = $apiKey
+                                $script:LLMWorkflowContextLatticeApiKey = ConvertTo-SecureString -String $apiKey -AsPlainText -Force
                                 $changes += "Stored API key in module config"
                             } else {
                                 $changes += "Configured placeholder API key for non-interactive force mode"
@@ -1197,8 +1216,7 @@ except Exception as e:
                     $message = "Would set default URL (WhatIf mode)"
                 } else {
                     $defaultUrl = "http://127.0.0.1:8075"
-                    $env:CONTEXTLATTICE_ORCHESTRATOR_URL = $defaultUrl
-                    $changes += "Set default URL in current session: $defaultUrl"
+                    $changes += "Using default URL: $defaultUrl"
                     
                     # Also add to .env
                     $envPath = Join-Path $projectPath ".env"
@@ -1300,6 +1318,7 @@ except Exception as e:
         $message = "Exception during repair: $($_.Exception.Message)"
         $changes += "Error: $($_.Exception.Message)"
         Write-HealLog -Message "Exception repairing $IssueType`: $($_.Exception.Message)" -Level "ERROR"
+        throw
     }
     
     return @{
@@ -1737,17 +1756,4 @@ function Invoke-LLMWorkflowHeal {
     }
 }
 
-#===============================================================================
-# Export Module Members
-#===============================================================================
 
-if ($ExecutionContext.SessionState.Module) {
-    Export-ModuleMember -Function @(
-        'Invoke-LLMWorkflowHeal',
-        'Test-LLMWorkflowIssue',
-        'Repair-LLMWorkflowIssue',
-        'Get-LLMWorkflowRepairHistory',
-        'Clear-LLMWorkflowRepairHistory',
-        'Export-LLMWorkflowRepairHistory'
-    )
-}

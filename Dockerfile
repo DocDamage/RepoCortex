@@ -3,7 +3,7 @@
 # Supports: PowerShell + Python 3.10+ + ChromaDB + codemunch-pro
 
 # Stage 1: Base image with PowerShell
-FROM mcr.microsoft.com/powershell:latest AS base
+FROM mcr.microsoft.com/powershell:lts-7.4-ubuntu-22.04 AS base
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -31,9 +31,11 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 # Stage 2: Install Python dependencies
 FROM base AS python-deps
 
-# Install chromadb and codemunch-pro
+COPY requirements.lock.txt /tmp/requirements.lock.txt
+
+# Install from lock file with hash verification
 RUN python -m pip install --upgrade pip setuptools wheel && \
-    python -m pip install chromadb>=0.5.0 codemunch-pro
+    python -m pip install -r /tmp/requirements.lock.txt --require-hashes
 
 # Verify installations
 RUN python -c "import chromadb; print('ChromaDB version:', chromadb.__version__)" && \
@@ -42,8 +44,8 @@ RUN python -c "import chromadb; print('ChromaDB version:', chromadb.__version__)
 # Stage 3: Final image
 FROM base AS final
 
-# Copy Python packages from python-deps stage
-COPY --from=python-deps /usr/local/lib/python3.*/dist-packages /usr/local/lib/python3/dist-packages
+# Copy Python packages from python-deps stage (explicit Python 3.10 path)
+COPY --from=python-deps /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 COPY --from=python-deps /usr/local/bin /usr/local/bin
 
 # Create working directories
@@ -58,7 +60,7 @@ COPY tools/ /opt/llm-workflow/tools/
 COPY docker/ /opt/llm-workflow/docker/
 
 # Install PowerShell module (dynamically detect version from manifest)
-RUN pwsh -NoProfile -Command "\\
+RUN pwsh -NoProfile -Command "\
     \$manifestPath = '/opt/llm-workflow/module/LLMWorkflow/LLMWorkflow.psd1'; \
     \$manifest = Import-PowerShellDataFile -Path \$manifestPath; \
     \$moduleVersion = \$manifest.ModuleVersion; \

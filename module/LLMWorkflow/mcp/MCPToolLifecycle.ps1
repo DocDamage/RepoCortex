@@ -386,7 +386,17 @@ function Invoke-MCPToolRegistrySync {
         $null = New-Item -ItemType Directory -Path $dir -Force
     }
 
-    $payload | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $Path -Encoding UTF8
+    $tempPath = "$Path.tmp"
+    try {
+        $payload | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $tempPath -Encoding UTF8
+        Move-Item -LiteralPath $tempPath -Destination $Path -Force
+    }
+    catch {
+        if (Test-Path -LiteralPath $tempPath) {
+            Remove-Item -LiteralPath $tempPath -Force -ErrorAction SilentlyContinue
+        }
+        throw
+    }
 
     $script:MCPToolRegistry = $Registry
 

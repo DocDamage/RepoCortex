@@ -107,9 +107,8 @@ def _append_history(history_path: str, entry: dict[str, Any], max_entries: int) 
                 lines = lines[-max_entries:]
                 with open(history_path, "w", encoding="utf-8") as f:
                     f.writelines(lines)
-        except Exception:
-            # Ignore errors when trimming history
-            pass
+        except Exception as exc:
+            print(f"[warning] Failed to trim history file: {exc}", file=sys.stderr)
 
 
 def _compute_memory_id(memory: dict[str, Any]) -> str:
@@ -211,7 +210,7 @@ def main() -> int:
         args.orchestrator_url,
         _as_text(config.get("orchestratorUrl")),
         os.environ.get("CONTEXTLATTICE_ORCHESTRATOR_URL", ""),
-        "http://127.0.0.1:8075",
+        "https://127.0.0.1:8075",
     ).rstrip("/")
     palace_path = os.path.expanduser(
         _resolve(
@@ -229,6 +228,10 @@ def main() -> int:
         "",
         "mempalace_drawers",
     )
+
+    if orchestrator_url.startswith("http://") and api_key:
+        print(json.dumps({"error": "HTTP URLs are not allowed when an API key is present. Use HTTPS."}))
+        return 2
 
     if not args.dry_run and not api_key:
         print(json.dumps({"error": f"Missing API key. Set --api-key or env var {api_key_env_var}."}))

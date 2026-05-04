@@ -278,14 +278,15 @@ function Invoke-StartCommand {
 
             # Start the server
             $process = $null
+            $binary = $config.ProcessName
             if ($target -eq 'gateway') {
-                $process = Start-Process -FilePath "pwsh" `
+                $process = Start-Process -FilePath $binary `
                                          -ArgumentList @("-File", $scriptPath, "-Transport", "http", "-Port", $config.DefaultPort) `
                                          -WindowStyle Hidden `
                                          -PassThru
             }
             else {
-                $process = Start-Process -FilePath "pwsh" `
+                $process = Start-Process -FilePath $binary `
                                          -ArgumentList @("-File", $scriptPath, "-Mode", "http", "-Port", $config.DefaultPort) `
                                          -WindowStyle Hidden `
                                          -PassThru

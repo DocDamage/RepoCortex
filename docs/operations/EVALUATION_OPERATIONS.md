@@ -271,5 +271,5 @@ The following alerts are recommended for production operation:
 
 ## See Also
 
-- `docs/OBSERVABILITY_ARCHITECTURE.md` — Detailed architecture of the telemetry modules.
+- `docs/architecture/OBSERVABILITY_ARCHITECTURE.md` — Detailed architecture of the telemetry modules.
 - `tests/Telemetry.Tests.ps1` — Pester tests for span and envelope correctness.

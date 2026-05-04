@@ -11,17 +11,6 @@ BeforeAll {
     $script:ModulePath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\Journal.ps1'
     $script:RunIdPath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\RunId.ps1'
 
-    if (-not (Get-Command Test-RunIdFormat -ErrorAction SilentlyContinue)) {
-        if (Test-Path $script:RunIdPath) {
-            try { . $script:RunIdPath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }
-        }
-    }
-    if (-not (Get-Command Test-RunIdFormat -ErrorAction SilentlyContinue)) {
-        function Test-RunIdFormat { param([string]$RunId) return $RunId -match '^\d{8}T\d{6}Z-[0-9a-f]{4}$' }
-        function New-RunId { return '20260101T000000Z-0001' }
-        function Get-CurrentRunId { return '20260101T000000Z-0001' }
-    }
-
     if (Test-Path $script:ModulePath) {
         try { . $script:ModulePath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }
     }

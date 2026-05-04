@@ -468,13 +468,19 @@ function Invoke-GitFetch {
     try {
         Invoke-RateLimit -SourceType 'git'
 
-        # Configure credentials if provided
-        $envBackup = @{}
+        # Configure credentials securely via temporary credential helper
+        $tempGitConfig = $null
+        $tempCredHelper = $null
         if ($Credentials.username -and $Credentials.password) {
-            $envBackup['GIT_USERNAME'] = $env:GIT_USERNAME
-            $envBackup['GIT_PASSWORD'] = $env:GIT_PASSWORD
-            $env:GIT_USERNAME = $Credentials.username
-            $env:GIT_PASSWORD = Unprotect-Credential -EncryptedData $Credentials.password
+            $gitPassword = Unprotect-Credential -EncryptedData $Credentials.password
+            $tempCredHelper = Join-Path ([System.IO.Path]::GetTempPath()) "git-cred-$(New-Guid).sh"
+            $credScript = "#!/bin/sh`necho username=$($Credentials.username)`necho password=$gitPassword"
+            Set-Content -LiteralPath $tempCredHelper -Value $credScript -Encoding UTF8 -NoNewline
+            if (-not $IsWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
+                chmod +x $tempCredHelper
+            }
+            $tempGitConfig = Join-Path ([System.IO.Path]::GetTempPath()) "git-config-$(New-Guid)"
+            Set-Content -LiteralPath $tempGitConfig -Value "[credential]`n    helper = $tempCredHelper`n" -Encoding UTF8 -NoNewline
         }
 
         # Build git arguments
@@ -502,15 +508,21 @@ function Invoke-GitFetch {
         $psi.RedirectStandardError = $true
         $psi.UseShellExecute = $false
         $psi.CreateNoWindow = $true
+        if ($tempGitConfig) {
+            $psi.EnvironmentVariables['GIT_CONFIG_GLOBAL'] = $tempGitConfig
+        }
 
         $process = [System.Diagnostics.Process]::Start($psi)
         $stdout = $process.StandardOutput.ReadToEnd()
         $stderr = $process.StandardError.ReadToEnd()
         $process.WaitForExit()
 
-        # Restore environment
-        foreach ($key in $envBackup.Keys) {
-            Set-Item "env:$key" $envBackup[$key]
+        # Clean up temporary credential files
+        if ($tempGitConfig -and (Test-Path -LiteralPath $tempGitConfig)) {
+            Remove-Item -LiteralPath $tempGitConfig -Force -ErrorAction SilentlyContinue
+        }
+        if ($tempCredHelper -and (Test-Path -LiteralPath $tempCredHelper)) {
+            Remove-Item -LiteralPath $tempCredHelper -Force -ErrorAction SilentlyContinue
         }
 
         if ($process.ExitCode -eq 0) {
@@ -764,24 +776,20 @@ function Invoke-S3Fetch {
         $null = New-Item -ItemType Directory -Path $tempDir -Force
         $awsArgs += $tempDir
 
-        # Add endpoint if specified
-        $envBackup = @{}
-        if ($Endpoint) {
-            $envBackup['AWS_ENDPOINT_URL'] = $env:AWS_ENDPOINT_URL
-            $env:AWS_ENDPOINT_URL = $Endpoint
-        }
-
-        # Add credentials if provided
+        # Build temporary AWS credentials file to avoid exposing secrets in environment variables
+        $tempAwsCreds = $null
         if ($Credentials.AccessKey -and $Credentials.SecretKey) {
-            $envBackup['AWS_ACCESS_KEY_ID'] = $env:AWS_ACCESS_KEY_ID
-            $envBackup['AWS_SECRET_ACCESS_KEY'] = $env:AWS_SECRET_ACCESS_KEY
-            $env:AWS_ACCESS_KEY_ID = $Credentials.AccessKey
-            $env:AWS_SECRET_ACCESS_KEY = Unprotect-Credential -EncryptedData $Credentials.SecretKey
-        }
-
-        if ($Region) {
-            $envBackup['AWS_DEFAULT_REGION'] = $env:AWS_DEFAULT_REGION
-            $env:AWS_DEFAULT_REGION = $Region
+            $awsSecret = Unprotect-Credential -EncryptedData $Credentials.SecretKey
+            $tempAwsCreds = Join-Path ([System.IO.Path]::GetTempPath()) "aws-creds-$(New-Guid)"
+            $credContent = @"
+[default]
+aws_access_key_id = $($Credentials.AccessKey)
+aws_secret_access_key = $awsSecret
+"@
+            if ($Region) {
+                $credContent += "`nregion = $Region`n"
+            }
+            Set-Content -LiteralPath $tempAwsCreds -Value $credContent -Encoding UTF8 -NoNewline
         }
 
         # Execute AWS CLI
@@ -792,20 +800,24 @@ function Invoke-S3Fetch {
         $psi.RedirectStandardError = $true
         $psi.UseShellExecute = $false
         $psi.CreateNoWindow = $true
+        if ($Endpoint) {
+            $psi.EnvironmentVariables['AWS_ENDPOINT_URL'] = $Endpoint
+        }
+        if ($Region) {
+            $psi.EnvironmentVariables['AWS_DEFAULT_REGION'] = $Region
+        }
+        if ($tempAwsCreds) {
+            $psi.EnvironmentVariables['AWS_SHARED_CREDENTIALS_FILE'] = $tempAwsCreds
+        }
 
         $process = [System.Diagnostics.Process]::Start($psi)
         $stdout = $process.StandardOutput.ReadToEnd()
         $stderr = $process.StandardError.ReadToEnd()
         $process.WaitForExit()
 
-        # Restore environment
-        foreach ($key in $envBackup.Keys) {
-            if ($envBackup[$key]) {
-                Set-Item "env:$key" $envBackup[$key]
-            }
-            else {
-                Remove-Item "env:$key" -ErrorAction SilentlyContinue
-            }
+        # Clean up temporary credentials file
+        if ($tempAwsCreds -and (Test-Path -LiteralPath $tempAwsCreds)) {
+            Remove-Item -LiteralPath $tempAwsCreds -Force -ErrorAction SilentlyContinue
         }
 
         if ($process.ExitCode -eq 0) {

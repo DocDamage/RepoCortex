@@ -91,8 +91,8 @@ jobs:
 
       - name: Test Python dependencies
         run: |
-          docker run --rm llm-workflow:test shell -c "python -c 'import chromadb; print(chromadb.__version__)'"
-          docker run --rm llm-workflow:test shell -c "codemunch-pro --version || true"
+          docker run --rm --entrypoint /bin/bash llm-workflow:test -c "python -c 'import chromadb; print(chromadb.__version__)'"
+          docker run --rm --entrypoint /bin/bash llm-workflow:test -c "codemunch-pro --version || true"
 
       - name: Test PowerShell module
         run: |

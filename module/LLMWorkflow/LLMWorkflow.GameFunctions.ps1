@@ -1226,7 +1226,4 @@ function Invoke-LLMWorkflowGameUp {
     }
 }
 
-# Export functions
-if ($null -ne $MyInvocation.MyCommand.Module) {
-    Export-ModuleMember -Function New-LLMWorkflowGamePreset, Get-LLMWorkflowGameTemplates, Export-LLMWorkflowAssetManifest, Invoke-LLMWorkflowGameUp
-}
+

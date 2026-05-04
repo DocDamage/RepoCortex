@@ -1,7 +1,7 @@
 # Technical Debt Audit Summary
 
 Canonical implementation-side audit summary for the current repository structure.
-This document is the concise planning companion to the detailed working audit in `../../deep_audit_results.txt`.
+This document is the concise planning companion to the detailed working audit.
 
 Audit date: `2026-04-14`
 
@@ -9,7 +9,7 @@ Audit date: `2026-04-14`
 - [Post-0.9.6 Strategic Execution Plan](./LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
 - [Implementation Progress](./PROGRESS.md)
 - [Remaining Work](./REMAINING_WORK.md)
-- [Detailed Working Audit](../../deep_audit_results.txt)
+- [Production Release Audit](../../../AAA_PRODUCTION_RELEASE_AUDIT_2026-05-03.md)
 
 ## Summary
 

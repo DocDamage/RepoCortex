@@ -9,6 +9,8 @@
 - [Remaining Work](../implementation/REMAINING_WORK.md)
 - [Documentation Truth Matrix](../reference/DOCS_TRUTH_MATRIX.md)
 
+**Last Updated:** 2026-05-03
+
 ## Release State Labels
 
 | Label | Meaning |

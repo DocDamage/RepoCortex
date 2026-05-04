@@ -26,16 +26,8 @@ BeforeAll {
 }
 
 AfterAll {
-    # Restore original storage path and clean up any created default workspace under real HOME
+    # Restore original storage path only; never delete real user data
     $script:WorkspaceStoragePath = $script:OriginalStoragePath
-    $realWorkspaceDir = Join-Path (Join-Path $HOME '.llm-workflow') 'workspaces'
-    if (Test-Path $realWorkspaceDir) {
-        Remove-Item -LiteralPath $realWorkspaceDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
-    $realLlmDir = Join-Path $HOME '.llm-workflow'
-    if (Test-Path $realLlmDir) {
-        Remove-Item -LiteralPath $realLlmDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
 }
 
 AfterEach {

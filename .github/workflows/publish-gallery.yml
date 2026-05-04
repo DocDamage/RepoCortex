@@ -42,7 +42,7 @@ jobs:
           Write-Output "Module version $moduleVersion validated."
 
       - name: Publish to PowerShell Gallery
-        if: ${{ secrets.PSGALLERY_API_KEY != '' }}
+        if: env.PSGALLERY_API_KEY != ''
         shell: powershell
         env:
           PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
@@ -51,7 +51,7 @@ jobs:
           Publish-Module -Path .\module\LLMWorkflow -NuGetApiKey $env:PSGALLERY_API_KEY -Repository PSGallery
 
       - name: Fail if API key is missing
-        if: ${{ secrets.PSGALLERY_API_KEY == '' }}
+        if: env.PSGALLERY_API_KEY == ''
         shell: powershell
         run: |
           throw "PSGALLERY_API_KEY secret is not set. Cannot publish module."

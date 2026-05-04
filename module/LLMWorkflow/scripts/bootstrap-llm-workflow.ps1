@@ -75,9 +75,12 @@ function Import-EnvFile {
     [CmdletBinding()]
     param([string]$Path)
 
+    $secrets = @{}
     if (-not (Test-Path -LiteralPath $Path)) {
-        return
+        return $secrets
     }
+
+    $sensitiveKeyPatterns = @('KEY', 'SECRET', 'TOKEN', 'PASSWORD', 'API_KEY')
 
     foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
         $line = $rawLine.Trim()
@@ -95,11 +98,24 @@ function Import-EnvFile {
                     $value = $value.Substring(1, $value.Length - 2)
                 }
             }
+            $isSensitive = $false
+            foreach ($pattern in $sensitiveKeyPatterns) {
+                if ($name -match $pattern) {
+                    $isSensitive = $true
+                    break
+                }
+            }
+            if ($isSensitive) {
+                $secrets[$name] = $value
+                Write-Verbose "Skipping process-scoped env var for sensitive key: $name"
+                continue
+            }
             [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
         }
     }
 
     Write-Step "Loaded env vars from $Path"
+    return $secrets
 }
 
 function Ensure-PythonImport {
@@ -182,11 +198,15 @@ Invoke-IfExists -ScriptPath $codemunchBootstrap -NamedArgs @{ ProjectRoot = $pro
 Invoke-IfExists -ScriptPath $contextBootstrap -NamedArgs @{ ProjectRoot = $projectPath }
 Invoke-IfExists -ScriptPath $memoryBootstrap -NamedArgs @{ ProjectRoot = $projectPath }
 
-Import-EnvFile -Path (Join-Path $projectPath ".env")
-Import-EnvFile -Path (Join-Path (Join-Path $projectPath ".contextlattice") "orchestrator.env")
+$script:BootstrapEnvSecrets = @{}
+$envFileSecrets = Import-EnvFile -Path (Join-Path $projectPath ".env")
+foreach ($kvp in $envFileSecrets.GetEnumerator()) { $script:BootstrapEnvSecrets[$kvp.Key] = $kvp.Value }
+$orchSecrets = Import-EnvFile -Path (Join-Path (Join-Path $projectPath ".contextlattice") "orchestrator.env")
+foreach ($kvp in $orchSecrets.GetEnumerator()) { $script:BootstrapEnvSecrets[$kvp.Key] = $kvp.Value }
 
 if (-not $SkipContextVerify) {
-    if (-not [string]::IsNullOrWhiteSpace($env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY)) {
+    $ctxApiKey = if ($script:BootstrapEnvSecrets.ContainsKey('CONTEXTLATTICE_ORCHESTRATOR_API_KEY')) { $script:BootstrapEnvSecrets['CONTEXTLATTICE_ORCHESTRATOR_API_KEY'] } else { $null }
+    if (-not [string]::IsNullOrWhiteSpace($ctxApiKey)) {
         $verifyArgs = @{}
         if ($SmokeTestContext) {
             $verifyArgs["SmokeTest"] = $true
@@ -201,7 +221,8 @@ if (-not $SkipContextVerify) {
 }
 
 if (-not $SkipBridgeDryRun) {
-    if (-not [string]::IsNullOrWhiteSpace($env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY)) {
+    $ctxApiKey = if ($script:BootstrapEnvSecrets.ContainsKey('CONTEXTLATTICE_ORCHESTRATOR_API_KEY')) { $script:BootstrapEnvSecrets['CONTEXTLATTICE_ORCHESTRATOR_API_KEY'] } else { $null }
+    if (-not [string]::IsNullOrWhiteSpace($ctxApiKey)) {
         Invoke-IfExists -ScriptPath $memorySync -NamedArgs @{ DryRun = $true }
     } else {
         Write-Warning "[llm-workflow] Skipping MemPalace bridge dry-run: CONTEXTLATTICE_ORCHESTRATOR_API_KEY is not set."

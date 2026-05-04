@@ -67,7 +67,13 @@ def _is_retryable_error(exc: Exception) -> bool:
     # Connection-related errors
     if isinstance(exc, OSError) and hasattr(exc, 'errno'):
         # ECONNREFUSED, ECONNRESET, ETIMEDOUT, etc.
-        if exc.errno in (54, 61, 60, 65):  # Connection reset, refused, timeout, no route
+        if exc.errno in (
+            errno.ECONNRESET,   # Connection reset
+            errno.ECONNREFUSED, # Connection refused
+            errno.ETIMEDOUT,    # Connection timed out
+            errno.EHOSTUNREACH, # No route to host
+            errno.ENETUNREACH,  # Network unreachable
+        ):
             return True
     return False
 
@@ -219,8 +225,8 @@ def _append_history(history_path: str, entry: dict[str, Any], max_entries: int) 
                 lines = lines[-max_entries:]
                 with open(history_path, "w", encoding="utf-8") as f:
                     f.writelines(lines)
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[warning] Failed to trim history file: {exc}", file=sys.stderr)
 
 
 def cosine_similarity(a: list[float], b: list[float]) -> float:

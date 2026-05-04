@@ -271,5 +271,5 @@ graph LR
 
 ## See Also
 
-- `docs/EVALUATION_OPERATIONS.md` — Linking evaluation events to traces and dashboards.
+- `docs/operations/EVALUATION_OPERATIONS.md` — Linking evaluation events to traces and dashboards.
 - `tests/Telemetry.Tests.ps1` — Pester test suite for the telemetry modules.

@@ -1,4 +1,4 @@
-Set-StrictMode -Version Latest
+﻿Set-StrictMode -Version Latest
 
 # Save the module root path for later use (PSScriptRoot changes when dot-sourcing)
 $script:ModuleRoot = $PSScriptRoot
@@ -29,7 +29,7 @@ $essentialFiles = @(
 $missingEssential = $essentialFiles | Where-Object {
     -not (Test-Path -LiteralPath (Join-Path $coreDir $_))
 }
-if ($missingEssential.Count -gt 0) {
+if (@($missingEssential).Count -gt 0) {
     Write-Warning "LLMWorkflow module: Missing $($missingEssential.Count) essential core file(s): $($missingEssential -join ', '). Module may load partially."
 }
 
@@ -81,6 +81,7 @@ foreach ($coreFile in $CoreFiles) {
     }
 }
 
+#===============================================================================
 # Source telemetry components (Workstream 2)
 Get-ChildItem -Path (Join-Path $script:ModuleRoot "telemetry") -Filter "*.ps1" -File | ForEach-Object {
     if (Test-PSVersionRequirement -FilePath $_.FullName) {
@@ -849,6 +850,52 @@ function Get-ProviderPreferenceOrder {
 
 <#
 .SYNOPSIS
+    Imports environment variables from a .env file, skipping sensitive keys.
+#>
+function Import-EnvFile {
+    [CmdletBinding()]
+    param([string]$Path)
+    
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    
+    # Sensitive key patterns that should NOT be set as process-scoped env vars
+    # to prevent credential leakage to child processes.
+    $sensitiveKeyPatterns = @(
+        '_API_KEY$', '_SECRET$', '_PASSWORD$', '_TOKEN$', '_CREDENTIAL$'
+    )
+    
+    foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
+        $line = $rawLine.Trim()
+        if ([string]::IsNullOrWhiteSpace($line)) { continue }
+        if ($line.StartsWith("#")) { continue }
+        if ($line -match "^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$") {
+            $name = $matches[1]
+            $value = $matches[2]
+            if ($value.Length -ge 2) {
+                if (($value.StartsWith("'") -and $value.EndsWith("'")) -or ($value.StartsWith('"') -and $value.EndsWith('"'))) {
+                    $value = $value.Substring(1, $value.Length - 2)
+                }
+            }
+            # Check if this is a sensitive variable - skip process-scoped setting
+            $isSensitive = $false
+            foreach ($pattern in $sensitiveKeyPatterns) {
+                if ($name -match $pattern) {
+                    $isSensitive = $true
+                    break
+                }
+            }
+            if ($isSensitive) {
+                # Store sensitive values in module scope only, not process env
+                Write-Verbose "Skipping process-scoped env var for sensitive key: $name"
+                continue
+            }
+            [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
+        }
+    }
+}
+
+<#
+.SYNOPSIS
     Resolves the best available provider profile based on environment variables.
 #>
 function Resolve-ProviderProfile {
@@ -967,9 +1014,86 @@ function Test-ProviderKey {
         return -not [string]::IsNullOrWhiteSpace($BaseUrl)
     }
     
-    # For all other providers, just validate the key format and base URL presence
-    # In a real implementation, this would make an actual API call
-    return $true
+    # Build validation URL and headers based on provider
+    $uri = $null
+    $headers = @{ Authorization = "Bearer $ApiKey" }
+    $method = 'HEAD'
+    
+    switch ($ProviderName.ToLower()) {
+        'openai' {
+            $base = if (-not [string]::IsNullOrWhiteSpace($BaseUrl)) { $BaseUrl } else { 'https://api.openai.com/v1' }
+            $uri = "$base/models"
+        }
+        'claude' {
+            $base = if (-not [string]::IsNullOrWhiteSpace($BaseUrl)) { $BaseUrl } else { 'https://api.anthropic.com/v1' }
+            $uri = "$base/models"
+            $headers['x-api-key'] = $ApiKey
+            $headers['anthropic-version'] = '2023-06-01'
+        }
+        'kimi' {
+            $base = if (-not [string]::IsNullOrWhiteSpace($BaseUrl)) { $BaseUrl } else { 'https://api.moonshot.cn/v1' }
+            $uri = "$base/models"
+        }
+        'gemini' {
+            $base = if (-not [string]::IsNullOrWhiteSpace($BaseUrl)) { $BaseUrl } else { 'https://generativelanguage.googleapis.com/v1beta/openai' }
+            $uri = "$base/models"
+        }
+        'glm' {
+            $base = if (-not [string]::IsNullOrWhiteSpace($BaseUrl)) { $BaseUrl } else { 'https://open.bigmodel.cn/api/paas/v4' }
+            $uri = "$base/models"
+        }
+        'ollama' {
+            $base = if (-not [string]::IsNullOrWhiteSpace($BaseUrl)) { $BaseUrl } else { 'http://localhost:11434' }
+            $headers = @{}
+            if ($base -match '/v1$') {
+                $uri = ($base -replace '/v1$','') + '/api/tags'
+            } else {
+                $uri = "$base/api/tags"
+            }
+            $method = 'GET'
+        }
+        default {
+            Write-Warning "Provider key validation not implemented for provider: $ProviderName"
+            return $false
+        }
+    }
+    
+    if (-not $uri) {
+        Write-Warning "Could not determine validation URI for provider: $ProviderName"
+        return $false
+    }
+    
+    $response = $null
+    try {
+        $irmParams = @{
+            Uri = $uri
+            Method = $method
+            Headers = $headers
+            TimeoutSec = $TimeoutSec
+            ErrorAction = 'Stop'
+            UseBasicParsing = $true
+        }
+        $response = Invoke-WebRequest @irmParams
+    } catch [System.Net.WebException] {
+        $statusCode = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
+        if ($statusCode -eq 405 -and $method -eq 'HEAD') {
+            try {
+                $irmParams.Method = 'GET'
+                $response = Invoke-WebRequest @irmParams
+            } catch {
+                Write-Verbose "Provider key validation failed for $ProviderName (HTTP error on GET)"
+                return $false
+            }
+        } else {
+            Write-Verbose "Provider key validation failed for $ProviderName (HTTP $statusCode)"
+            return $false
+        }
+    } catch {
+        Write-Verbose "Provider key validation failed for $ProviderName ($($_.Exception.Message))"
+        return $false
+    }
+    
+    return ($null -ne $response -and $response.StatusCode -ge 200 -and $response.StatusCode -lt 300)
 }
 
 # Multi-Palace support functions
@@ -1384,12 +1508,21 @@ function Show-LLMWorkflowDashboard {
 $GameFunctionsPath = Join-Path $PSScriptRoot "LLMWorkflow.GameFunctions.ps1"
 if (Test-Path -LiteralPath $GameFunctionsPath) {
     . $GameFunctionsPath
+    Write-Verbose "[DEBUG] After GameFunctions dot-source: $(@(Get-Command New-LLMWorkflowGamePreset -ErrorAction SilentlyContinue).Count)"
+}
+
+# Source dashboard views
+$DashboardViewsPath = Join-Path $PSScriptRoot "DashboardViews.ps1"
+if (Test-Path -LiteralPath $DashboardViewsPath) {
+    . $DashboardViewsPath
+    Write-Verbose "[DEBUG] After DashboardViews dot-source: $(@(Get-Command Show-PackHealthDashboard -ErrorAction SilentlyContinue).Count)"
 }
 
 # Source heal functions
 $HealFunctionsPath = Join-Path $PSScriptRoot "LLMWorkflow.HealFunctions.ps1"
 if (Test-Path -LiteralPath $HealFunctionsPath) {
     . $HealFunctionsPath
+    Write-Verbose "[DEBUG] After HealFunctions dot-source: $(@(Get-Command Test-LLMWorkflowIssue -ErrorAction SilentlyContinue).Count)"
 }
 
 Set-Alias -Name llmup -Value Invoke-LLMWorkflowUp
@@ -1403,14 +1536,61 @@ Set-Alias -Name llmsync -Value Sync-LLMWorkflowAllPalaces
 Set-Alias -Name llmdashboard -Value Show-LLMWorkflowDashboard
 Set-Alias -Name llmheal -Value Invoke-LLMWorkflowHeal
 
+# Loader Validation Guard (AAA Release Audit: HIGH-A1)
+# Validates that critical functions were actually defined after all dot-sourcing.
+$criticalFunctions = @(
+    'Invoke-LLMWorkflowUp',
+    'Get-LLMWorkflowVersion',
+    'Test-LLMWorkflowSetup',
+    'Get-CurrentWorkspace',
+    'New-JournalEntry',
+    'Show-PackHealthDashboard',
+    'Test-LLMWorkflowIssue',
+    'New-LLMWorkflowGamePreset'
+)
+$missingCritical = $criticalFunctions | Where-Object {
+    $null -eq (Get-Command -Name $_ -ErrorAction SilentlyContinue)
+}
+if (@($missingCritical).Count -gt 0) {
+    throw "LLMWorkflow module partial-load detected. Missing critical function(s): $($missingCritical -join ', ')"
+}
+
 Export-ModuleMember -Function @(
-    'Invoke-LLMWorkflowUp', 'Uninstall-LLMWorkflow', 'Install-LLMWorkflow', 'Update-LLMWorkflow', 
+    # Core workflow
+    'Invoke-LLMWorkflowUp', 'Uninstall-LLMWorkflow', 'Install-LLMWorkflow', 'Update-LLMWorkflow',
     'Get-LLMWorkflowVersion', 'Test-LLMWorkflowSetup',
+    # Retrieval & routing
     'Invoke-QueryRouting', 'Get-RetrievalProfile', 'Get-RetrievalProfileList', 'Get-QueryIntent', 'Get-RoutingExplanation',
     'New-AnswerPlan', 'Add-PlanEvidence', 'Test-AnswerPlanCompleteness',
     'New-AnswerTrace', 'Add-TraceEvidence', 'Export-AnswerTrace',
     'Get-CachedRetrieval', 'Invoke-CacheInvalidation', 'Invoke-CacheMaintenance', 'Clear-RetrievalCache',
-    'Invoke-LLMWorkflowHeal', 'Show-LLMWorkflowDashboard', 'Get-LLMWorkflowPlugins', 'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
-    'Get-GoldenTasks', 'Test-GoldenTaskCompleteness',
-    'Get-TelemetryLog', 'Clear-TelemetryLog'
+    # Heal / repair
+    'Invoke-LLMWorkflowHeal', 'Test-LLMWorkflowIssue', 'Repair-LLMWorkflowIssue',
+    'Get-LLMWorkflowRepairHistory', 'Clear-LLMWorkflowRepairHistory', 'Export-LLMWorkflowRepairHistory',
+    # Dashboard
+    'Show-LLMWorkflowDashboard',
+    'Show-PackHealthDashboard', 'Show-RetrievalActivityDashboard', 'Show-CrossPackGraph',
+    'Show-MCPGatewayStatus', 'Show-FederationStatus', 'Export-DashboardHTML',
+    # Plugins
+    'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins',
+    # Palaces
+    'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
+    # Golden tasks
+    'Get-GoldenTasks', 'Test-GoldenTaskCompleteness', 'Invoke-PackGoldenTasks', 'Test-GoldenTaskResult',
+    # Telemetry
+    'Get-TelemetryLog', 'Clear-TelemetryLog',
+    # Ingestion
+    'New-IngestionJob', 'Start-IngestionJob', 'Get-IngestionJob', 'Stop-IngestionJob', 'Remove-IngestionJob',
+    'Register-IngestionSource', 'Test-IngestionSource', 'Get-IngestionMetrics',
+    'Invoke-GitHubRepoIngestion', 'Invoke-DocsSiteIngestion',
+    # Extraction
+    'Invoke-StructuredExtraction', 'Invoke-BatchExtraction', 'Export-ExtractionReport',
+    # Snapshot
+    'New-PackSnapshot', 'Export-PackSnapshot', 'Import-PackSnapshot', 'Restore-FromSnapshot',
+    # Federated memory
+    'New-FederatedMemoryNode', 'Register-FederatedNode', 'New-SharedMemorySpace',
+    # Config
+    'Start-InteractiveConfig', 'ConvertFrom-NaturalLanguageConfig',
+    # Game team
+    'New-LLMWorkflowGamePreset', 'Get-LLMWorkflowGameTemplates', 'Export-LLMWorkflowAssetManifest', 'Invoke-LLMWorkflowGameUp'
 ) -Alias llmup, llmdown, llmcheck, llmver, llmupdate, llmplugins, llmpalaces, llmsync, llmdashboard, llmheal

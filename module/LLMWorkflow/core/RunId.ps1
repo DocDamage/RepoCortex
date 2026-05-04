@@ -97,10 +97,8 @@ function New-RunId {
             $Suffix = $randomValue.ToString("x4")  # Lowercase 4-digit hex
         }
         catch {
-            # Fallback to System.Random if crypto RNG is not available
-            $random = New-Object System.Random
-            $suffixValue = $random.Next(0, 65536)  # 0 to 0xFFFF
-            $Suffix = $suffixValue.ToString("x4")  # Lowercase 4-digit hex
+            # Crypto RNG failure is a critical error; do not fall back to weak RNG
+            throw "Failed to generate cryptographically secure run ID suffix: $_"
         }
     }
     

@@ -44,10 +44,14 @@ jobs:
           . .\scripts\security\Invoke-SBOMBuild.ps1
           $sbomResult = Invoke-SBOMBuild -ProjectRoot .
 
-          $criticalFindings = $secretReport.summary.critical + $vulnReport.summary.critical
+          . .\scripts\security\Invoke-SecurityBaseline.ps1
+          $baselineResult = Invoke-SecurityBaseline -ProjectRoot . -FailOnCritical
+
+          $criticalFindings = $secretReport.summary.critical + $vulnReport.summary.critical + $baselineResult.CriticalCount
           Write-Host "Secret scan critical findings: $($secretReport.summary.critical)"
           Write-Host "Vulnerability scan critical findings: $($vulnReport.summary.critical)"
           Write-Host "SBOM components: $($sbomResult.componentCount)"
+          Write-Host "Security baseline critical findings: $($baselineResult.CriticalCount)"
 
           if ($criticalFindings -gt 0) {
             throw "Critical security findings detected. Release blocked."
@@ -81,14 +85,14 @@ jobs:
 
             $filesToSign = Get-ChildItem -Path $moduleStage -Recurse -File -Include *.ps1,*.psm1,*.psd1
             foreach ($file in $filesToSign) {
-              $sig = Set-AuthenticodeSignature -FilePath $file.FullName -Certificate $cert -TimestampServer "http://timestamp.digicert.com"
-              if ($sig.Status -notin @("Valid", "UnknownError")) {
+              $sig = Set-AuthenticodeSignature -FilePath $file.FullName -Certificate $cert -TimestampServer "https://timestamp.digicert.com"
+              if ($sig.Status -ne "Valid") {
                 throw "Signature failed for $($file.FullName): $($sig.Status)"
               }
               "signed $($file.FullName)" | Add-Content -LiteralPath $signReport
             }
           } else {
-            "code_signing=disabled (missing CODESIGN_PFX_BASE64/CODESIGN_PFX_PASSWORD secrets)" | Set-Content -LiteralPath $signReport -Encoding UTF8
+            throw "Code signing secrets (CODESIGN_PFX_BASE64/CODESIGN_PFX_PASSWORD) are missing. Release blocked."
           }
 
           $zipPath = Join-Path $env:RUNNER_TEMP ("LLMWorkflow-" + $version + ".zip")

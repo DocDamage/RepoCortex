@@ -33,7 +33,7 @@ The LLM Workflow is a unified toolkit that integrates three core components:
 
 ## Phase 1 Core Infrastructure
 
-The platform implements enterprise-grade operational infrastructure per IMPROVEMENT_PROPOSALS.md. This provides state integrity, operator trust, safe continuous operation, and controlled automation.
+The platform implements enterprise-grade operational infrastructure. This provides state integrity, operator trust, safe continuous operation, and controlled automation.
 
 ### Core Infrastructure Stack
 

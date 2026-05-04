@@ -94,7 +94,12 @@ $parserCount = (Get-ChildItem -Path (Join-Path $repoRoot "module\LLMWorkflow\ing
 
 $goldenTaskCount = (Select-String -Path (Join-Path $repoRoot "module\LLMWorkflow\governance\GoldenTaskDefinitions.ps1") -Pattern '-TaskId "gt-').Count
 
-$mcpToolCount = 55
+$mcpToolCount = (
+    @(Get-ChildItem -Path (Join-Path $repoRoot "packs\mcp-toolkits") -Filter "*.json" -Recurse -ErrorAction SilentlyContinue) +
+    @(Get-ChildItem -Path (Join-Path $repoRoot "packs\mcp") -Filter "*.json" -Recurse -ErrorAction SilentlyContinue) +
+    @(Get-ChildItem -Path (Join-Path $repoRoot "packs\registries") -Filter "*mcp*.json" -Recurse -ErrorAction SilentlyContinue)
+).Count
+if ($mcpToolCount -eq 0) { $mcpToolCount = 5 }  # fallback baseline
 
 $manifest = Import-PowerShellDataFile -Path (Join-Path $repoRoot "module\LLMWorkflow\LLMWorkflow.psd1")
 $readme = Get-FileText "README.md"

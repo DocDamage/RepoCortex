@@ -89,8 +89,8 @@ This checklist must be completed and signed off before a release candidate can b
 | # | Check | Owner | Evidence | Status |
 |---|-------|-------|----------|--------|
 | 6.1 | `DurableOrchestrator.ps1` exists | Workflow Owner | `module/LLMWorkflow/workflow/DurableOrchestrator.ps1` | Pending |
-| 6.2 | Checkpoint save function exists | Workflow Owner | `Save-WorkflowCheckpoint` in durable module | Pending |
-| 6.3 | Checkpoint resume function exists | Workflow Owner | `Resume-WorkflowCheckpoint` in durable module | Pending |
+| 6.2 | Checkpoint save function exists | Workflow Owner | `Write-Checkpoint` in durable module | Pending |
+| 6.3 | Checkpoint resume function exists | Workflow Owner | `Resume-DurableWorkflow` / `Read-Checkpoint` in durable module | Pending |
 | 6.4 | Durable execution is tested | Workflow Owner | Durable execution tests in `tests/` | Pending |
 | 6.5 | Self-healing / durability is documented | Docs Owner | `docs/operations/SELF_HEALING.md` | Pending |
 

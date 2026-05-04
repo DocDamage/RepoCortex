@@ -381,13 +381,12 @@ function Import-EnvFile {
     [CmdletBinding()]
     param([string]$Path)
     
-    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $secrets = @{}
+    if (-not (Test-Path -LiteralPath $Path)) { return $secrets }
     
     # Sensitive key patterns that should NOT be set as process-scoped env vars
     # to prevent credential leakage to child processes.
-    $sensitiveKeyPatterns = @(
-        '_API_KEY$', '_SECRET$', '_PASSWORD$', '_TOKEN$', '_CREDENTIAL$'
-    )
+    $sensitiveKeyPatterns = @('KEY', 'SECRET', 'TOKEN', 'PASSWORD', 'API_KEY')
     
     foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
         $line = $rawLine.Trim()
@@ -410,13 +409,14 @@ function Import-EnvFile {
                 }
             }
             if ($isSensitive) {
-                # Store sensitive values in module scope only, not process env
+                $secrets[$name] = $value
                 Write-Verbose "Skipping process-scoped env var for sensitive key: $name"
                 continue
             }
             [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
         }
     }
+    return $secrets
 }
 
 function Test-PythonImport {
@@ -485,6 +485,9 @@ function Get-FirstEnvValue {
         if (-not [string]::IsNullOrWhiteSpace($value)) {
             return @{ Name = $name; Value = $value }
         }
+        if ($script:DashboardEnvSecrets -and $script:DashboardEnvSecrets.ContainsKey($name)) {
+            return @{ Name = $name; Value = $script:DashboardEnvSecrets[$name] }
+        }
     }
     return @{ Name = ""; Value = "" }
 }
@@ -509,8 +512,11 @@ function Invoke-DashboardCheck {
     $currentCheck = 0
     
     $projectPath = (Resolve-Path -LiteralPath $ProjectRoot).Path
-    Import-EnvFile -Path (Join-Path $projectPath ".env")
-    Import-EnvFile -Path (Join-Path $projectPath ".contextlattice" "orchestrator.env")
+    $script:DashboardEnvSecrets = @{}
+    $envFileSecrets = Import-EnvFile -Path (Join-Path $projectPath ".env")
+    foreach ($kvp in $envFileSecrets.GetEnumerator()) { $script:DashboardEnvSecrets[$kvp.Key] = $kvp.Value }
+    $orchSecrets = Import-EnvFile -Path (Join-Path $projectPath ".contextlattice" "orchestrator.env")
+    foreach ($kvp in $orchSecrets.GetEnumerator()) { $script:DashboardEnvSecrets[$kvp.Key] = $kvp.Value }
     
     # Check 1: Python command
     $currentCheck++
@@ -626,7 +632,8 @@ function Invoke-DashboardCheck {
     $currentCheck++
     & $OnCheckComplete $currentCheck $totalChecks "contextlattice_env" "PENDING" "Checking..."
     $ctxUrl = $env:CONTEXTLATTICE_ORCHESTRATOR_URL
-    $ctxKeySet = -not [string]::IsNullOrWhiteSpace($env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY)
+    $ctxKey = if ($script:DashboardEnvSecrets.ContainsKey('CONTEXTLATTICE_ORCHESTRATOR_API_KEY')) { $script:DashboardEnvSecrets['CONTEXTLATTICE_ORCHESTRATOR_API_KEY'] } else { $null }
+    $ctxKeySet = -not [string]::IsNullOrWhiteSpace($ctxKey)
     $ctxEnvOk = (-not [string]::IsNullOrWhiteSpace($ctxUrl)) -and $ctxKeySet
     $checks.Add([pscustomobject]@{ Name = "contextlattice_env"; Ok = $ctxEnvOk; Detail = if ($ctxEnvOk) { "url=$ctxUrl, apiKey=present" } else { "Need CONTEXTLATTICE_ORCHESTRATOR_URL and CONTEXTLATTICE_ORCHESTRATOR_API_KEY" }; LatencyMs = $null })
     $contextEnvStatus = "WARN"
@@ -684,7 +691,8 @@ function Invoke-DashboardCheck {
             $statusOk = $false
             $statusDetail = ""
             try {
-                $headers = @{ "x-api-key" = $env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY }
+                $ctxApiKey = if ($script:DashboardEnvSecrets.ContainsKey('CONTEXTLATTICE_ORCHESTRATOR_API_KEY')) { $script:DashboardEnvSecrets['CONTEXTLATTICE_ORCHESTRATOR_API_KEY'] } else { $null }
+                $headers = @{ "x-api-key" = $ctxApiKey }
                 $status = Invoke-RestMethod -Method Get -Uri "$base/status" -Headers $headers -TimeoutSec $TimeoutSec
                 $statusStopwatch.Stop()
                 $statusOk = $true

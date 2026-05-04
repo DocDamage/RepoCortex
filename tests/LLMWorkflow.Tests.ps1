@@ -1,4 +1,4 @@
-Set-StrictMode -Version Latest
+﻿Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $manifestPath = Join-Path $repoRoot "module\LLMWorkflow\LLMWorkflow.psd1"
@@ -39,14 +39,14 @@ KIMI_API_KEY=$kimiKey
             -SkipContextVerify `
             -SkipBridgeDryRun
 
-        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot "tools") "codemunch")) | Should Be $true
-        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot "tools") "contextlattice")) | Should Be $true
-        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot "tools") "memorybridge")) | Should Be $true
-        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot ".codemunch") "index.defaults.json")) | Should Be $true
-        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot ".contextlattice") "orchestrator.env.sample")) | Should Be $true
-        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot ".memorybridge") "bridge.config.json")) | Should Be $true
-        $env:GLM_BASE_URL | Should Be $glmBaseUrl
-        $env:KIMI_API_KEY | Should Be $kimiKey
+        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot "tools") "codemunch")) | Should -Be $true
+        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot "tools") "contextlattice")) | Should -Be $true
+        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot "tools") "memorybridge")) | Should -Be $true
+        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot ".codemunch") "index.defaults.json")) | Should -Be $true
+        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot ".contextlattice") "orchestrator.env.sample")) | Should -Be $true
+        (Test-Path -LiteralPath (Join-Path (Join-Path $projectRoot ".memorybridge") "bridge.config.json")) | Should -Be $true
+        $env:GLM_BASE_URL | Should -Be $glmBaseUrl
+        $env:KIMI_API_KEY | Should -Be $kimiKey
     }
 
     It "returns setup validation and version info" {
@@ -67,7 +67,7 @@ GLM_BASE_URL=https://example.test/glm
         $setup.passCount | Should BeGreaterThan 0
 
         $version = Get-LLMWorkflowVersion
-        $version.manifestVersion | Should Match "^\d+\.\d+\.\d+$"
+        $version.manifestVersion | Should -Match "^\d+\.\d+\.\d+$"
     }
 
     It "updates profile idempotently during install" {
@@ -87,7 +87,7 @@ GLM_BASE_URL=https://example.test/glm
         $profileContent = Get-Content -LiteralPath $profilePath -Raw
         ([regex]::Matches($profileContent, "# >>> llm-workflow >>>")).Count | Should Be 1
         ([regex]::Matches($profileContent, "# <<< llm-workflow <<<")).Count | Should Be 1
-        $profileContent | Should Match "Set-Alias llmup llm-workflow-up -Scope Global"
+        $profileContent | Should -Match "Set-Alias llmup llm-workflow-up -Scope Global"
 
         $uninstall = Uninstall-LLMWorkflow `
             -InstallRoot $installRoot `
@@ -95,11 +95,11 @@ GLM_BASE_URL=https://example.test/glm
             -KeepModuleFiles `
             -KeepUserEnv
 
-        $uninstall.installRootRemoved | Should Be $true
-        $uninstall.profileUpdated | Should Be $true
-        (Test-Path -LiteralPath $installRoot) | Should Be $false
+        $uninstall.installRootRemoved | Should -Be $true
+        $uninstall.profileUpdated | Should -Be $true
+        (Test-Path -LiteralPath $installRoot) | Should -Be $false
         $profileAfter = Get-Content -LiteralPath $profilePath -Raw
-        $profileAfter | Should Not Match "# >>> llm-workflow >>>"
+        $profileAfter | Should -Not -Match "# >>> llm-workflow >>>"
     }
 }
 
@@ -199,7 +199,7 @@ Describe "Provider Resolution" {
         }
 
         It "throws error for unsupported provider" {
-            { Get-ProviderProfile -Name "unsupported" } | Should Throw "Unsupported provider: unsupported"
+            { Get-ProviderProfile -Name "unsupported" } | Should -Throw "Unsupported provider: unsupported"
         }
 
         It "handles case-insensitive provider names" {
@@ -214,7 +214,7 @@ Describe "Provider Resolution" {
     Context "Resolve-ProviderProfile" {
         It "returns null when no provider credentials found" {
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result | Should Be $null
+            $result | Should -Be $null
         }
 
         It "auto-detects provider with credentials in priority order" {
@@ -362,19 +362,19 @@ Describe "Test-ProviderKey" {
     Context "Input validation" {
         It "returns false for whitespace-only API key" {
             $result = Test-ProviderKey -ProviderName "openai" -ApiKey "   " -BaseUrl "https://api.openai.com/v1"
-            $result | Should Be $false
+            $result | Should -Be $false
         }
 
         It "does not accept empty string for API key due to parameter binding" {
             # Empty string triggers parameter validation error before function body runs
-            { Test-ProviderKey -ProviderName "openai" -ApiKey "" -BaseUrl "https://api.openai.com/v1" } | Should Throw
+            { Test-ProviderKey -ProviderName "openai" -ApiKey "" -BaseUrl "https://api.openai.com/v1" } | Should -Throw
         }
     }
 
     Context "Provider-specific handling - documented behavior" {
         It "returns false for contextlattice when base URL is empty" {
             $result = Test-ProviderKey -ProviderName "contextlattice" -ApiKey "ctx_test_key" -BaseUrl ""
-            $result | Should Be $false
+            $result | Should -Be $false
         }
 
         It "documents gemini uses x-goog-api-key header with correct endpoint" {
@@ -420,11 +420,11 @@ Describe "Test-ProviderKey" {
     Context "Timeout parameter" {
         It "accepts custom timeout parameter" {
             # Since we can't easily mock, just verify the function accepts the parameter
-            { Test-ProviderKey -ProviderName "openai" -ApiKey "test" -TimeoutSec 5 } | Should Not Throw
+            { Test-ProviderKey -ProviderName "openai" -ApiKey "test" -TimeoutSec 5 } | Should -Not -Throw
         }
 
         It "uses default timeout when not specified" {
-            { Test-ProviderKey -ProviderName "openai" -ApiKey "test" } | Should Not Throw
+            { Test-ProviderKey -ProviderName "openai" -ApiKey "test" } | Should -Not -Throw
         }
     }
 }
@@ -445,9 +445,9 @@ Describe "Error Handling - Missing Python" {
         $setup = Test-LLMWorkflowSetup -ProjectRoot $projectRoot
         
         $pythonCheck = $setup.checks | Where-Object { $_.name -eq "python_command" }
-        $pythonCheck | Should Not Be $null
+        $pythonCheck | Should -Not -Be $null
         # Check passes or fails depending on whether python is installed on test machine
-        $pythonCheck.status -eq "pass" -or $pythonCheck.status -eq "fail" | Should Be $true
+        $pythonCheck.status -eq "pass" -or $pythonCheck.status -eq "fail" | Should -Be $true
     }
 
     It "Test-LLMWorkflowSetup includes chromadb check in results" {
@@ -457,41 +457,15 @@ Describe "Error Handling - Missing Python" {
         $setup = Test-LLMWorkflowSetup -ProjectRoot $projectRoot
         
         $chromadbCheck = $setup.checks | Where-Object { $_.name -eq "python_chromadb" }
-        $chromadbCheck | Should Not Be $null
+        $chromadbCheck | Should -Not -Be $null
         # Status can be pass or warn depending on environment
-        $chromadbCheck.status -eq "pass" -or $chromadbCheck.status -eq "warn" | Should Be $true
+        $chromadbCheck.status -eq "pass" -or $chromadbCheck.status -eq "warn" | Should -Be $true
     }
 }
 
 Describe "Error Handling - Invalid .env Format" {
     BeforeAll {
         Import-Module $manifestPath -Force
-    }
-
-    # Inline implementation of Get-EnvFileMap for testing
-    function script:Test-EnvFileMap {
-        param([string]$Path)
-        $result = @{}
-        if (-not (Test-Path -LiteralPath $Path)) {
-            return $result
-        }
-        foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
-            $line = $rawLine.Trim()
-            if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith("#")) {
-                continue
-            }
-            if ($line -match "^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$") {
-                $name = $matches[1]
-                $value = $matches[2]
-                if ($value.Length -ge 2) {
-                    if (($value.StartsWith("'") -and $value.EndsWith("'")) -or ($value.StartsWith('"') -and $value.EndsWith('"'))) {
-                        $value = $value.Substring(1, $value.Length - 2)
-                    }
-                }
-                $result[$name] = $value
-            }
-        }
-        return $result
     }
 
     It "Get-EnvFileMap gracefully handles malformed .env lines" {
@@ -514,8 +488,8 @@ export EXPORTED_KEY=exported_value
         $result["INDENTED_KEY"] | Should Be "indented_value"
         
         # Malformed lines should be skipped
-        $result.ContainsKey("INVALID") | Should Be $false
-        $result.ContainsKey("ANOTHER_INVALID_LINE") | Should Be $false
+        $result.ContainsKey("INVALID") | Should -Be $false
+        $result.ContainsKey("ANOTHER_INVALID_LINE") | Should -Be $false
     }
 
     It "Get-EnvFileMap returns empty hashtable for non-existent file" {
@@ -523,7 +497,7 @@ export EXPORTED_KEY=exported_value
         
         $result = Test-EnvFileMap -Path $nonExistentFile
         
-        $result | Should Not Be $null
+        $result | Should -Not -Be $null
         $result.Count | Should Be 0
     }
 
@@ -558,11 +532,11 @@ Describe "Error Handling - Invalid Provider Name" {
     }
 
     It "Get-ProviderProfile throws meaningful error for non-existent provider" {
-        { Get-ProviderProfile -Name "nonexistent" } | Should Throw "Unsupported provider: nonexistent"
+        { Get-ProviderProfile -Name "nonexistent" } | Should -Throw "Unsupported provider: nonexistent"
     }
 
     It "Get-ProviderProfile throws error for empty provider name" {
-        { Get-ProviderProfile -Name "" } | Should Throw
+        { Get-ProviderProfile -Name "" } | Should -Throw
     }
 
     It "Resolve-ProviderProfile gracefully handles invalid LLM_PROVIDER env var" {
@@ -609,7 +583,7 @@ Describe "Error Handling - Missing API Key" {
     It "Resolve-ProviderProfile returns null when no provider keys are set" {
         $result = Resolve-ProviderProfile -RequestedProvider "auto"
         
-        $result | Should Be $null
+        $result | Should -Be $null
     }
 
     It "Test-LLMWorkflowSetup includes glm_base_url check in results" {
@@ -625,19 +599,19 @@ CONTEXTLATTICE_ORCHESTRATOR_URL=http://127.0.0.1:8075
         
         # Should have glm_base_url check (status depends on environment)
         $glmCheck = $setup.checks | Where-Object { $_.name -eq "glm_base_url" }
-        $glmCheck | Should Not Be $null
+        $glmCheck | Should -Not -Be $null
     }
 
     It "Test-ProviderKey returns false when API key is whitespace only" {
         $result = Test-ProviderKey -ProviderName "openai" -ApiKey "   " -BaseUrl "https://api.openai.com/v1"
         
-        $result | Should Be $false
+        $result | Should -Be $false
     }
 
     It "Test-ProviderKey handles contextlattice with empty base URL" {
         $result = Test-ProviderKey -ProviderName "contextlattice" -ApiKey "test_key" -BaseUrl ""
         
-        $result | Should Be $false
+        $result | Should -Be $false
     }
 }
 
@@ -651,18 +625,18 @@ Describe "Error Handling - Invalid Project Root" {
         
         $setup = Test-LLMWorkflowSetup -ProjectRoot $nonExistentPath
         
-        $setup.passed | Should Be $false
+        $setup.passed | Should -Be $false
         $setup.failCount | Should BeGreaterThan 0
         
         $rootCheck = $setup.checks | Where-Object { $_.name -eq "project_root" }
         $rootCheck.status | Should Be "fail"
-        $rootCheck.details | Should Match "does not exist"
+        $rootCheck.details | Should -Match "does not exist"
     }
 
     It "Test-LLMWorkflowSetup -Strict throws when validation fails" {
         $nonExistentPath = Join-Path $TestDrive "strict-test-project"
         
-        { Test-LLMWorkflowSetup -ProjectRoot $nonExistentPath -Strict } | Should Throw "Setup validation failed"
+        { Test-LLMWorkflowSetup -ProjectRoot $nonExistentPath -Strict } | Should -Throw "Setup validation failed"
     }
 }
 
@@ -677,7 +651,7 @@ Describe "Error Handling - Toolkit Source Validation" {
         # This test validates that the check logic exists by verifying the throw statement is in the code
         $module = Get-Module LLMWorkflow
         $moduleContent = $module.Definition
-        $moduleContent | Should Match "Missing toolkit templates"
+        $moduleContent | Should -Match "Missing toolkit templates"
     }
 
     It "Invoke-LLMWorkflowUp throws when bootstrap script is missing" {
@@ -692,15 +666,8 @@ Describe "Error Handling - Toolkit Source Validation" {
 
         # Test will validate error handling for missing internal scripts
         # The actual bootstrap script validates its own existence
-        { 
-            $scriptPath = Join-Path (Join-Path (Join-Path (Join-Path $repoRoot "module") "LLMWorkflow") "scripts") "bootstrap-llm-workflow.ps1"
-            if (Test-Path $scriptPath) {
-                # If script exists, test passes - the validation logic exists
-                $true | Should Be $true
-            } else {
-                throw "Missing script"
-            }
-        } | Should Not Throw
+        $scriptPath = Join-Path (Join-Path (Join-Path (Join-Path $repoRoot "module") "LLMWorkflow") "scripts") "bootstrap-llm-workflow.ps1"
+        $scriptPath | Should -Exist
     }
 }
 
@@ -709,31 +676,7 @@ Describe "Error Handling - Environment Variable Loading" {
         Import-Module $manifestPath -Force
     }
 
-    # Reuse the Test-EnvFileMap function defined in previous Describe block
-    function script:Test-EnvFileMapSpecial {
-        param([string]$Path)
-        $result = @{}
-        if (-not (Test-Path -LiteralPath $Path)) {
-            return $result
-        }
-        foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
-            $line = $rawLine.Trim()
-            if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith("#")) {
-                continue
-            }
-            if ($line -match "^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$") {
-                $name = $matches[1]
-                $value = $matches[2]
-                if ($value.Length -ge 2) {
-                    if (($value.StartsWith("'") -and $value.EndsWith("'")) -or ($value.StartsWith('"') -and $value.EndsWith('"'))) {
-                        $value = $value.Substring(1, $value.Length - 2)
-                    }
-                }
-                $result[$name] = $value
-            }
-        }
-        return $result
-    }
+
 
     It "gracefully handles .env file with special characters in values" {
         $envFile = Join-Path $TestDrive "special-chars.env"
@@ -766,7 +709,7 @@ SPACE BETWEEN=value
         
         # Only valid key names should be parsed
         $result["VALID_KEY"] | Should Be "valid_value"
-        $result.ContainsKey("123_INVALID_STARTS_WITH_NUMBER") | Should Be $false
+        $result.ContainsKey("123_INVALID_STARTS_WITH_NUMBER") | Should -Be $false
     }
 }
 
@@ -781,7 +724,7 @@ Describe "Error Handling - Update-LLMWorkflow" {
             throw "404 Not Found"
         }
 
-        { Update-LLMWorkflow -Repository "nonexistent/repo-that-does-not-exist" -Version "999.999.999" -Force } | Should Throw
+        { Update-LLMWorkflow -Repository "nonexistent/repo-that-does-not-exist" -Version "999.999.999" -Force } | Should -Throw
     }
 }
 
@@ -829,7 +772,7 @@ Describe "Error Handling - Template Drift Detection" {
         $sourceHash = (Get-FileHash -LiteralPath (Join-Path $sourceDir "test.txt") -Algorithm SHA256).Hash
         $targetHash = (Get-FileHash -LiteralPath (Join-Path $targetDir "test.txt") -Algorithm SHA256).Hash
         
-        $sourceHash | Should Not Be $targetHash
+        $sourceHash | Should -Not -Be $targetHash
     }
 
     It "reports no drift when directories match" {
@@ -846,7 +789,7 @@ Describe "Error Handling - Template Drift Detection" {
         $sourceHash = (Get-FileHash -LiteralPath (Join-Path $sourceDir "test.txt") -Algorithm SHA256).Hash
         $targetHash = (Get-FileHash -LiteralPath (Join-Path $targetDir "test.txt") -Algorithm SHA256).Hash
         
-        $sourceHash | Should Be $targetHash
+        $sourceHash | Should -Be $targetHash
     }
 }
 
@@ -867,9 +810,9 @@ CONTEXTLATTICE_ORCHESTRATOR_API_KEY=test
         $setup = Test-LLMWorkflowSetup -ProjectRoot $projectRoot
         
         $urlCheck = $setup.checks | Where-Object { $_.name -eq "contextlattice_url" }
-        $urlCheck | Should Not Be $null
+        $urlCheck | Should -Not -Be $null
         # URL check exists - actual status depends on environment
-        $urlCheck.status -eq "pass" -or $urlCheck.status -eq "fail" -or $urlCheck.status -eq "warn" | Should Be $true
+        $urlCheck.status -eq "pass" -or $urlCheck.status -eq "fail" -or $urlCheck.status -eq "warn" | Should -Be $true
     }
 
     It "Test-LLMWorkflowSetup checks contextlattice URL status" {
@@ -883,9 +826,9 @@ CONTEXTLATTICE_ORCHESTRATOR_API_KEY=test
         $setup = Test-LLMWorkflowSetup -ProjectRoot $projectRoot
         
         $urlCheck = $setup.checks | Where-Object { $_.name -eq "contextlattice_url" }
-        $urlCheck | Should Not Be $null
+        $urlCheck | Should -Not -Be $null
         # Status depends on environment and whether URL is configured
-        $urlCheck.status -eq "warn" -or $urlCheck.status -eq "fail" -or $urlCheck.status -eq "pass" | Should Be $true
+        $urlCheck.status -eq "warn" -or $urlCheck.status -eq "fail" -or $urlCheck.status -eq "pass" | Should -Be $true
     }
 }
 
@@ -902,18 +845,13 @@ Describe "Error Handling - MemPalace Bridge Configuration" {
         # Bridge should handle missing config
         $configPath = Join-Path $projectRoot ".memorybridge\bridge.config.json"
         
-        Test-Path -LiteralPath $configPath | Should Be $false
+        Test-Path -LiteralPath $configPath | Should -Be $false
         # The sync script would create default or throw based on implementation
     }
 
     It "validates MemPalace directory existence" {
         $invalidPalacePath = Join-Path $TestDrive "nonexistent-palace"
-        
-        Test-Path -LiteralPath $invalidPalacePath | Should Be $false
-        
-        # Bridge sync would fail when palace path doesn't exist
-        # This validates the error condition exists
-        $true | Should Be $true
+        $invalidPalacePath | Should -Not -Exist
     }
 }
 
@@ -934,8 +872,8 @@ Describe "Error Handling - Uninstall Operations" {
             -KeepModuleFiles `
             -KeepUserEnv
 
-        $result.installRootRemoved | Should Be $false
-        $result.profileUpdated | Should Be $false
+        $result.installRootRemoved | Should -Be $false
+        $result.profileUpdated | Should -Be $false
     }
 
     It "Uninstall-LLMWorkflow handles non-existent profile gracefully" {
@@ -949,8 +887,8 @@ Describe "Error Handling - Uninstall Operations" {
             -KeepModuleFiles `
             -KeepUserEnv
 
-        $result.installRootRemoved | Should Be $true
-        $result.profileUpdated | Should Be $false
+        $result.installRootRemoved | Should -Be $true
+        $result.profileUpdated | Should -Be $false
     }
 }
 
@@ -975,7 +913,7 @@ CONTEXTLATTICE_ORCHESTRATOR_API_KEY=test
         $healthCheck = $setup.checks | Where-Object { $_.name -eq "contextlattice_health" }
         if ($healthCheck) {
             # Status depends on whether connection succeeded or failed
-            $healthCheck.status -eq "pass" -or $healthCheck.status -eq "fail" | Should Be $true
+            $healthCheck.status -eq "pass" -or $healthCheck.status -eq "fail" | Should -Be $true
         }
     }
 
@@ -991,7 +929,7 @@ CONTEXTLATTICE_ORCHESTRATOR_URL=http://127.0.0.1:8075
         
         $connectivityCheck = $setup.checks | Where-Object { $_.name -eq "contextlattice_connectivity" }
         if ($connectivityCheck) {
-            $connectivityCheck.status -eq "warn" -or $connectivityCheck.status -eq "pass" | Should Be $true
+            $connectivityCheck.status -eq "warn" -or $connectivityCheck.status -eq "pass" | Should -Be $true
         }
     }
 }

@@ -186,7 +186,7 @@ A v1.0 release of LLMWorkflow is certified only when **all** of the following qu
 | Check | Evidence |
 |-------|----------|
 | Durable orchestrator module exists | `module/LLMWorkflow/workflow/DurableOrchestrator.ps1` |
-| Checkpoint/recovery functions are implemented | `Save-WorkflowCheckpoint` and `Resume-WorkflowCheckpoint` exist |
+| Checkpoint/recovery functions are implemented | `Write-Checkpoint` and `Resume-DurableWorkflow` / `Read-Checkpoint` exist |
 | Recovery is tested | `tests/` include at least one durable-execution test |
 | Durable execution is documented | `docs/operations/SELF_HEALING.md` or equivalent covers durable recovery |
 

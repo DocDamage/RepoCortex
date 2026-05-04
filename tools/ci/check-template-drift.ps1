@@ -61,7 +61,7 @@ function Compare-DirectoryContent {
     }
 }
 
-$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot ".." "..")).Path
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path (Join-Path $PSScriptRoot "..") "..")).Path
 
 $pairs = @(
     @{

@@ -206,6 +206,7 @@ function New-RunManifest {
         }
     }
     catch {
+        Write-Warning "[Journal] Failed to retrieve git commit hash: $_"
         $gitCommit = ""
     }
     
@@ -452,6 +453,7 @@ function New-JournalEntry {
             $entry['sequence'] = $existingEntries.Count
         }
         catch {
+            Write-Warning "[Journal] Failed to read existing journal entries: $_"
             $existingEntries = @()
             $entry['sequence'] = 0
         }

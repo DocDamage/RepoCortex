@@ -95,6 +95,12 @@ To keep numbers consistent, use the following counting rules and scripts.
 ### CHANGELOG.md
 - No known drift.
 
+### Cross-References
+- Broken links between `OBSERVABILITY_ARCHITECTURE.md` and `EVALUATION_OPERATIONS.md` were corrected on 2026-05-03.
+
+### Cross-References
+- Known broken links exist between `OBSERVABILITY_ARCHITECTURE.md` and `EVALUATION_OPERATIONS.md` (paths corrected 2026-05-03).
+
 ## Resolution Plan
 
 1. ✅ Reconciled 2026-04-14: `VERSION`, `README.md`, `docs/implementation/PROGRESS.md`, `docs/releases/CHANGELOG.md`, `RELEASE_STATE.md`, and `LLMWorkflow.psd1` all aligned to `0.9.6`.

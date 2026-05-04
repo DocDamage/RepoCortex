@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Dashboard Views module for LLM Workflow platform (Phase 7).
@@ -326,7 +326,7 @@ function Get-PackList {
                 }
             }
             catch {
-                Write-Warning "Failed to parse manifest: $($file.Name) — $_"
+                Write-Warning "Failed to parse manifest: $($file.Name) - $_"
             }
         }
     }
@@ -931,7 +931,7 @@ function Get-RetrievalMetrics {
                 Write-Warning "Cache file contained $parseFailures unparseable line(s)."
             }
             if ($cacheEntries) {
-                $hitCount = ($cacheEntries | Measure-Object -Property { $_.metadata.hitCount } -Sum).Sum
+                $hitCount = ($cacheEntries | ForEach-Object { $_.metadata.hitCount } | Measure-Object -Sum).Sum
                 $totalAccess = $cacheEntries.Count + $hitCount
                 if ($totalAccess -gt 0) {
                     $metrics.cacheHitRate = [math]::Round($hitCount / $totalAccess, 2)
@@ -2258,17 +2258,3 @@ h2 { color: $($script:HtmlThemes[$Theme].accentColor); }
 "@
 }
 
-#===============================================================================
-# Module Export
-#===============================================================================
-
-if ($ExecutionContext.SessionState.Module) {
-    Export-ModuleMember -Function @(
-        'Show-PackHealthDashboard'
-        'Show-RetrievalActivityDashboard'
-        'Show-CrossPackGraph'
-        'Show-MCPGatewayStatus'
-        'Show-FederationStatus'
-        'Export-DashboardHTML'
-    )
-}

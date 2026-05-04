@@ -253,7 +253,8 @@ main() {
             ;;
         shell|bash|sh)
             log_info "Starting bash shell..."
-            exec /bin/bash
+            shift
+            exec /bin/bash "$@"
             ;;
         pwsh|powershell)
             log_info "Starting PowerShell..."
