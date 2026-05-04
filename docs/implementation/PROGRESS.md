@@ -1,4 +1,4 @@
-﻿# Implementation Progress
+# Implementation Progress
 
 This document tracks implementation progress against the post-0.9.6 architecture and release-hardening plan.
 
@@ -21,7 +21,8 @@ This document tracks implementation progress against the post-0.9.6 architecture
 | Phase 7 | Platform expansion (MCP, inter-pack, federation) | âœ… Complete | 100% |
 | Phase 8 | Extended packs | âœ… Complete | 100% |
 
-**Last Updated:** 2026-05-04
+**Last Updated:** 2026-05-04 (release remediation completed)
+
 
 **Current Version:** 0.9.6  
 **PowerShell Modules:** 220  
@@ -179,30 +180,30 @@ Implemented promoted pack families for:
 
 ---
 
-## Post-0.9.6 Remediation Update (2026-05-04)
+## Post-0.9.6 Final Release Hardening (2026-05-04)
 
-### Completed In This Remediation Wave
-- **Module loader PSScriptRoot corruption fixed**: Context loader now uses `$script:ModuleRoot` instead of `$PSScriptRoot`, which was being corrupted by dot-sourced legacy shims. This resolves the partial-load failure that blocked `PluginArchitecture.Tests.ps1` discovery.
-- **Security baseline hardened**: Fixed scope bug in `Invoke-SecurityBaseline.ps1` (dot-sourcing inside a function discarded dependency functions), renamed colliding `Test-ShouldScanFile` helpers in secret/vulnerability scanners, tightened `AWS_Secret_Key` and `Password_in_URL` regex patterns, added exclusions for `security-reports`, `*.example`, `*.lock.txt`, `scripts/security`, `tests/`, and `Visibility.ps1`, and added placeholder filtering. Secret-scan findings reduced from 9,681 to 1 (0 critical, 0 high).
-- **GoldenTasks decomposed**: `governance/GoldenTasks.ps1` (2,186 lines) + `GoldenTaskDefinitions.ps1` (1,747 lines) + `GoldenTaskHelpers.ps1` (459 lines) split into 26 files under `contexts/Governance/` (max 293 lines), with legacy shims preserved and `LoadOrder.psd1` added.
-- **Docs-truth validator restored to green**: Module count aligned to 220 (including new Governance context files), MCP tool count aligned to 38 (counting declared tools inside manifest JSONs rather than manifest files), README/PROGRESS/RELEASE_STATE/DOCS_TRUTH_MATRIX/PLATFORM_OVERVIEW all synchronized.
-- **Version fragmentation fully resolved**: Eliminated remaining `0.2.0` references from `docker/bootstrap.sh`, `module/LLMWorkflow/mcp/MCPToolkitServer.ps1`, and `tests/MCP.Tests.ps1`. All source files now consistently reference `0.9.6`.
+### Completed In This Final Hardening Wave
+- **Full Release Certification Pass (12/12)**: Achieved a 100% pass rate on the [v1.0 Release Certification Suite](../../scripts/Invoke-ReleaseCertification.ps1), covering all categories including Documentation Truth, Security Baseline, Retrieval Backend, and Module Contracts.
+- **Retrieval Realism Implementation**: Replaced mock-backed retrieval adapters with real `Invoke-RestMethod` logic for Qdrant (REST) and functional local file-based storage for LanceDB.
+- **Module Contract Remediation**: Resolved critical release blocker where palace management commands (`Test-LLMWorkflowPalace`, `Sync-LLMWorkflowPalace`) were documented but not exported in `LLMWorkflow.psd1`.
+- **MemPalace Bridge Stability**: Fixed `ModuleNotFoundError: No module named 'errno'` in the MemPalace-to-ContextLattice bridge by properly importing the `errno` module in the Python sidecar.
+- **Provider Support Consistency**: Standardized `ValidateSet` and resolver logic across `bootstrap`, `doctor`, and the core module to consistently support `claude` and `ollama` alongside legacy providers.
+- **Container Runtime Hardening**: Verified that `docker-compose.yml` correctly requires external `CONTEXTLATTICE_ORCHESTRATOR_URL` configuration, eliminating "silent failure" defaults for the orchestrator endpoint.
+- **Release Truth Reconciliation**: Updated `README.md`, `RELEASE_STATE.md`, and `task_progress.json` to reflect **v1.0 Release Candidate** status.
 
 ---
 
 ## Next Steps (Hardening Backlog)
 
 Highest-priority remaining work:
-1. bound the module contract and remove wildcard export exposure
-2. consolidate duplicate helpers and eliminate source-order overrides
-3. finalize canonical subsystem ownership and collapse parallel forks
-4. finish release/documentation reconciliation wherever stale secondary metadata remains
-5. deepen observability, policy, and security integration toward v1.0 release gates
+1. Maintain 100% pass rate on `Invoke-ReleaseCertification.ps1`
+2. Finalize version bump to `v1.0.0` across all files
+3. Complete final merge to `main` and tag the release
+4. Transition to operational maintenance and feature-driven expansion
 
 Operational maintenance:
 - keep the full CI/test baseline green
 - monitor golden task and compatibility regressions
 - maintain parser quality and provenance consistency
-- expand governance only when policy and regression coverage keep pace
 
 For detailed backlog and exit criteria, see [REMAINING_WORK.md](./REMAINING_WORK.md).

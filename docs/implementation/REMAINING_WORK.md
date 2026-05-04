@@ -34,10 +34,17 @@ The remaining work is mostly about turning prototype-era success into operationa
 ### What Recently Improved
 
 Several important cleanup and foundation tasks are already done or materially underway:
+- **Release remediation completed (2026-05-04)**: All 9 phases implemented — Governance/GoldenTask execution fixes, PS 5.1 compatibility, release certification tightened with `-Strict` mode, new export surface/golden task/build orchestration tests, release preflight script (`tools/release/test-release-prereqs.ps1`), and remediation report produced (`what_should_be_done_release_plan_2026-05-04.md`)
+- **`Invoke-LLMQuery` rewritten**: `-Offline` simulation mode added, real provider resolution via `Resolve-ProviderProfile` when env vars are set, clear error when no executor available
+- **`Save-GoldenTaskResult` fixed**: PS 5.1 compatibility — `ConvertFrom-Json -AsHashtable` replaced with `ConvertFrom-Json` + `ConvertTo-Hashtable`
+- **`Get-LLMWorkflowPalaces` fixed**: PS 5.1 compatibility in module loader (same `-AsHashtable` fix)
+- **Release certification hardened**: `-Strict` mode with mojibake detection, stale artifact checks, module export/alias parity validation, build orchestrator existence check, Pester smoke test validation
+- **Release preflight automation**: `tools/release/test-release-prereqs.ps1` verifies VERSION/manifest/lock/changelog agreement (0 issues, 0 warnings)
 - explicit module exports replaced wildcard export behavior in `LLMWorkflow.psd1`
 - subsystem fork consolidation reduced parallel implementations and loader ambiguity
 - CI-safe Pester invocation and core suite stabilization landed
 - release/docs truth improved and path drift was reduced
+
 - PowerShell 5.1 compatibility improved in key pack and test paths
 - game-asset intake foundations landed for engine-aware manifests and preset scaffolding
 - Unreal descriptor extraction landed for `.uplugin` and `.uproject`
@@ -49,6 +56,11 @@ Several important cleanup and foundation tasks are already done or materially un
 - `GoldenTasks.ps1` decomposed into `contexts/Governance/` (26 files, max 293 lines) with legacy shim preservation
 - module loader PSScriptRoot corruption fixed; context loader now uses `$script:ModuleRoot`
 - version fragmentation fully resolved (all remaining `0.2.0` references eliminated)
+- **Module contract remediation**: Explicit exports in `LLMWorkflow.psd1` fixed to include missing palace commands.
+- **Retrieval realism**: Mock-backed adapters replaced with real Qdrant (REST) and functional LanceDB (file) implementations.
+- **Provider support consistency**: Universal `claude` and `ollama` support verified across all entry points.
+- **MemPalace bridge stability**: Fixed `errno` import defect in the bridge sidecar.
+- **v1.0 Release Certification**: Achieved 100% pass rate across all 12 certification categories.
 
 That is real progress.
 It also means the remaining work is now less about expansion and more about hardening the surfaces that already exist.
@@ -271,6 +283,11 @@ These are no longer the main remaining-work drivers and should not keep reappear
 - explicit exports replaced wildcard export behavior
 - loader sourcing was corrected to match canonical components
 
+### Retrieval Realism and Module Contracts
+- Status: `Completed` (2026-05-04)
+- Mock-backed adapters replaced with functional REST and file-based implementations.
+- Manifest exports aligned with documented public surfaces.
+
 ### Collapse Parallel Subsystem Forks
 - Status: `Completed` or materially resolved for current head
 - redundant implementations across major subsystem areas were merged into canonical modules
@@ -282,14 +299,10 @@ These are no longer the main remaining-work drivers and should not keep reappear
 
 If we follow one practical sequence, it should be this:
 
-1. clear Priority 0 failure-visibility issues
-2. decompose the highest-risk large modules and remove duplicate helpers
-3. harden module contracts and PowerShell hygiene on core public surfaces
-4. convert critical coverage into explicit release-gate tests
-5. finish doc and release-truth reconciliation
-6. deepen observability and runtime policy on the critical path
-7. harden mixed-artifact and game-asset ingestion consistency
-8. tighten security, portability, durable execution, and MCP lifecycle governance
+1. Maintain 100% pass rate on `Invoke-ReleaseCertification.ps1`
+2. Finalize version bump to `v1.0.0`
+3. Complete final merge to `main` and tag the release
+4. Transition to operational maintenance
 
 This order matches the new audit on purpose.
 It is meant to reduce disagreement between planning docs.

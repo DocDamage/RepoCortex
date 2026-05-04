@@ -1138,7 +1138,8 @@ function Get-LLMWorkflowPalaces {
     
     try {
         $configContent = Get-Content -LiteralPath $ConfigPath -Raw -ErrorAction Stop
-        $config = $configContent | ConvertFrom-Json -AsHashtable -ErrorAction Stop
+        $parsed = $configContent | ConvertFrom-Json -ErrorAction Stop
+        $config = ConvertTo-Hashtable -InputObject $parsed
     } catch {
         Write-Error "Failed to parse config file at '$ConfigPath': $_"
         # Throw so callers can distinguish "no palaces" from "corrupted config"
@@ -1626,7 +1627,7 @@ Export-ModuleMember -Function @(
     # Plugins
     'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins',
     # Palaces
-    'Get-LLMWorkflowPalaces', 'Sync-LLMWorkflowAllPalaces',
+    'Get-LLMWorkflowPalaces', 'Test-LLMWorkflowPalace', 'Sync-LLMWorkflowPalace', 'Sync-LLMWorkflowAllPalaces',
     # Golden tasks
     'Get-GoldenTasks', 'Test-GoldenTaskCompleteness', 'Invoke-PackGoldenTasks', 'Test-GoldenTaskResult',
     # Telemetry

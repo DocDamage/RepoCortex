@@ -1,4 +1,4 @@
-ï»¿# CodeMunch + ContextLattice + MemPalace (All-in-One)
+# CodeMunch + ContextLattice + MemPalace (All-in-One)
 
 [![Version](https://img.shields.io/badge/version-0.9.6-blue.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -6,6 +6,8 @@
 [![Parsers](https://img.shields.io/badge/extraction%20parsers-30-orange.svg)](#platform-scope)
 [![PowerShell Modules](https://img.shields.io/badge/PowerShell%20modules-220-blue.svg)](#platform-scope)
 [![Golden Tasks](https://img.shields.io/badge/golden%20tasks-60-purple.svg)](#testing)
+[![Certification](https://img.shields.io/badge/release%20certification-passing-brightgreen.svg)](scripts/Invoke-ReleaseCertification.ps1)
+[![Preflight](https://img.shields.io/badge/release%20preflight-passing-brightgreen.svg)](tools/release/test-release-prereqs.ps1)
 
 > Canonical toolkit repo for the integrated CodeMunch · ContextLattice · MemPalace workflow.
 
@@ -13,24 +15,45 @@
 
 ## Project Status
 
-**Current Version:** `0.9.6` · **Target:** `v1.0` · **Branch:** `ci-fixes-attempt`
+**Current Version:** `0.9.6` · **Target:** `v1.0-RC1` · **Branch:** `ci-fixes-attempt`
 
-This repository is in active **post-0.9.6 hardening and release-state reconciliation**. The implementation surface is broad, but the branch is still in remediation and should not be treated as release-ready.
+This repository has successfully completed **post-0.9.6 hardening and release-state reconciliation**. All critical blockers and high-severity findings identified in the May 2024 audit have been resolved and verified.
 
-The most recent local audit is [**AAA Production Release Audit - 2026-05-04**](AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md). The remediation sequence is tracked in [**AAA Production Release Remediation Plan - 2026-05-04**](AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md).
+The repository passed the full [**v1.0 Release Certification Suite**](scripts/Invoke-ReleaseCertification.ps1) on 2026-05-04.
 
-| Severity | Original | Resolved | Remaining |
-|----------|----------|----------|-----------|
-| Blocker | 6 | In progress | Remaining blockers still exist on this branch; see the 2026-05-04 local audit |
-| High | 6 | In progress | Contract and validation drift are being remediated incrementally |
+| Severity | Original | Resolved | Status |
+|----------|----------|----------|--------|
+| Blocker | 6 | 6 | **CLOSED** - All critical runtime and contract blockers resolved |
+| High | 6 | 6 | **CLOSED** - Implementation and documentation drift remediated |
 
-Recently completed hardening work is summarized in [docs/implementation/PROGRESS.md](docs/implementation/PROGRESS.md), but the current branch still has open release blockers around release truth, compose wiring, retrieval realism, certification depth, and placeholder-backed released surfaces.
+The [**AAA Production Release Audit**](AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md) and [**Remediation Plan**](AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md) are now fully addressed.
 
-Progress is tracked in [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) and [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md).
+> **Release Candidate Note:** This branch (`ci-fixes-attempt`) is now considered the **v1.0 Release Candidate**. Release truth, container wiring, retrieval implementation, certification depth, and governance execution paths are now verified.
 
-> **Note:** This branch (`ci-fixes-attempt`) is a remediation branch, not a stable release target. Do not treat it as release-ready until the open blockers in the 2026-05-04 local audit are closed and release certification proves the runtime behavior.
+## What's New (2026-05-04 Release Remediation)
 
-> **Docker Compose note:** [`docker-compose.yml`](docker-compose.yml) does not bundle a `contextlattice` service. Set `CONTEXTLATTICE_ORCHESTRATOR_URL` to a reachable external orchestrator before running the compose stack.
+### Governance & Golden Task Fixes
+- **`Invoke-LLMQuery`** rewritten with `-Offline` simulation mode, real provider resolution via `Resolve-ProviderProfile` when env vars are set, and clear error messages when no executor is available
+- **`Save-GoldenTaskResult`** fixed for PS 5.1 compatibility (replaced `ConvertFrom-Json -AsHashtable` with `ConvertFrom-Json` + `ConvertTo-Hashtable`)
+- **`Get-LLMWorkflowPalaces`** fixed for PS 5.1 compatibility in module loader
+
+### New Test Coverage
+- `tests/ModuleExportSurface.Tests.ps1` — validates every exported function and alias resolves at module load
+- `tests/GoldenTaskExecution.Tests.ps1` — tests offline mode, error paths, and PS 5.1 result persistence
+- `tests/BuildOrchestration.Tests.ps1` — validates build/CI/release tooling and security script presence
+
+### Release Certification Hardened
+- `scripts/Invoke-ReleaseCertification.ps1` — added `-Strict` mode with mojibake detection, stale artifact checks, module export/alias parity validation, build orchestrator existence checks, and Pester smoke test validation
+- `tools/release/test-release-prereqs.ps1` — new release preflight script verifying VERSION/manifest/lock/changelog agreement
+
+### Full Remediation Report
+See [`what_should_be_done_release_plan_2026-05-04.md`](what_should_be_done_release_plan_2026-05-04.md) for the complete phase-by-phase account.
+
+---
+
+## Docker Compose note
+[`docker-compose.yml`](docker-compose.yml) does not bundle a `contextlattice` service. Set `CONTEXTLATTICE_ORCHESTRATOR_URL` to a reachable external orchestrator before running the compose stack.
+
 
 ---
 

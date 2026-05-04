@@ -1,0 +1,321 @@
+{
+  "ProjectRoot": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one",
+  "Timestamp": "2026-05-04T19:28:51Z",
+  "OverallPassed": false,
+  "Categories": {
+    "DocumentationTruth": true,
+    "Observability": true,
+    "ModuleContracts": false,
+    "Policy": true,
+    "DocumentIngestion": true,
+    "GameAssetIngestion": true,
+    "Security": true,
+    "DurableExecution": true,
+    "MCPGovernance": true,
+    "ContainerRuntime": true,
+    "RetrievalBackend": false,
+    "CIValidation": true
+  },
+  "ScanResults": {
+    "SBOM": {
+      "success": true,
+      "outputPath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\sbom.json",
+      "componentCount": 400,
+      "tool": "Invoke-SBOMBuild (Syft-compatible)",
+      "timestamp": "2026-05-04T19:27:29Z"
+    },
+    "SecretScan": {
+      "scanType": "secret",
+      "tool": "Invoke-SecretScan (TruffleHog-compatible)",
+      "timestamp": "2026-05-04T19:28:04Z",
+      "projectRoot": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one",
+      "summary": {
+        "medium": 1,
+        "totalFindings": 3,
+        "low": 0,
+        "high": 2,
+        "critical": 0,
+        "scannedFiles": 381
+      },
+      "findings": [
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\sbom.json",
+          "LineNumber": 2521,
+          "PatternName": "Generic_API_Key",
+          "Type": "api_key",
+          "Severity": "high",
+          "MatchedValue": "ApiKey:f5ea5b5df3be440cac88c3b2f86aecf2\"",
+          "LineText": "\"bom-ref\": \"urn:llmworkflow:component:file:Issue-Repair_MissingContextLatticeApiKey:f5ea5b5df3be440cac88c3b2f86aecf2\","
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\sbom.json",
+          "LineNumber": 7825,
+          "PatternName": "Generic_API_Key",
+          "Type": "api_key",
+          "Severity": "high",
+          "MatchedValue": "ApiKey:f5ea5b5df3be440cac88c3b2f86aecf2\"",
+          "LineText": "\"urn:llmworkflow:component:file:Issue-Repair_MissingContextLatticeApiKey:f5ea5b5df3be440cac88c3b2f86aecf2\","
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\docs\\reference\\dashboard.md",
+          "LineNumber": 181,
+          "PatternName": "Email_Address",
+          "Type": "pii",
+          "Severity": "medium",
+          "MatchedValue": "admin@example.com",
+          "LineText": "Send-MailMessage -To \"admin@example.com\" -Subject \"LLM Workflow Health Alert\" -Body \"Check logs at $logFile\""
+        }
+      ]
+    },
+    "VulnerabilityScan": {
+      "scanType": "vulnerability",
+      "tool": "Invoke-VulnerabilityScan (Trivy-compatible)",
+      "timestamp": "2026-05-04T19:28:08Z",
+      "projectRoot": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one",
+      "summary": {
+        "medium": 10,
+        "totalFindings": 18,
+        "low": 2,
+        "high": 6,
+        "critical": 0,
+        "scannedFiles": 387
+      },
+      "findings": [
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\Dockerfile",
+          "LineNumber": 1,
+          "PatternName": "Dockerfile_No_Healthcheck",
+          "Type": "misconfiguration",
+          "Severity": "low",
+          "Title": "Missing HEALTHCHECK in Dockerfile",
+          "Description": "No HEALTHCHECK instruction found; container health cannot be monitored.",
+          "LineText": "[Pattern not found in file]"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\Dockerfile.windows",
+          "LineNumber": 1,
+          "PatternName": "Dockerfile_No_Healthcheck",
+          "Type": "misconfiguration",
+          "Severity": "low",
+          "Title": "Missing HEALTHCHECK in Dockerfile",
+          "Description": "No HEALTHCHECK instruction found; container health cannot be monitored.",
+          "LineText": "[Pattern not found in file]"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\contexts\\Healing\\internal\\Issue-Repair_MissingContextLatticeApiKey.ps1",
+          "LineNumber": 46,
+          "PatternName": "PowerShell_ConvertToSecureString_NoKey",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Plain-text secure string conversion",
+          "Description": "Converting plain text to secure strings in scripts may expose credentials.",
+          "LineText": "$script:LLMWorkflowContextLatticeApiKey = ConvertTo-SecureString -String $apiKey -AsPlainText -Force"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\contexts\\_shared\\Secrets.ps1",
+          "LineNumber": 50,
+          "PatternName": "PowerShell_ConvertToSecureString_NoKey",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Plain-text secure string conversion",
+          "Description": "Converting plain text to secure strings in scripts may expose credentials.",
+          "LineText": "return ConvertTo-SecureString -String $value -AsPlainText -Force"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\contexts\\_shared\\Secrets.ps1",
+          "LineNumber": 63,
+          "PatternName": "PowerShell_ConvertToSecureString_NoKey",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Plain-text secure string conversion",
+          "Description": "Converting plain text to secure strings in scripts may expose credentials.",
+          "LineText": "return ConvertTo-SecureString -String $userValue -AsPlainText -Force"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\contexts\\_shared\\Secrets.ps1",
+          "LineNumber": 111,
+          "PatternName": "PowerShell_ConvertToSecureString_NoKey",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Plain-text secure string conversion",
+          "Description": "Converting plain text to secure strings in scripts may expose credentials.",
+          "LineText": "return ConvertTo-SecureString -String $PlainText -AsPlainText -Force"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\ingestion\\ExternalIngestion.ps1",
+          "LineNumber": 600,
+          "PatternName": "PowerShell_DownloadString",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Remote download execution detected",
+          "Description": "Downloading and executing remote content can introduce supply-chain risks.",
+          "LineText": "$response = Invoke-WebRequest -Uri $Url -Headers $Headers -UseBasicParsing -ErrorAction Stop"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\ingestion\\ExternalIngestion.ps1",
+          "LineNumber": 681,
+          "PatternName": "PowerShell_DownloadString",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Remote download execution detected",
+          "Description": "Downloading and executing remote content can introduce supply-chain risks.",
+          "LineText": "$response = Invoke-WebRequest -Uri $currentUrl -Headers $Headers -UseBasicParsing"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\module\\LLMWorkflow\\ingestion\\TikaAdapter.ps1",
+          "LineNumber": 105,
+          "PatternName": "PowerShell_DownloadString",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Remote download execution detected",
+          "Description": "Downloading and executing remote content can introduce supply-chain risks.",
+          "LineText": "$response = Invoke-WebRequest -Uri $uri -Method GET -TimeoutSec 10 -UseBasicParsing -ErrorAction Stop"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 79,
+          "PatternName": "PowerShell_ConvertToSecureString_NoKey",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Plain-text secure string conversion",
+          "Description": "Converting plain text to secure strings in scripts may expose credentials.",
+          "LineText": "Pattern = 'ConvertTo-SecureString.*-AsPlainText'"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 95,
+          "PatternName": "Module_Old_TLS",
+          "Type": "code_vulnerability",
+          "Severity": "high",
+          "Title": "Weak TLS configuration",
+          "Description": "Enabling older TLS versions reduces transport security.",
+          "LineText": "Pattern = '\\[Net\\.ServicePointManager\\]::SecurityProtocol\\s*=.*Tls11?|Ssl3'"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 70,
+          "PatternName": "PowerShell_DownloadString",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Remote download execution detected",
+          "Description": "Downloading and executing remote content can introduce supply-chain risks.",
+          "LineText": "PowerShell_DownloadString = @{"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 71,
+          "PatternName": "PowerShell_DownloadString",
+          "Type": "code_vulnerability",
+          "Severity": "medium",
+          "Title": "Remote download execution detected",
+          "Description": "Downloading and executing remote content can introduce supply-chain risks.",
+          "LineText": "Pattern = 'Invoke-WebRequest.*-UseBasicParsing|DownloadString|DownloadFile'"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 63,
+          "PatternName": "PowerShell_InvokeExpression",
+          "Type": "code_vulnerability",
+          "Severity": "high",
+          "Title": "Use of Invoke-Expression detected",
+          "Description": "Invoke-Expression can lead to code injection if user input is passed in.",
+          "LineText": "Pattern = 'Invoke-Expression|iex\\s'"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 67,
+          "PatternName": "PowerShell_InvokeExpression",
+          "Type": "code_vulnerability",
+          "Severity": "high",
+          "Title": "Use of Invoke-Expression detected",
+          "Description": "Invoke-Expression can lead to code injection if user input is passed in.",
+          "LineText": "Title = 'Use of Invoke-Expression detected'"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\scripts\\security\\Invoke-VulnerabilityScan.ps1",
+          "LineNumber": 68,
+          "PatternName": "PowerShell_InvokeExpression",
+          "Type": "code_vulnerability",
+          "Severity": "high",
+          "Title": "Use of Invoke-Expression detected",
+          "Description": "Invoke-Expression can lead to code injection if user input is passed in.",
+          "LineText": "Description = 'Invoke-Expression can lead to code injection if user input is passed in.'"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\tests\\SecurityBaseline.Tests.ps1",
+          "LineNumber": 259,
+          "PatternName": "PowerShell_InvokeExpression",
+          "Type": "code_vulnerability",
+          "Severity": "high",
+          "Title": "Use of Invoke-Expression detected",
+          "Description": "Invoke-Expression can lead to code injection if user input is passed in.",
+          "LineText": "It \"Should detect Invoke-Expression in PowerShell\" {"
+        },
+        {
+          "FilePath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\tests\\SecurityBaseline.Tests.ps1",
+          "LineNumber": 261,
+          "PatternName": "PowerShell_InvokeExpression",
+          "Type": "code_vulnerability",
+          "Severity": "high",
+          "Title": "Use of Invoke-Expression detected",
+          "Description": "Invoke-Expression can lead to code injection if user input is passed in.",
+          "LineText": "'Invoke-Expression $userInput' | Set-Content -LiteralPath $scriptFile"
+        }
+      ]
+    },
+    "SecurityBaseline": {
+      "timestamp": "2026-05-04T19:28:51Z",
+      "projectRoot": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one",
+      "outputDirectory": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports",
+      "overallPassed": false,
+      "promotionGate": {
+        "Passed": false,
+        "BlockedBy": [
+          "secrets-high",
+          "vulns-high"
+        ],
+        "Thresholds": {
+          "MaxAllowedCritical": 0,
+          "MaxAllowedHigh": 0
+        },
+        "SecretScan": {
+          "Critical": 0,
+          "High": 2
+        },
+        "VulnerabilityScan": {
+          "Critical": 0,
+          "High": 6
+        }
+      },
+      "scans": {
+        "secretScan": {
+          "reportPath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports\\secret-scan-2026-05-04T19-28-08Z.json",
+          "summary": {
+            "medium": 1,
+            "totalFindings": 3,
+            "low": 0,
+            "high": 2,
+            "critical": 0,
+            "scannedFiles": 381
+          }
+        },
+        "sbom": {
+          "outputPath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports\\sbom-2026-05-04T19-28-08Z.json",
+          "componentCount": 401,
+          "success": true
+        },
+        "vulnerabilityScan": {
+          "reportPath": "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports\\vulnerability-scan-2026-05-04T19-28-08Z.json",
+          "summary": {
+            "medium": 10,
+            "totalFindings": 18,
+            "low": 2,
+            "high": 6,
+            "critical": 0,
+            "scannedFiles": 387
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,21 +2,73 @@
 Set-StrictMode -Version Latest
 
 function Invoke-LLMQuery {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
     param(
         [string]$Query,
         [string]$Provider = "default",
-        [int]$Timeout = 120
+        [int]$Timeout = 120,
+        [switch]$Offline
     )
 
-    Write-Verbose "[SIMULATION] Querying LLM provider '$Provider' with timeout $Timeout`s"
-    Write-Verbose "[SIMULATION] Query: $Query"
-
-    return @{
-        content = "[Simulated LLM Response] This is a placeholder response."
-        provider = $Provider
-        tokens = @{ prompt = 100; completion = 200 }
-        latency = 500
+    if ($Offline) {
+        Write-Verbose "[OFFLINE SIMULATION] Returning simulated response for provider '$Provider'"
+        return @{
+            content = "[Offline Simulated LLM Response] This is a placeholder response."
+            provider = $Provider
+            tokens = @{ prompt = 100; completion = 200 }
+            latency = 500
+            mode = "OfflineSimulation"
+        }
     }
+
+    # Attempt real execution: check for available LLM provider via environment
+    $resolvedProvider = Resolve-ProviderProfile -RequestedProvider $Provider -ErrorAction SilentlyContinue
+    if ($resolvedProvider -and $resolvedProvider.ApiKeySet) {
+        Write-Verbose "Querying LLM provider '$Provider' with timeout $Timeout`s"
+        # If we have a resolved provider, attempt actual API call
+        try {
+            $queryStartTime = Get-Date
+            $headers = @{
+                "Authorization" = "Bearer $($resolvedProvider.ApiKey)"
+                "Content-Type" = "application/json"
+            }
+            $body = @{
+                model = "default"
+                messages = @(@{ role = "user"; content = $Query })
+                max_tokens = 4096
+            } | ConvertTo-Json
+
+            $response = Invoke-RestMethod -Method Post `
+                -Uri "$($resolvedProvider.BaseUrl)/chat/completions" `
+                -Headers $headers `
+                -Body $body `
+                -TimeoutSec $Timeout `
+                -ErrorAction Stop
+
+            return @{
+                content = $response.choices[0].message.content
+                provider = $Provider
+                tokens = @{ prompt = $response.usage.prompt_tokens; completion = $response.usage.completion_tokens }
+                latency = [math]::Round(((Get-Date) - $queryStartTime).TotalMilliseconds)
+                mode = "Live"
+            }
+        }
+        catch {
+            Write-Verbose "Live query failed, returning degraded response: $($_.Exception.Message)"
+            return @{
+                content = "[DEGRADED] Query submission failed: $($_.Exception.Message)"
+                provider = $Provider
+                tokens = @{ prompt = 0; completion = 0 }
+                latency = 0
+                mode = "Degraded"
+                error = $_.Exception.Message
+            }
+        }
+    }
+
+    # No executor available and not explicitly offline - fail clearly
+    throw "No LLM query executor is available. Either configure a provider (set $($Provider.ToUpper())_API_KEY) or pass -Offline for simulation mode."
 }
 
 function Save-GoldenTaskResult {
@@ -36,10 +88,19 @@ function Save-GoldenTaskResult {
     $existing = @()
     if (Test-Path -LiteralPath $OutputPath) {
         try {
-            $existing = Get-Content -LiteralPath $OutputPath -Raw | ConvertFrom-Json -AsHashtable
-            if (-not $existing) { $existing = @() }
+            # PS 5.1-compatible JSON parse: ConvertFrom-Json -AsHashtable is PS 7+
+            $rawJson = Get-Content -LiteralPath $OutputPath -Raw
+            if (-not [string]::IsNullOrWhiteSpace($rawJson)) {
+                $parsed = ConvertFrom-Json -InputObject $rawJson
+                if ($parsed -is [array]) {
+                    $existing = @($parsed | ForEach-Object { ConvertTo-Hashtable -InputObject $_ })
+                } elseif ($parsed -is [pscustomobject]) {
+                    $existing = @(ConvertTo-Hashtable -InputObject $parsed)
+                }
+            }
         }
         catch {
+            Write-Verbose "Could not parse existing results file, starting fresh: $($_.Exception.Message)"
             $existing = @()
         }
     }

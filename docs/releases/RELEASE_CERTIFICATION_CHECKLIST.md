@@ -109,7 +109,11 @@ This checklist must be completed and signed off before a release candidate can b
 |---|-------|-------|----------|--------|
 | 8.1 | All existing Pester tests pass | QA Owner | `Invoke-Pester tests/` exits 0 | Pending |
 | 8.2 | Release certification tests pass | QA Owner | `tests/ReleaseCertification.Tests.ps1` | Pending |
-| 8.3 | Test coverage is documented or measured | QA Owner | Coverage report or test inventory | Pending |
+| 8.3 | Module export surface tests exist and pass | QA Owner | `tests/ModuleExportSurface.Tests.ps1` | Pending |
+| 8.4 | Golden task execution tests exist and pass | QA Owner | `tests/GoldenTaskExecution.Tests.ps1` | Pending |
+| 8.5 | Build orchestration tests exist and pass | QA Owner | `tests/BuildOrchestration.Tests.ps1` | Pending |
+| 8.6 | Test coverage is documented or measured | QA Owner | Coverage report or test inventory | Pending |
+
 
 ## 9. Cross-Workstream Gates
 

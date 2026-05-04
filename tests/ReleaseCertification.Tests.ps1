@@ -24,6 +24,7 @@ BeforeAll {
     $script:ScriptsRoot = Join-Path $script:ProjectRoot "scripts"
     $script:PolicyRoot = Join-Path $script:ProjectRoot "policy"
     $script:CiRoot = Join-Path $script:ProjectRoot "tools\ci"
+    . (Join-Path $script:ScriptsRoot "Invoke-ReleaseCertification.ps1")
 }
 
 Describe "Documentation Truth" {
@@ -85,6 +86,18 @@ Describe "Observability" {
     It "OpenTelemetryBridge.ps1 exists" {
         $path = Join-Path $script:ModuleRoot "telemetry\OpenTelemetryBridge.ps1"
         Test-Path -LiteralPath $path | Should -Be $true
+    }
+}
+
+Describe "Module Contracts" {
+    It "documented palace commands are exported from the module" {
+        $manifestPath = Join-Path $script:ModuleRoot "LLMWorkflow.psd1"
+        Test-ModuleExportsCommands -ManifestPath $manifestPath -CommandNames @(
+            'Get-LLMWorkflowPalaces',
+            'Test-LLMWorkflowPalace',
+            'Sync-LLMWorkflowPalace',
+            'Sync-LLMWorkflowAllPalaces'
+        ) | Should -Be $true
     }
 }
 
@@ -177,6 +190,18 @@ Describe "Retrieval Backend" {
     It "RetrievalBackendAdapter.ps1 exists" {
         $path = Join-Path $script:ModuleRoot "retrieval\RetrievalBackendAdapter.ps1"
         Test-Path -LiteralPath $path | Should -Be $true
+    }
+
+    It "release certification does not treat mock-only retrieval adapters as ready" {
+        $path = Join-Path $script:ModuleRoot "retrieval\RetrievalBackendAdapter.ps1"
+        Test-RetrievalBackendImplementation -Path $path | Should -Be $false
+    }
+}
+
+Describe "Container Runtime" {
+    It "docker-compose does not rely on a nonexistent implicit contextlattice service default" {
+        $composePath = Join-Path $script:ProjectRoot "docker-compose.yml"
+        Test-ComposeContextLatticeConfiguration -ComposePath $composePath | Should -Be $true
     }
 }
 

@@ -101,6 +101,8 @@ jobs:
   docker-compose-test:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    env:
+      CONTEXTLATTICE_ORCHESTRATOR_URL: http://127.0.0.1:8075
 
     steps:
       - name: Checkout

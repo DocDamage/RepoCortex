@@ -18,7 +18,10 @@ function Invoke-GoldenTask {
         [string]$LLMProvider = "default",
 
         [Parameter(Mandatory = $false)]
-        [int]$TimeoutSeconds = 120
+        [int]$TimeoutSeconds = 120,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Offline
     )
 
     begin {
@@ -33,9 +36,8 @@ function Invoke-GoldenTask {
                 throw "Task '$($Task.taskId)' is missing required 'query' field"
             }
 
-            # Simulate or perform actual LLM query
-            # In production, this would call the actual LLM workflow system
-            $llmResponse = Invoke-LLMQuery -Query $Task.query -Provider $LLMProvider -Timeout $TimeoutSeconds
+            # Execute LLM query (real provider if available, or -Offline for simulation)
+            $llmResponse = Invoke-LLMQuery -Query $Task.query -Provider $LLMProvider -Timeout $TimeoutSeconds -Offline:$Offline
 
             # Extract properties from LLM response
             $extractedProperties = Extract-ResponseProperties -Response $llmResponse -Task $Task

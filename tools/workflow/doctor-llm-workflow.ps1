@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$ProjectRoot = ".",
-    [ValidateSet("auto", "openai", "kimi", "gemini", "glm")]
+    [ValidateSet("auto", "openai", "kimi", "gemini", "glm", "claude", "ollama")]
     [string]$Provider = "auto",
     [switch]$CheckContext,
     [int]$TimeoutSec = 10,
@@ -168,6 +168,14 @@ function Get-ProviderProfile {
                 DefaultBaseUrl = "https://api.openai.com/v1"
             }
         }
+        "claude" {
+            return @{
+                Name = "claude"
+                ApiKeyVars = @("ANTHROPIC_API_KEY", "CLAUDE_API_KEY")
+                BaseUrlVars = @("ANTHROPIC_BASE_URL", "CLAUDE_BASE_URL")
+                DefaultBaseUrl = "https://api.anthropic.com/v1"
+            }
+        }
         "kimi" {
             return @{
                 Name = "kimi"
@@ -192,6 +200,14 @@ function Get-ProviderProfile {
                 DefaultBaseUrl = "https://open.bigmodel.cn/api/paas/v4"
             }
         }
+        "ollama" {
+            return @{
+                Name = "ollama"
+                ApiKeyVars = @("OLLAMA_API_KEY")
+                BaseUrlVars = @("OLLAMA_BASE_URL", "OLLAMA_HOST")
+                DefaultBaseUrl = "http://localhost:11434/v1"
+            }
+        }
         default {
             throw "Unsupported provider: $Name"
         }
@@ -203,7 +219,7 @@ function Resolve-ProviderProfile {
     param([string]$RequestedProvider)
 
     $requested = $RequestedProvider.ToLowerInvariant()
-    $order = @("openai", "kimi", "gemini", "glm")
+    $order = @("openai", "claude", "kimi", "gemini", "glm", "ollama")
 
     if ($requested -ne "auto") {
         $profile = Get-ProviderProfile -Name $requested
@@ -264,6 +280,14 @@ function Test-ProviderKey {
                 if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
                 return $true
             }
+            "claude" {
+                $headers["x-api-key"] = $ApiKey
+                $headers["anthropic-version"] = "2023-06-01"
+                $response = Invoke-RestMethod -Method Get -Uri "$BaseUrl/models" -Headers $headers -TimeoutSec $TimeoutSec
+                $stopwatch.Stop()
+                if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
+                return $true
+            }
             "kimi" {
                 $response = Invoke-RestMethod -Method Get -Uri "$BaseUrl/models" -Headers $headers -TimeoutSec $TimeoutSec
                 $stopwatch.Stop()
@@ -283,6 +307,13 @@ function Test-ProviderKey {
                     max_tokens = 1
                 } | ConvertTo-Json -Depth 4
                 $response = Invoke-RestMethod -Method Post -Uri "$BaseUrl/chat/completions" -Headers $headers -Body $body -TimeoutSec $TimeoutSec
+                $stopwatch.Stop()
+                if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
+                return $true
+            }
+            "ollama" {
+                $ollamaBaseUrl = if ($BaseUrl -match '/v1$') { $BaseUrl -replace '/v1$','' } else { $BaseUrl }
+                $response = Invoke-RestMethod -Method Get -Uri "$ollamaBaseUrl/api/tags" -TimeoutSec $TimeoutSec
                 $stopwatch.Stop()
                 if ($LatencyMs) { $LatencyMs.Value = $stopwatch.ElapsedMilliseconds }
                 return $true
@@ -420,7 +451,7 @@ if ($null -eq $providerResolved) {
     $checks.Add([pscustomobject]@{
         Name = "provider_credentials"
         Ok = $false
-        Detail = "No provider key found. Set OPENAI_API_KEY, KIMI_API_KEY, GEMINI_API_KEY, or GLM_API_KEY in .env"
+        Detail = "No provider key found. Set OPENAI_API_KEY, ANTHROPIC_API_KEY or CLAUDE_API_KEY, KIMI_API_KEY, GEMINI_API_KEY, GLM_API_KEY, or OLLAMA_API_KEY in .env"
         LatencyMs = $null
     })
 } else {

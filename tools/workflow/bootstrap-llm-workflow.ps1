@@ -2,7 +2,7 @@
 param(
     [string]$ProjectRoot = ".",
     [string]$ToolkitSource = "",
-    [ValidateSet("auto", "openai", "kimi", "gemini", "glm")]
+    [ValidateSet("auto", "openai", "kimi", "gemini", "glm", "claude", "ollama")]
     [string]$Provider = "auto",
     [switch]$SkipDependencyInstall,
     [switch]$SkipProviderNormalize,
@@ -434,6 +434,14 @@ function Get-ProviderProfile {
                 DefaultBaseUrl = "https://api.openai.com/v1"
             }
         }
+        "claude" {
+            return @{
+                Name = "claude"
+                ApiKeyVars = @("ANTHROPIC_API_KEY", "CLAUDE_API_KEY")
+                BaseUrlVars = @("ANTHROPIC_BASE_URL", "CLAUDE_BASE_URL")
+                DefaultBaseUrl = "https://api.anthropic.com/v1"
+            }
+        }
         "kimi" {
             return @{
                 Name = "kimi"
@@ -458,6 +466,14 @@ function Get-ProviderProfile {
                 DefaultBaseUrl = "https://open.bigmodel.cn/api/paas/v4"
             }
         }
+        "ollama" {
+            return @{
+                Name = "ollama"
+                ApiKeyVars = @("OLLAMA_API_KEY")
+                BaseUrlVars = @("OLLAMA_BASE_URL", "OLLAMA_HOST")
+                DefaultBaseUrl = "http://localhost:11434/v1"
+            }
+        }
         default {
             throw "Unsupported provider: $Name"
         }
@@ -467,7 +483,7 @@ function Get-ProviderProfile {
 function Get-ProviderPreferenceOrder {
     [CmdletBinding()]
     param()
-    return @("openai", "kimi", "gemini", "glm")
+    return @("openai", "claude", "kimi", "gemini", "glm", "ollama")
 }
 
 function Resolve-ProviderProfile {
@@ -536,7 +552,7 @@ function Set-NormalizedProviderEnvironment {
 
     $resolved = Resolve-ProviderProfile -RequestedProvider $RequestedProvider
     if ($null -eq $resolved -or [string]::IsNullOrWhiteSpace($resolved.ApiKey)) {
-        $hint = "OPENAI_API_KEY, KIMI_API_KEY, GEMINI_API_KEY, or GLM_API_KEY"
+        $hint = "OPENAI_API_KEY, ANTHROPIC_API_KEY or CLAUDE_API_KEY, KIMI_API_KEY, GEMINI_API_KEY, GLM_API_KEY, or OLLAMA_API_KEY"
         if ($FailIfMissing) {
             throw "No usable provider API key found in environment ($hint)."
         }

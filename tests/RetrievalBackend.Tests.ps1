@@ -62,14 +62,15 @@ Describe "RetrievalBackendAdapter Module Tests" {
     }
 
     Context "Test-RetrievalBackendConnection Function" {
-        It "Should report Qdrant as reachable (mock)" {
+        It "Should report Qdrant as reachable" {
+            Mock Invoke-RestMethod { return @{ status = 'ok' } }
             $adapter = New-RetrievalBackendAdapter -Backend "qdrant" -Collection "test-pack"
             $result = Test-RetrievalBackendConnection -Adapter $adapter
 
             $result.Success | Should -Be $true
             $result.Reachable | Should -Be $true
             $result.Backend | Should -Be "qdrant"
-            $result.MockHealthCheck.status | Should -Be "ok"
+            $result.Health.status | Should -Be "ok"
         }
 
         It "Should verify LanceDB data path is writable" {
@@ -84,14 +85,14 @@ Describe "RetrievalBackendAdapter Module Tests" {
     }
 
     Context "Add-RetrievalDocument Function" {
-        It "Should return mock success for Qdrant" {
+        It "Should return success for Qdrant" {
+            Mock Invoke-RestMethod { return @{ result = @{ status = 'acknowledged' } } }
             $adapter = New-RetrievalBackendAdapter -Backend "qdrant" -Collection "test-pack"
             $result = Add-RetrievalDocument -Adapter $adapter -DocumentId "doc-1" -Vector @(0.1, 0.2, 0.3) -Payload @{ text = "hello" }
 
             $result.Success | Should -Be $true
             $result.DocumentId | Should -Be "doc-1"
-            $result.mockResponse.status | Should -Be "ok"
-            $result.mockResponse.operation | Should -Be "upsert"
+            $result.Response.result.status | Should -Be "acknowledged"
         }
 
         It "Should persist document for LanceDB" {
@@ -104,14 +105,15 @@ Describe "RetrievalBackendAdapter Module Tests" {
     }
 
     Context "Search-RetrievalBackend Function" {
-        It "Should return mock search result for Qdrant" {
+        It "Should return search result for Qdrant" {
+            Mock Invoke-RestMethod { [pscustomobject]@{ result = @([pscustomobject]@{ id = "q-1"; score = 0.9 }) } }
             $adapter = New-RetrievalBackendAdapter -Backend "qdrant" -Collection "test-pack"
             $result = Search-RetrievalBackend -Adapter $adapter -Vector @(0.1, 0.2, 0.3) -Limit 5
 
             $result.Success | Should -Be $true
             $result.Backend | Should -Be "qdrant"
-            $result.mockResponse.status | Should -Be "ok"
-            $result.mockResponse.operation | Should -Be "search"
+            $result.Results.Count | Should -Be 1
+            $result.Results[0].id | Should -Be "q-1"
         }
 
         It "Should search documents for LanceDB" {
@@ -142,14 +144,14 @@ Describe "RetrievalBackendAdapter Module Tests" {
     }
 
     Context "Remove-RetrievalDocument Function" {
-        It "Should return mock success for Qdrant" {
+        It "Should return success for Qdrant" {
+            Mock Invoke-RestMethod { return @{ result = @{ status = 'acknowledged' } } }
             $adapter = New-RetrievalBackendAdapter -Backend "qdrant" -Collection "test-pack"
             $result = Remove-RetrievalDocument -Adapter $adapter -DocumentId "doc-1"
 
             $result.Success | Should -Be $true
             $result.DocumentId | Should -Be "doc-1"
-            $result.mockResponse.status | Should -Be "ok"
-            $result.mockResponse.operation | Should -Be "delete"
+            $result.Response.result.status | Should -Be "acknowledged"
         }
 
         It "Should remove document from LanceDB" {

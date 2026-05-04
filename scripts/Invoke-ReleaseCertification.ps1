@@ -72,6 +72,96 @@ function Test-DirectoryHasFiles {
     return ($fileList.Count -gt 0)
 }
 
+function Test-ModuleExportsCommands {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ManifestPath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$CommandNames
+    )
+
+    if (-not (Test-Path -LiteralPath $ManifestPath)) {
+        return $false
+    }
+
+    try {
+        Import-Module $ManifestPath -Force -ErrorAction Stop
+        foreach ($commandName in $CommandNames) {
+            $command = Get-Command -Name $commandName -ErrorAction SilentlyContinue
+            if ($null -eq $command -or $command.Source -ne 'LLMWorkflow') {
+                return $false
+            }
+        }
+        return $true
+    }
+    catch {
+        return $false
+    }
+    finally {
+        Remove-Module -Name LLMWorkflow -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Test-ComposeContextLatticeConfiguration {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ComposePath
+    )
+
+    if (-not (Test-Path -LiteralPath $ComposePath)) {
+        return $false
+    }
+
+    $raw = Get-Content -LiteralPath $ComposePath -Raw -ErrorAction SilentlyContinue
+    if ([string]::IsNullOrWhiteSpace($raw)) {
+        return $false
+    }
+
+    $definesBundledService = $raw -match '(?m)^\s{2}contextlattice:\s*$'
+    $usesBrokenImplicitDefault = $raw -match [regex]::Escape('http://contextlattice:8075')
+    $requiresExplicitExternalUrl = $raw -match [regex]::Escape('Set CONTEXTLATTICE_ORCHESTRATOR_URL to a reachable external ContextLattice orchestrator')
+
+    return ($definesBundledService -or ((-not $usesBrokenImplicitDefault) -and $requiresExplicitExternalUrl))
+}
+
+function Test-RetrievalBackendImplementation {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $false
+    }
+
+    $raw = Get-Content -LiteralPath $Path -Raw -ErrorAction SilentlyContinue
+    if ([string]::IsNullOrWhiteSpace($raw)) {
+        return $false
+    }
+
+    $mockIndicators = @(
+        'Qdrant via HTTP REST mocks',
+        'LanceDB via file-based mocks',
+        'mockResponse',
+        'MockHealthCheck'
+    )
+
+    foreach ($indicator in $mockIndicators) {
+        if ($raw -match [regex]::Escape($indicator)) {
+            return $false
+        }
+    }
+
+    return $true
+}
+
 function Get-CertificationStatus {
     [CmdletBinding()]
     [OutputType([string])]
@@ -96,13 +186,17 @@ function Test-ReleaseCriteria {
     .DESCRIPTION
         Performs existence and content checks for documentation, observability,
         policy, ingestion, security, durable execution, MCP governance, retrieval,
-        and CI validation artifacts.
+        and CI validation artifacts. In -Strict mode, adds module import/export
+        parity checks, stale artifact detection, mojibake detection, build
+        orchestrator existence, and Pester smoke suite requirements.
 
     .PARAMETER ProjectRoot
         Root path of the project to evaluate.
 
     .PARAMETER Strict
-        If specified, missing security scan scripts will cause the Security category to fail.
+        If specified, enables extended checks: module import/export parity,
+        stale artifacts, mojibake detection, build orchestrator existence,
+        and Pester smoke suite validation.
 
     .OUTPUTS
         System.Management.Automation.PSCustomObject
@@ -123,10 +217,14 @@ function Test-ReleaseCriteria {
     }
 
     $moduleRoot = Join-Path $ProjectRoot "module\LLMWorkflow"
+    $moduleManifestPath = Join-Path $moduleRoot "LLMWorkflow.psd1"
     $docsRoot = Join-Path $ProjectRoot "docs"
     $scriptsRoot = Join-Path $ProjectRoot "scripts"
     $policyRoot = Join-Path $ProjectRoot "policy"
     $ciRoot = Join-Path $ProjectRoot "tools\ci"
+    $composePath = Join-Path $ProjectRoot "docker-compose.yml"
+    $buildRoot = Join-Path $ProjectRoot "tools\build"
+    $testRoot = Join-Path $ProjectRoot "tests"
 
     # --- Documentation Truth ---
     $versionPath = Join-Path $ProjectRoot "VERSION"
@@ -163,11 +261,98 @@ function Test-ReleaseCriteria {
 
     $documentationTruth = $versionExists -and $versionNotEmpty -and $allDocsExist
 
+    # -- Extended Strict checks: mojibake, stale artifacts, build orchestrator --
+    $mojibakeDetected = $false
+    $staleArtifactsFound = $false
+    $buildOrchestratorExists = $false
+    $moduleExportParityPassed = $true
+
+    if ($Strict) {
+        # Mojibake check in release-facing docs (UTF-8 encoding artifacts)
+        $mojibakePattern = '[\x80-\xFF]{2,}'
+
+        $mojibakeTargets = @(
+            'README.md',
+            'PROGRESS.md',
+            'docs\implementation\PROGRESS.md',
+            'docs\releases\RELEASE_STATE.md',
+            'docs\releases\V1_RELEASE_CRITERIA.md',
+            'docs\releases\RELEASE_CERTIFICATION_CHECKLIST.md',
+            'docs\reference\DOCS_TRUTH_MATRIX.md'
+        )
+        foreach ($relPath in $mojibakeTargets) {
+            $fullPath = Join-Path $ProjectRoot $relPath
+            if (Test-Path -LiteralPath $fullPath) {
+                $content = Get-Content -LiteralPath $fullPath -Raw
+                if ($content -match $mojibakePattern) {
+                    $mojibakeDetected = $true
+                    break
+                }
+            }
+        }
+
+        # Stale root artifact check
+        foreach ($badFile in @('_content_probe.txt', 'f')) {
+            if (Test-Path -LiteralPath (Join-Path $ProjectRoot $badFile)) {
+                $staleArtifactsFound = $true
+            }
+        }
+
+        # Build orchestrator check
+        $buildOrchestratorExists = Test-Path -LiteralPath (Join-Path $buildRoot 'Invoke-LLMBuild.ps1')
+
+        # Module export parity check
+        if (Test-Path -LiteralPath $moduleManifestPath) {
+            try {
+                $manifest = Import-PowerShellDataFile -Path $moduleManifestPath
+                if ($manifest.FunctionsToExport) {
+                    Import-Module $moduleManifestPath -Force -ErrorAction Stop
+                    foreach ($fn in $manifest.FunctionsToExport) {
+                        $cmd = Get-Command -Name $fn -Module LLMWorkflow -ErrorAction SilentlyContinue
+                        if (-not $cmd) {
+                            $moduleExportParityPassed = $false
+                            break
+                        }
+                    }
+                    foreach ($alias in $manifest.AliasesToExport) {
+                        $resolved = Get-Alias -Name $alias -ErrorAction SilentlyContinue
+                        if (-not $resolved) {
+                            $moduleExportParityPassed = $false
+                            break
+                        }
+                        $targetCmd = Get-Command -Name $resolved.Definition -ErrorAction SilentlyContinue
+                        if (-not $targetCmd) {
+                            $moduleExportParityPassed = $false
+                            break
+                        }
+                    }
+                }
+            }
+            catch {
+                $moduleExportParityPassed = $false
+            }
+            finally {
+                Remove-Module LLMWorkflow -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        # Pester smoke test presence
+        $pesterSmokeExists = Test-Path -LiteralPath (Join-Path $testRoot 'CoreModule.Tests.ps1')
+    }
+
     # --- Observability ---
     $observability = (
         (Test-FileExists -Path (Join-Path $moduleRoot "telemetry\SpanFactory.ps1")) -and
         (Test-FileExists -Path (Join-Path $moduleRoot "telemetry\TraceEnvelope.ps1")) -and
         (Test-FileExists -Path (Join-Path $moduleRoot "telemetry\OpenTelemetryBridge.ps1"))
+    )
+
+    # --- Module Contracts ---
+    $moduleContracts = Test-ModuleExportsCommands -ManifestPath $moduleManifestPath -CommandNames @(
+        'Get-LLMWorkflowPalaces',
+        'Test-LLMWorkflowPalace',
+        'Sync-LLMWorkflowPalace',
+        'Sync-LLMWorkflowAllPalaces'
     )
 
     # --- Policy ---
@@ -267,8 +452,15 @@ function Test-ReleaseCriteria {
         (Test-FileExists -Path (Join-Path $moduleRoot "mcp\MCPToolLifecycle.ps1"))
     )
 
+    # --- Container Runtime ---
+    $containerRuntime = Test-ComposeContextLatticeConfiguration -ComposePath $composePath
+
     # --- Retrieval Backend ---
-    $retrievalBackend = Test-FileExists -Path (Join-Path $moduleRoot "retrieval\RetrievalBackendAdapter.ps1")
+    $retrievalBackendPath = Join-Path $moduleRoot "retrieval\RetrievalBackendAdapter.ps1"
+    $retrievalBackend = (
+        (Test-FileExists -Path $retrievalBackendPath) -and
+        (Test-RetrievalBackendImplementation -Path $retrievalBackendPath)
+    )
 
     # --- CI Validation ---
     $ciValidation = Test-FileExists -Path (Join-Path $ciRoot "validate-docs-truth.ps1")
@@ -276,12 +468,14 @@ function Test-ReleaseCriteria {
     $overallPassed = (
         $documentationTruth -and
         $observability -and
+        $moduleContracts -and
         $policy -and
         $documentIngestion -and
         $gameAssetIngestion -and
         $security -and
         $durableExecution -and
         $mcpGovernance -and
+        $containerRuntime -and
         $retrievalBackend -and
         $ciValidation
     )
@@ -293,12 +487,14 @@ function Test-ReleaseCriteria {
         Categories = [ordered]@{
             DocumentationTruth = $documentationTruth
             Observability = $observability
+            ModuleContracts = $moduleContracts
             Policy = $policy
             DocumentIngestion = $documentIngestion
             GameAssetIngestion = $gameAssetIngestion
             Security = $security
             DurableExecution = $durableExecution
             MCPGovernance = $mcpGovernance
+            ContainerRuntime = $containerRuntime
             RetrievalBackend = $retrievalBackend
             CIValidation = $ciValidation
         }

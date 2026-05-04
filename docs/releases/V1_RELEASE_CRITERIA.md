@@ -10,6 +10,9 @@ This document defines the explicit exit criteria for declaring LLMWorkflow v1.0 
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
 - [Remaining Work](../implementation/REMAINING_WORK.md)
 - [Release Certification Checklist](./RELEASE_CERTIFICATION_CHECKLIST.md)
+- [Release Remediation Report (2026-05-04)](../../what_should_be_done_release_plan_2026-05-04.md)
+- [Release Preflight Tool](../../tools/release/test-release-prereqs.ps1)
+
 
 ---
 

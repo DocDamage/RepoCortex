@@ -22,7 +22,7 @@ function New-RetrievalBackendAdapter {
     .DESCRIPTION
         Initializes an adapter object that provides a unified surface for
         vector search, document indexing, and connection testing. Supports
-        Qdrant via HTTP REST mocks and LanceDB via file-based mocks.
+        Qdrant via HTTP REST API and LanceDB via local file-based storage.
 
     .PARAMETER Backend
         The backend type: 'qdrant' or 'lancedb'.
@@ -103,7 +103,7 @@ function Add-RetrievalDocument {
 
     .DESCRIPTION
         For Qdrant, sends an HTTP upsert request to the collection points
-        endpoint. For LanceDB, appends the document to a local JSON mock
+        endpoint. For LanceDB, appends the document to a local JSON 
         table on disk.
 
     .PARAMETER Adapter
@@ -172,15 +172,9 @@ function Add-RetrievalDocument {
                     }
 
                     $url = "$($Adapter.baseUrl)/collections/$($Adapter.collection)/points?wait=true"
-
-                    # Mock implementation: simulate success without network
+                    $response = Invoke-RestMethod -Method Put -Uri $url -Headers $headers -Body $body -ErrorAction Stop
                     $result.Success = $true
-                    $result['mockResponse'] = @{
-                        status = 'ok'
-                        operation = 'upsert'
-                        url = $url
-                        bodyLength = $body.Length
-                    }
+                    $result['Response'] = $response
                 }
                 'lancedb' {
                     $tableDir = Join-Path $Adapter.dataPath $Adapter.collection
@@ -279,14 +273,9 @@ function Remove-RetrievalDocument {
                     }
 
                     $url = "$($Adapter.baseUrl)/collections/$($Adapter.collection)/points/delete?wait=true"
-
-                    # Mock implementation
+                    $response = Invoke-RestMethod -Method Post -Uri $url -Headers $headers -Body $body -ErrorAction Stop
                     $result.Success = $true
-                    $result['mockResponse'] = @{
-                        status = 'ok'
-                        operation = 'delete'
-                        url = $url
-                    }
+                    $result['Response'] = $response
                 }
                 'lancedb' {
                     $tableDir = Join-Path $Adapter.dataPath $Adapter.collection
@@ -337,9 +326,9 @@ function Search-RetrievalBackend {
         Performs a vector search with optional payload filters.
 
     .DESCRIPTION
-        For Qdrant, constructs a mock HTTP search request. For LanceDB,
+        For Qdrant, constructs an HTTP search request. For LanceDB,
         performs an in-memory cosine similarity search over the local
-        mock table and applies payload filters.
+        table and applies payload filters.
 
     .PARAMETER Adapter
         Adapter object created by New-RetrievalBackendAdapter.
@@ -348,7 +337,7 @@ function Search-RetrievalBackend {
         Query embedding vector.
 
     .PARAMETER Filter
-        Optional hashtable of payload filters (exact match only in mock).
+        Optional hashtable of payload filters (exact match only).
 
     .PARAMETER Limit
         Maximum number of results. Default: 10.
@@ -409,16 +398,11 @@ function Search-RetrievalBackend {
                     }
 
                     $url = "$($Adapter.baseUrl)/collections/$($Adapter.collection)/points/search"
+                    $response = Invoke-RestMethod -Method Post -Uri $url -Headers $headers -Body $jsonBody -ErrorAction Stop
 
-                    # Mock implementation: return empty but valid result structure
                     $result.Success = $true
-                    $result['mockResponse'] = @{
-                        status = 'ok'
-                        operation = 'search'
-                        url = $url
-                        bodyLength = $jsonBody.Length
-                    }
-                    $result.Results = @()
+                    $result['Response'] = $response
+                    $result.Results = if ($response.result) { $response.result } else { @() }
                 }
                 'lancedb' {
                     $tableDir = Join-Path $Adapter.dataPath $Adapter.collection
@@ -492,7 +476,7 @@ function Test-RetrievalBackendConnection {
         Tests connectivity to the retrieval backend.
 
     .DESCRIPTION
-        For Qdrant, performs a mock health check against the base URL.
+        For Qdrant, performs a health check against the base URL.
         For LanceDB, verifies that the data path is writable.
 
     .PARAMETER Adapter
@@ -526,13 +510,10 @@ function Test-RetrievalBackendConnection {
         try {
             switch ($Adapter.backend) {
                 'qdrant' {
-                    # Mock health check
+                    $health = Invoke-RestMethod -Method Get -Uri "$($Adapter.baseUrl)/healthz" -ErrorAction Stop
                     $result.Success = $true
-                    $result.Reachable = $true
-                    $result['MockHealthCheck'] = @{
-                        url = "$($Adapter.baseUrl)/healthz"
-                        status = 'ok'
-                    }
+                    $result.Reachable = ($health.status -eq 'ok')
+                    $result['Health'] = $health
                 }
                 'lancedb' {
                     if (-not (Test-Path -LiteralPath $Adapter.dataPath)) {
