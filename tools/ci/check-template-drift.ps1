@@ -11,7 +11,9 @@ function Get-RelativeFileHashes {
     )
 
     $rootPath = (Resolve-Path -LiteralPath $Root).Path
-    $files = Get-ChildItem -LiteralPath $rootPath -Recurse -File | Sort-Object FullName
+    $files = Get-ChildItem -LiteralPath $rootPath -Recurse -File |
+        Where-Object { $_.FullName -notmatch '__pycache__' -and $_.Extension -ne '.pyc' } |
+        Sort-Object FullName
     $map = @{}
     foreach ($file in $files) {
         $relative = $file.FullName.Substring($rootPath.Length).TrimStart('\', '/').Replace('\', '/')
@@ -20,6 +22,7 @@ function Get-RelativeFileHashes {
     }
     return $map
 }
+
 
 function Compare-DirectoryContent {
     [CmdletBinding()]

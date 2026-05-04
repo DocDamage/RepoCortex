@@ -11,20 +11,10 @@ if (-not (Test-Path -LiteralPath $ctxDir)) {
     New-Item -ItemType Directory -Path $ctxDir -Force | Out-Null
 }
 
-$schemaPath = Join-Path $ctxDir "orchestrator.env.schema.json"
-if (-not (Test-Path -LiteralPath $schemaPath)) {
-    $sourceSchema = Join-Path $PSScriptRoot "..\..\..\..\..\.contextlattice\orchestrator.env.schema.json"
-    if (Test-Path -LiteralPath $sourceSchema) {
-        Copy-Item -LiteralPath $sourceSchema -Destination $schemaPath -Force
-    }
-}
-
 $projectName = Split-Path -Leaf $root
 $envSamplePath = Join-Path $ctxDir "orchestrator.env.sample"
 if (-not (Test-Path -LiteralPath $envSamplePath)) {
 @"
-# ContextLattice Orchestrator Configuration
-# Schema: ./orchestrator.env.schema.json
 CONTEXTLATTICE_ORCHESTRATOR_URL=http://127.0.0.1:8075
 CONTEXTLATTICE_ORCHESTRATOR_API_KEY=replace-with-your-contextlattice-api-key
 CONTEXTLATTICE_PROJECT_NAME=$projectName
@@ -46,7 +36,6 @@ if (-not (Test-Path -LiteralPath $mcpSamplePath)) {
 }
 
 Write-Output "Bootstrapped ContextLattice project files:"
-Write-Output " - $schemaPath"
 Write-Output " - $envSamplePath"
 Write-Output " - $mcpSamplePath"
 
