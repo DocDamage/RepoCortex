@@ -1,2 +1,33 @@
+# LLM Workflow Platform - Python Dependency Scan Manifest (v0.9.6)
+# Generated from codebase analysis. Used by Invoke-LLMWorkflowUp --SkipDependencyInstall.
+# Core dependencies
 chromadb>=0.5.0
+codemunch-pro>=0.1.0
+docling>=2.0.0
+tika>=2.6.0
+Pillow>=10.0.0
+requests>=2.28.0
+
+# Document ingestion
+python-magic>=0.4.27
+python-docx>=0.8.11
+openpyxl>=3.1.0
+PyPDF2>=3.0.0
+pypdf>=3.15.0
+python-pptx>=0.6.21
+
+# Embeddings & ML
+sentence-transformers>=2.2.0
+numpy>=1.24.0
+
+# Web & networking
+urllib3>=1.26.0
+httpx>=0.24.0
+
+# Utilities
+pyyaml>=6.0
+jsonschema>=4.18.0
+click>=8.1.0
+rich>=13.0.0
+toml>=0.10.2
 

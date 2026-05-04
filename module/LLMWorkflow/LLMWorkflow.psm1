@@ -3,6 +3,36 @@ Set-StrictMode -Version Latest
 # Save the module root path for later use (PSScriptRoot changes when dot-sourcing)
 $script:ModuleRoot = $PSScriptRoot
 
+#===============================================================================
+# Module Loader Validation Guard (AAA Release Audit: HIGH-A1)
+# Ensures the module root directory exists and core files are present before
+# attempting to load any components. Prevents silent partial-load scenarios.
+#===============================================================================
+
+# Validate module root
+if (-not (Test-Path -LiteralPath $script:ModuleRoot)) {
+    throw "LLMWorkflow module root not found at: $script:ModuleRoot"
+}
+
+# Validate core directory exists
+$coreDir = Join-Path $script:ModuleRoot "core"
+if (-not (Test-Path -LiteralPath $coreDir)) {
+    throw "LLMWorkflow core directory not found at: $coreDir. Module cannot load."
+}
+
+# Validate at least the essential core files exist
+$essentialFiles = @(
+    "TypeConverters.ps1",
+    "Logging.ps1",
+    "StateFile.ps1"
+)
+$missingEssential = $essentialFiles | Where-Object {
+    -not (Test-Path -LiteralPath (Join-Path $coreDir $_))
+}
+if ($missingEssential.Count -gt 0) {
+    Write-Warning "LLMWorkflow module: Missing $($missingEssential.Count) essential core file(s): $($missingEssential -join ', '). Module may load partially."
+}
+
 # Helper to check PS version requirement
 function Test-PSVersionRequirement {
     param([string]$FilePath)
@@ -969,11 +999,12 @@ function Get-LLMWorkflowPalaces {
     }
     
     try {
-        $configContent = Get-Content -LiteralPath $ConfigPath -Raw
-        $config = $configContent | ConvertFrom-Json -AsHashtable
+        $configContent = Get-Content -LiteralPath $ConfigPath -Raw -ErrorAction Stop
+        $config = $configContent | ConvertFrom-Json -AsHashtable -ErrorAction Stop
     } catch {
-        Write-Error "Failed to parse config file: $_"
-        return @()
+        Write-Error "Failed to parse config file at '$ConfigPath': $_"
+        # Throw so callers can distinguish "no palaces" from "corrupted config"
+        throw
     }
     
     # Check version and format

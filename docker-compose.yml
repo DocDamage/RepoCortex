@@ -57,6 +57,8 @@ services:
     depends_on:
       chromadb:
         condition: service_started
+    # NOTE: To deploy without ChromaDB, comment out depends_on above
+    # and set MEMPALACE_PALACE_PATH to an existing ChromaDB persistent directory.
     restart: unless-stopped
 
   # ChromaDB service for local MemPalace

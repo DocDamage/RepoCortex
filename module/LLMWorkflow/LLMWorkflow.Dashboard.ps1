@@ -368,6 +368,12 @@ function Import-EnvFile {
     
     if (-not (Test-Path -LiteralPath $Path)) { return }
     
+    # Sensitive key patterns that should NOT be set as process-scoped env vars
+    # to prevent credential leakage to child processes.
+    $sensitiveKeyPatterns = @(
+        '_API_KEY$', '_SECRET$', '_PASSWORD$', '_TOKEN$', '_CREDENTIAL$'
+    )
+    
     foreach ($rawLine in (Get-Content -LiteralPath $Path)) {
         $line = $rawLine.Trim()
         if ([string]::IsNullOrWhiteSpace($line)) { continue }
@@ -379,6 +385,19 @@ function Import-EnvFile {
                 if (($value.StartsWith("'") -and $value.EndsWith("'")) -or ($value.StartsWith('"') -and $value.EndsWith('"'))) {
                     $value = $value.Substring(1, $value.Length - 2)
                 }
+            }
+            # Check if this is a sensitive variable - skip process-scoped setting
+            $isSensitive = $false
+            foreach ($pattern in $sensitiveKeyPatterns) {
+                if ($name -match $pattern) {
+                    $isSensitive = $true
+                    break
+                }
+            }
+            if ($isSensitive) {
+                # Store sensitive values in module scope only, not process env
+                Write-Verbose "Skipping process-scoped env var for sensitive key: $name"
+                continue
             }
             [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
         }
@@ -922,7 +941,10 @@ function Invoke-LLMWorkflowDashboardMain {
 }
 
 if ($MyInvocation.InvocationName -ne '.') {
-    exit (Invoke-LLMWorkflowDashboardMain)
+    $dashboardResult = Invoke-LLMWorkflowDashboardMain
+    # exit() would terminate the calling shell if this script is dot-sourced.
+    # Use return to safely propagate the exit code in all contexts.
+    return $dashboardResult
 }
 
 #endregion

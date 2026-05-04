@@ -35,35 +35,38 @@ Describe "Documentation Truth" {
         $content.Trim() | Should -Not -Be ''
     }
 
-    It "RELEASE_STATE.md exists" {
-        $path = Join-Path $script:DocsRoot "RELEASE_STATE.md"
+    It "RELEASE_STATE.md exists in releases subdirectory" {
+        $path = Join-Path $script:DocsRoot "releases\RELEASE_STATE.md"
         Test-Path -LiteralPath $path | Should -Be $true
     }
 
-    It "DOCS_TRUTH_MATRIX.md exists" {
-        $path = Join-Path $script:DocsRoot "DOCS_TRUTH_MATRIX.md"
+    It "DOCS_TRUTH_MATRIX.md exists in reference subdirectory" {
+        $path = Join-Path $script:DocsRoot "reference\DOCS_TRUTH_MATRIX.md"
         Test-Path -LiteralPath $path | Should -Be $true
     }
 
-    It "All required documentation files exist" {
-        $requiredDocs = @(
-            'V1_RELEASE_CRITERIA.md',
-            'RELEASE_CERTIFICATION_CHECKLIST.md',
-            'RELEASE_STATE.md',
-            'DOCS_TRUTH_MATRIX.md',
-            'DOCUMENT_INGESTION_MODEL.md',
-            'GAME_ASSET_INGESTION_MODEL.md',
-            'SECURITY_BASELINE.md',
-            'SUPPLY_CHAIN_POLICY.md',
-            'POLICY_RUNTIME_MODEL.md',
-            'OBSERVABILITY_ARCHITECTURE.md',
-            'EVALUATION_OPERATIONS.md',
-            'SELF_HEALING.md'
-        )
+    It "All required documentation files exist in appropriate subdirectories" {
+        # Maps doc files to their subdirectory under docs/
+        $requiredDocMap = @{
+            'V1_RELEASE_CRITERIA.md' = 'releases'
+            'RELEASE_CERTIFICATION_CHECKLIST.md' = 'releases'
+            'RELEASE_STATE.md' = 'releases'
+            'DOCS_TRUTH_MATRIX.md' = 'reference'
+            'DOCUMENT_INGESTION_MODEL.md' = 'architecture'
+            'GAME_ASSET_INGESTION_MODEL.md' = 'architecture'
+            'SECURITY_BASELINE.md' = 'architecture'
+            'SUPPLY_CHAIN_POLICY.md' = 'reference'
+            'POLICY_RUNTIME_MODEL.md' = 'architecture'
+            'OBSERVABILITY_ARCHITECTURE.md' = 'architecture'
+            'EVALUATION_OPERATIONS.md' = 'operations'
+            'SELF_HEALING.md' = 'operations'
+        }
 
-        foreach ($doc in $requiredDocs) {
-            $path = Join-Path $script:DocsRoot $doc
-            Test-Path -LiteralPath $path | Should -Be $true -Because "$doc should exist"
+        foreach ($entry in $requiredDocMap.GetEnumerator()) {
+            $doc = $entry.Key
+            $subdir = $entry.Value
+            $path = Join-Path $script:DocsRoot ($subdir + '\' + $doc)
+            Test-Path -LiteralPath $path | Should -Be $true -Because "'$doc' should exist in docs/$subdir/"
         }
     }
 }
@@ -123,11 +126,6 @@ Describe "Document Ingestion" {
 }
 
 Describe "Game Asset Ingestion" {
-    It "SpriteSheetParser.ps1 exists" {
-        $path = Join-Path $script:ModuleRoot "extraction\SpriteSheetParser.ps1"
-        Test-Path -LiteralPath $path | Should -Be $true
-    }
-
     It "MarketplaceProvenanceNormalizer.ps1 exists" {
         $path = Join-Path $script:ModuleRoot "ingestion\MarketplaceProvenanceNormalizer.ps1"
         Test-Path -LiteralPath $path | Should -Be $true

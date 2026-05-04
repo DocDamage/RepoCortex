@@ -57,13 +57,16 @@ COPY module/ /opt/llm-workflow/module/
 COPY tools/ /opt/llm-workflow/tools/
 COPY docker/ /opt/llm-workflow/docker/
 
-# Install PowerShell module
+# Install PowerShell module (dynamically detect version from manifest)
 RUN pwsh -NoProfile -Command "\\
-    \$ModulePath = '/root/.local/share/powershell/Modules/LLMWorkflow/0.2.0'; \
+    \$manifestPath = '/opt/llm-workflow/module/LLMWorkflow/LLMWorkflow.psd1'; \
+    \$manifest = Import-PowerShellDataFile -Path \$manifestPath; \
+    \$moduleVersion = \$manifest.ModuleVersion; \
+    \$ModulePath = '/root/.local/share/powershell/Modules/LLMWorkflow/' + \$moduleVersion; \
     New-Item -ItemType Directory -Path \$ModulePath -Force | Out-Null; \
     Copy-Item -Path '/opt/llm-workflow/module/LLMWorkflow/*' -Destination \$ModulePath -Recurse -Force; \
     Import-Module LLMWorkflow -Force; \
-    Write-Host 'LLMWorkflow module installed successfully'"
+    Write-Host \"LLMWorkflow module v\$moduleVersion installed successfully\""
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /opt/llm-workflow/entrypoint.sh
@@ -85,6 +88,6 @@ CMD ["llmup"]
 # Labels
 LABEL org.opencontainers.image.title="LLM Workflow Toolkit" \
       org.opencontainers.image.description="All-in-one workflow toolkit for CodeMunch Pro, ContextLattice, and MemPalace" \
-      org.opencontainers.image.version="0.2.0" \
+      org.opencontainers.image.version="0.9.6" \
       org.opencontainers.image.source="https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one" \
       org.opencontainers.image.licenses="MIT"

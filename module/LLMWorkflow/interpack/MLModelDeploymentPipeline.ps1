@@ -1774,9 +1774,20 @@ class MLInferenceModel {
     }
     
     async init() {
-        // Load ONNX Runtime Web
-        const ort = await import('https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/ort.min.js');
-        this.session = await ort.InferenceSession.create(this.modelPath);
+        // Load ONNX Runtime Web - vendored locally to avoid CDN dependency in production
+        try {
+            const ort = await import('./ort.min.js');
+            this.session = await ort.InferenceSession.create(this.modelPath);
+        } catch (e) {
+            console.warn('ONNX Runtime Web not available locally, attempting CDN fallback (requires internet)');
+            try {
+                const ort = await import('https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/ort.min.js');
+                this.session = await ort.InferenceSession.create(this.modelPath);
+            } catch (e2) {
+                console.error('Failed to load ONNX Runtime Web:', e2);
+                throw new Error('ML model initialization failed: ONNX Runtime Web not available');
+            }
+        }
         console.log('ML Model loaded successfully');
     }
     
@@ -1805,7 +1816,21 @@ if (typeof module !== 'undefined' && module.exports) {
 <html>
 <head>
     <title>ML Inference Demo</title>
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/ort.min.js"></script>
+    <!-- ONNX Runtime Web: first tries local vendored copy, falls back to CDN -->
+    <script>
+    // Attempt local vendored ONNX Runtime Web first
+    var ort = null;
+    document.write('<script src="ort.min.js"><\/script>');
+    // If local load failed, try CDN as fallback (requires internet)
+    setTimeout(function() {
+        if (typeof ort === 'undefined') {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/ort.min.js';
+            s.onload = function() { console.log('ONNX Runtime Web loaded from CDN (fallback)'); };
+            document.head.appendChild(s);
+        }
+    }, 500);
+    </script>
     <script src="ml-inference.js"></script>
 </head>
 <body>

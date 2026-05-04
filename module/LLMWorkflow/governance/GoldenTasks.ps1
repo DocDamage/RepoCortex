@@ -1206,7 +1206,12 @@ function Invoke-PackGoldenTasks {
                 $categoryStats[$cat] = @{ Passed = 0; Failed = 0; Total = 0 }
             }
             $categoryStats[$cat].Total++
-            $isSuccess = if ($res -is [hashtable]) { $res['Success'] } else { try { $res.Success } catch { $false } }
+            $isSuccess = if ($res -is [hashtable]) { $res['Success'] } else { 
+                try { $res.Success } catch { 
+                    Write-Verbose "GoldenTasks: Failed to read Success property from result - treating as false"
+                    $false 
+                } 
+            }
             if ($isSuccess) {
                 $categoryStats[$cat].Passed++
             }
@@ -1227,7 +1232,12 @@ function Invoke-PackGoldenTasks {
                 $difficultyStats[$diff] = @{ Passed = 0; Failed = 0; Total = 0 }
             }
             $difficultyStats[$diff].Total++
-            $isSuccess = if ($res -is [hashtable]) { $res['Success'] } else { try { $res.Success } catch { $false } }
+            $isSuccess = if ($res -is [hashtable]) { $res['Success'] } else { 
+                try { $res.Success } catch { 
+                    Write-Verbose "GoldenTasks: Failed to read Success property from difficultyStats result - treating as false"
+                    $false 
+                } 
+            }
             if ($isSuccess) {
                 $difficultyStats[$diff].Passed++
             }

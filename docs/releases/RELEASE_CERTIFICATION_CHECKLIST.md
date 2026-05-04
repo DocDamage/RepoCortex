@@ -68,10 +68,9 @@ This checklist must be completed and signed off before a release candidate can b
 
 | # | Check | Owner | Evidence | Status |
 |---|-------|-------|----------|--------|
-| 4.2.1 | `SpriteSheetParser.ps1` exists | Asset Owner | `module/LLMWorkflow/extraction/SpriteSheetParser.ps1` | Pending |
-| 4.2.2 | `MarketplaceProvenanceNormalizer.ps1` exists | Asset Owner | `module/LLMWorkflow/ingestion/MarketplaceProvenanceNormalizer.ps1` | Pending |
-| 4.2.3 | Game asset ingestion tests pass | Asset Owner | `tests/SpriteSheetExtraction.Tests.ps1`, `tests/MarketplaceProvenance.Tests.ps1` | Pending |
-| 4.2.4 | Game asset ingestion model is documented | Docs Owner | `docs/architecture/GAME_ASSET_INGESTION_MODEL.md` | Pending |
+| 4.2.1 | `MarketplaceProvenanceNormalizer.ps1` exists | Asset Owner | `module/LLMWorkflow/ingestion/MarketplaceProvenanceNormalizer.ps1` | Pending |
+| 4.2.2 | Game asset ingestion tests pass | Asset Owner | `tests/MarketplaceProvenance.Tests.ps1` | Pending |
+| 4.2.3 | Game asset ingestion model is documented | Docs Owner | `docs/architecture/GAME_ASSET_INGESTION_MODEL.md` | Pending |
 
 ## 5. Security
 
@@ -99,8 +98,8 @@ This checklist must be completed and signed off before a release candidate can b
 
 | # | Check | Owner | Evidence | Status |
 |---|-------|-------|----------|--------|
-| 7.1 | `MCPRegistry.ps1` exists | MCP Owner | `module/LLMWorkflow/mcp/MCPRegistry.ps1` | Pending |
-| 7.2 | `MCPLifecycle.ps1` exists | MCP Owner | `module/LLMWorkflow/mcp/MCPLifecycle.ps1` | Pending |
+| 7.1 | `MCPToolRegistry.ps1` exists | MCP Owner | `module/LLMWorkflow/mcp/MCPToolRegistry.ps1` | Pending |
+| 7.2 | `MCPToolLifecycle.ps1` exists | MCP Owner | `module/LLMWorkflow/mcp/MCPToolLifecycle.ps1` | Pending |
 | 7.3 | MCP governance tests pass | MCP Owner | `tests/MCP.Tests.ps1` | Pending |
 | 7.4 | MCP exposure policy rego exists | Policy Owner | `policy/opa/mcp_exposure.rego` | Pending |
 

@@ -1,0 +1,55 @@
+﻿{
+    "timestamp":  "2026-05-03T04:55:09Z",
+    "projectRoot":  "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one",
+    "outputDirectory":  "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports",
+    "overallPassed":  false,
+    "promotionGate":  {
+                          "Passed":  false,
+                          "BlockedBy":  [
+                                            "secrets-critical",
+                                            "secrets-high",
+                                            "vulns-high"
+                                        ],
+                          "Thresholds":  {
+                                             "MaxAllowedCritical":  0,
+                                             "MaxAllowedHigh":  0
+                                         },
+                          "SecretScan":  {
+                                             "Critical":  120,
+                                             "High":  25
+                                         },
+                          "VulnerabilityScan":  {
+                                                    "Critical":  0,
+                                                    "High":  6
+                                                }
+                      },
+    "scans":  {
+                  "secretScan":  {
+                                     "reportPath":  "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports\\secret-scan-2026-05-03T04-54-46Z.json",
+                                     "summary":  {
+                                                     "medium":  8,
+                                                     "high":  25,
+                                                     "totalFindings":  153,
+                                                     "low":  0,
+                                                     "scannedFiles":  396,
+                                                     "critical":  120
+                                                 }
+                                 },
+                  "sbom":  {
+                               "outputPath":  "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports\\sbom-2026-05-03T04-54-46Z.json",
+                               "componentCount":  284,
+                               "success":  true
+                           },
+                  "vulnerabilityScan":  {
+                                            "reportPath":  "F:\\stuff from desktop\\CodeMunch-ContextLattice-MemPalace---All-in-one\\security-reports\\vulnerability-scan-2026-05-03T04-54-46Z.json",
+                                            "summary":  {
+                                                            "medium":  7,
+                                                            "high":  6,
+                                                            "totalFindings":  15,
+                                                            "low":  2,
+                                                            "scannedFiles":  285,
+                                                            "critical":  0
+                                                        }
+                                        }
+              }
+}

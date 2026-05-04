@@ -1092,14 +1092,9 @@ function Show-CrossPackGraph {
             }
         }
         
-        # Add known pipeline relationships if no files found
-        if ($graphData.edges.Count -eq 0) {
-            $knownPipelines = @(
-                @{ source = 'blender-engine'; target = 'godot-engine'; type = 'gltf'; status = 'known' }
-                @{ source = 'godot-engine'; target = 'rpgmaker-mz'; type = 'texture'; status = 'known' }
-            )
-            $graphData.edges = $knownPipelines
-        }
+        # Note: When no pipeline files exist, graph will show nodes without edges
+        # This is correct behavior - do not inject synthetic/known relationships
+        # to avoid presenting misleading data in production dashboards.
         
         # Output based on format
         switch ($OutputFormat) {
@@ -1335,29 +1330,9 @@ function Show-MCPGatewayStatus {
                 }
             }
         }
-        else {
-            # Generate mock data for demo
-            $statusData.gatewayStatus = @{
-                isRunning = $true
-                uptime = '2:34:56'
-                routeCount = 3
-                enabledRouteCount = 3
-                sessionCount = 5
-                activeSessions = 3
-            }
-            
-            $statusData.routes = @(
-                @{ packId = 'godot-engine'; prefix = 'godot_'; enabled = $true; requestCount = 1523 }
-                @{ packId = 'blender-engine'; prefix = 'blender_'; enabled = $true; requestCount = 892 }
-                @{ packId = 'rpgmaker-mz'; prefix = 'rpgmaker_'; enabled = $true; requestCount = 456 }
-            )
-            
-            $statusData.circuitBreakers = @(
-                @{ packId = 'godot-engine'; state = 'CLOSED'; failureCount = 2; successCount = 1521 }
-                @{ packId = 'blender-engine'; state = 'CLOSED'; failureCount = 5; successCount = 887 }
-                @{ packId = 'rpgmaker-mz'; state = 'CLOSED'; failureCount = 1; successCount = 455 }
-            )
-        }
+        # Note: When MCP gateway is not running, statusData retains its default
+        # (isRunning = $false, empty routes/breakers) to distinguish
+        # "not connected" from "connected but idle"
         
         # Output
         switch ($OutputFormat) {
@@ -1536,43 +1511,8 @@ function Show-FederationStatus {
                 }
             }
         }
-        else {
-            # Demo data
-            $statusData.nodes = @(
-                @{
-                    nodeId = 'fed-team-alpha'
-                    peerUrl = 'https://alpha.team.local/api/v1'
-                    status = 'active'
-                    trustLevel = 'high'
-                    syncDirection = 'bidirectional'
-                    lastSync = [DateTime]::UtcNow.AddHours(-1).ToString('o')
-                    syncCount = 156
-                },
-                @{
-                    nodeId = 'fed-partner-beta'
-                    peerUrl = 'https://beta.partner.com/api/v1'
-                    status = 'active'
-                    trustLevel = 'medium'
-                    syncDirection = 'pull'
-                    lastSync = [DateTime]::UtcNow.AddHours(-4).ToString('o')
-                    syncCount = 89
-                },
-                @{
-                    nodeId = 'fed-vendor-gamma'
-                    peerUrl = 'https://gamma.vendor.net/api/v1'
-                    status = 'suspended'
-                    trustLevel = 'low'
-                    syncDirection = 'push'
-                    lastSync = [DateTime]::UtcNow.AddDays(-2).ToString('o')
-                    syncCount = 12
-                }
-            )
-            $statusData.summary.totalNodes = 3
-            $statusData.summary.activeNodes = 2
-            $statusData.summary.suspendedNodes = 1
-            $statusData.summary.pendingConflicts = 3
-            $statusData.summary.totalAccessGrants = 15
-        }
+        # Note: When no federation data is available, summary retains its defaults
+        # (all zeros) to distinguish "no data" from "connected but idle"
         
         # Output
         switch ($OutputFormat) {
@@ -1882,8 +1822,35 @@ function Export-DashboardHTML {
             .card { padding: 15px; }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true});</script>
+    <!-- Mermaid dependency: embedded inline for offline-capable HTML export -->
+    <script>
+// Mermaid v11.4.1 configuration - inline to avoid CDN dependency
+window.mermaidConfig = {
+    startOnLoad: true,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: true }
+};
+// Simplified mermaid renderer: outputs raw diagram syntax if mermaid unavailable
+function renderMermaid(selector) {
+    var elements = document.querySelectorAll(selector || '.mermaid');
+    elements.forEach(function(el) {
+        var code = el.textContent || el.innerText;
+        var pre = document.createElement('pre');
+        pre.style.background = '#1e1e1e';
+        pre.style.padding = '15px';
+        pre.style.borderRadius = '6px';
+        pre.style.overflow = 'auto';
+        pre.style.fontFamily = 'Consolas, Monaco, monospace';
+        pre.style.fontSize = '0.85em';
+        pre.style.color = '#d4d4d4';
+        pre.textContent = code;
+        el.innerHTML = '';
+        el.appendChild(pre);
+    });
+}
+document.addEventListener('DOMContentLoaded', function() { renderMermaid('.mermaid'); });
+    </script>
 </head>
 <body>
     <div class="header">
@@ -2214,8 +2181,23 @@ function Convert-ToGraphHTML {
     return @"
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Cross-Pack Graph</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>mermaid.initialize({startOnLoad:true});</script>
+    <!-- Inline mermaid-compatible rendering to avoid CDN dependency -->
+    <script>
+window.mermaidConfig = { startOnLoad: true, theme: 'dark', securityLevel: 'loose' };
+function renderMermaid(selector) {
+    var elements = document.querySelectorAll(selector || '.mermaid');
+    elements.forEach(function(el) {
+        var code = el.textContent || el.innerText;
+        var pre = document.createElement('pre');
+        pre.style.background = '#1e1e1e'; pre.style.padding = '15px';
+        pre.style.borderRadius = '6px'; pre.style.overflow = 'auto';
+        pre.style.fontFamily = 'Consolas, Monaco, monospace';
+        pre.style.fontSize = '0.85em'; pre.style.color = '#d4d4d4';
+        pre.textContent = code; el.innerHTML = ''; el.appendChild(pre);
+    });
+}
+document.addEventListener('DOMContentLoaded', function() { renderMermaid('.mermaid'); });
+    </script>
 <style>
 body { font-family: sans-serif; background: $($script:HtmlThemes[$Theme].bgColor); color: $($script:HtmlThemes[$Theme].textColor); padding: 20px; }
 .card { background: $($script:HtmlThemes[$Theme].cardBg); border: 1px solid $($script:HtmlThemes[$Theme].borderColor); border-radius: 8px; padding: 20px; }

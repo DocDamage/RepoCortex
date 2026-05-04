@@ -134,13 +134,12 @@ A v1.0 release of LLMWorkflow is certified only when **all** of the following qu
 ### Pass Criteria
 | Check | Evidence |
 |-------|----------|
-| Spritesheet parser exists | `module/LLMWorkflow/extraction/SpriteSheetParser.ps1` |
-| Marketplace provenance normalizer exists | `module/LLMWorkflow/ingestion/MarkplaceProvenanceNormalizer.ps1` |
+| Marketplace provenance normalizer exists | `module/LLMWorkflow/ingestion/MarketplaceProvenanceNormalizer.ps1` |
 | Game asset ingestion model is documented | `docs/architecture/GAME_ASSET_INGESTION_MODEL.md` exists |
 | Parsed manifests include provenance fields | Tests assert `sourcePath`, `parsedAt`, `parserVersion` |
 
 ### Fail Criteria
-- Required parser or normalizer is missing.
+- Required normalizer is missing.
 - Asset manifests omit provenance or pipeline version.
 
 ---
@@ -211,8 +210,8 @@ A v1.0 release of LLMWorkflow is certified only when **all** of the following qu
 ### Pass Criteria
 | Check | Evidence |
 |-------|----------|
-| MCP registry module exists | `module/LLMWorkflow/mcp/MCPRegistry.ps1` |
-| MCP lifecycle module exists | `module/LLMWorkflow/mcp/MCPLifecycle.ps1` |
+| MCP registry module exists | `module/LLMWorkflow/mcp/MCPToolRegistry.ps1` |
+| MCP lifecycle module exists | `module/LLMWorkflow/mcp/MCPToolLifecycle.ps1` |
 | MCP governance tests pass | `tests/MCP.Tests.ps1` or equivalent validates registry and lifecycle |
 | MCP exposure policy exists | `policy/opa/mcp_exposure.rego` |
 

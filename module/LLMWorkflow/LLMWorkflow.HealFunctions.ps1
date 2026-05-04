@@ -7,8 +7,8 @@ Set-StrictMode -Version Latest
 # Configuration and Constants
 #===============================================================================
 
-$script:HealHistoryPath = Join-Path $HOME ".llm-workflow\heal-history.jsonl"
-$script:HealLogPath = Join-Path $HOME ".llm-workflow\heal-log.txt"
+$script:HealHistoryPath = Join-Path $HOME ".llm-workflow" "heal-history.jsonl"
+$script:HealLogPath = Join-Path $HOME ".llm-workflow" "heal-log.txt"
 $script:MaxHistoryEntries = 1000
 
 # Issue categories
@@ -622,7 +622,7 @@ function Test-LLMWorkflowIssue {
         }
         
         "MissingPalaceDirectory" {
-            $palacePath = Join-Path $HOME ".mempalace\palace"
+            $palacePath = Join-Path $HOME ".mempalace" "palace"
             $envPath = [Environment]::GetEnvironmentVariable("MEMPALACE_PALACE_PATH")
             if ($envPath) {
                 $palacePath = $envPath
@@ -640,7 +640,7 @@ function Test-LLMWorkflowIssue {
         }
         
         "CorruptedSyncState" {
-            $statePath = Join-Path $projectPath ".memorybridge\sync-state.json"
+            $statePath = Join-Path $projectPath ".memorybridge" "sync-state.json"
             if (-not (Test-Path -LiteralPath $statePath)) {
                 return @{
                     Detected = $false
@@ -673,7 +673,7 @@ function Test-LLMWorkflowIssue {
         }
         
         "TemplateDrift" {
-            $toolkitSource = Join-Path $PSScriptRoot "templates\tools"
+            $toolkitSource = Join-Path $PSScriptRoot "templates" "tools"
             if (-not (Test-Path -LiteralPath $toolkitSource)) {
                 return @{
                     Detected = $false
@@ -739,7 +739,7 @@ function Test-LLMWorkflowIssue {
         }
         
         "MissingBridgeConfig" {
-            $configPath = Join-Path $projectPath ".memorybridge\bridge.config.json"
+            $configPath = Join-Path $projectPath ".memorybridge" "bridge.config.json"
             $exists = Test-Path -LiteralPath $configPath
             return @{
                 Detected = -not $exists
@@ -752,7 +752,7 @@ function Test-LLMWorkflowIssue {
         }
         
         "CorruptedBridgeConfig" {
-            $configPath = Join-Path $projectPath ".memorybridge\bridge.config.json"
+            $configPath = Join-Path $projectPath ".memorybridge" "bridge.config.json"
             if (-not (Test-Path -LiteralPath $configPath)) {
                 return @{
                     Detected = $false
@@ -981,7 +981,7 @@ function Repair-LLMWorkflowIssue {
                     $success = $true
                     $message = "Would create palace directory and collection (WhatIf mode)"
                 } else {
-                    $palacePath = Join-Path $HOME ".mempalace\palace"
+                    $palacePath = Join-Path $HOME ".mempalace" "palace"
                     $envPath = [Environment]::GetEnvironmentVariable("MEMPALACE_PALACE_PATH")
                     if ($envPath) {
                         $palacePath = $envPath.Replace("~", $HOME)
@@ -1030,7 +1030,7 @@ except Exception as e:
             }
             
             "CorruptedSyncState" {
-                $statePath = Join-Path $projectPath ".memorybridge\sync-state.json"
+                $statePath = Join-Path $projectPath ".memorybridge" "sync-state.json"
                 if ($WhatIf) {
                     $changes += "Would backup corrupted sync-state.json"
                     $changes += "Would create new empty sync-state.json"
@@ -1074,7 +1074,7 @@ except Exception as e:
                     $message = "Would re-sync templates (WhatIf mode)"
                 } else {
                     try {
-                        $toolkitSource = Join-Path $PSScriptRoot "templates\tools"
+                        $toolkitSource = Join-Path $PSScriptRoot "templates" "tools"
                         $toolsTarget = Join-Path $projectPath "tools"
                         
                         $tools = @("codemunch", "contextlattice", "memorybridge")
@@ -1127,10 +1127,13 @@ except Exception as e:
                         
                         $allowPlaceholder = ($Force -and -not $Interactive -and $apiKey -eq "your-api-key-here")
                         if (-not [string]::IsNullOrWhiteSpace($apiKey) -and ($apiKey -ne "your-api-key-here" -or $allowPlaceholder)) {
-                            # Add to current session
+                            # Store securely in config instead of leaking to process-scoped env var.
+                            # Process-scoped env vars are visible to child processes and other processes
+                            # on the same machine, creating a credential leakage surface.
                             if ($apiKey -ne "your-api-key-here") {
-                                $env:CONTEXTLATTICE_ORCHESTRATOR_API_KEY = $apiKey
-                                $changes += "Set API key in current session"
+                                # Store in module script scope only - not leaked to process env
+                                $global:LLMWorkflowContextLatticeApiKey = $apiKey
+                                $changes += "Stored API key in module config"
                             } else {
                                 $changes += "Configured placeholder API key for non-interactive force mode"
                             }
@@ -1242,7 +1245,7 @@ except Exception as e:
             }
             
             "CorruptedBridgeConfig" {
-                $configPath = Join-Path $projectPath ".memorybridge\bridge.config.json"
+                $configPath = Join-Path $projectPath ".memorybridge" "bridge.config.json"
                 if ($WhatIf) {
                     $changes += "Would backup corrupted bridge.config.json"
                     $changes += "Would recreate bridge.config.json with defaults"
