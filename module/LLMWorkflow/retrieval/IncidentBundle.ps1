@@ -227,12 +227,13 @@ function New-AnswerIncidentBundle {
     # Get run ID if not provided
     if ([string]::IsNullOrEmpty($RunId)) {
         try {
-            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction SilentlyContinue
+            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction Stop
             if ($runIdCmd) {
-                $RunId = & $runIdCmd -ErrorAction SilentlyContinue
+                $RunId = & $runIdCmd -ErrorAction Stop
             }
         }
         catch {
+            Write-Verbose "Could not resolve run ID: $($_.Exception.Message)"
             $RunId = "unknown"
         }
         if ([string]::IsNullOrEmpty($RunId)) {

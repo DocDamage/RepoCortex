@@ -177,7 +177,7 @@ function Get-FileMetadata {
     
     try {
         $fileInfo = Get-Item -LiteralPath $Path
-        $content = Get-Content -LiteralPath $Path -Raw -ErrorAction SilentlyContinue
+        $content = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
         $lineCount = if ($content) { @($content -split "`r?`n").Count } else { 0 }
         
         return @{

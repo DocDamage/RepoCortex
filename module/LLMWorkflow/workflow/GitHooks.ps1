@@ -291,8 +291,13 @@ function Uninstall-LLMWorkflowGitHooks {
         }
 
         # Check if it's an LLM Workflow hook
-        $content = Get-Content -LiteralPath $hookPath -Raw -ErrorAction SilentlyContinue
-        $isLLMWorkflowHook = $content -and ($content -match 'LLM Workflow Git Hook')
+        try {
+            $content = Get-Content -LiteralPath $hookPath -Raw -ErrorAction Stop
+            $isLLMWorkflowHook = $content -match 'LLM Workflow Git Hook'
+        } catch {
+            Write-Warning "Could not read hook file $hookPath`: $_"
+            $isLLMWorkflowHook = $false
+        }
 
         if (-not $isLLMWorkflowHook) {
             Write-Warning "Hook $hookType does not appear to be an LLM Workflow hook. Skipping."
@@ -420,8 +425,13 @@ function Test-GitHookConfiguration {
         $issues = @()
 
         if ($exists) {
-            $content = Get-Content -LiteralPath $hookPath -Raw -ErrorAction SilentlyContinue
-            $isLLMWorkflowHook = $content -and ($content -match 'LLM Workflow Git Hook')
+            try {
+                $content = Get-Content -LiteralPath $hookPath -Raw -ErrorAction Stop
+                $isLLMWorkflowHook = $content -match 'LLM Workflow Git Hook'
+            } catch {
+                Write-Warning "Could not read hook file $hookPath`: $_"
+                $isLLMWorkflowHook = $false
+            }
 
             if ($VerifyContent -and $isLLMWorkflowHook) {
                 # Verify the hook has valid content structure
@@ -559,7 +569,7 @@ function Invoke-GitHookPreCommit {
                 $filePath = Join-Path $ProjectRoot $file
                 if (Test-Path -LiteralPath $filePath -PathType Leaf) {
                     try {
-                        $content = Get-Content -LiteralPath $filePath -Raw -ErrorAction SilentlyContinue
+                        $content = Get-Content -LiteralPath $filePath -Raw -ErrorAction Stop
                         if ($content) {
                             $scanResult = Test-SecretInContent -Content $content -SeverityThreshold $SeverityThreshold
                             if ($scanResult.HasSecrets) {
@@ -768,8 +778,12 @@ function Invoke-GitHookPostCommit {
                 }
 
                 # Append to queue
-                $syncEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $syncStatePath -ErrorAction SilentlyContinue
-                $syncQueued = $true
+                try {
+                    $syncEntry | ConvertTo-Json -Compress | Add-Content -LiteralPath $syncStatePath -ErrorAction Stop
+                    $syncQueued = $true
+                } catch {
+                    Write-Warning "Failed to append sync state to $syncStatePath`: $_"
+                }
                 $messages += "Queued sync for $($packFiles.Count) pack files"
             }
 

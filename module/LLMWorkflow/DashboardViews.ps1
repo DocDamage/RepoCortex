@@ -299,14 +299,25 @@ function Get-PackList {
         [string]$ProjectRoot = '.'
     )
     
-    $manifestDir = Join-Path $ProjectRoot 'packs/manifests'
+    # Simple in-memory cache with 5-second TTL to reduce redundant disk I/O
+    # during dashboard rendering when this function is called multiple times.
+    $cacheKey = "PackList_$ProjectRoot"
+    $now = [DateTime]::UtcNow
+    if ($script:PackListCache -and $script:PackListCache[$cacheKey]) {
+        $cached = $script:PackListCache[$cacheKey]
+        if (($now - $cached.Timestamp).TotalSeconds -lt 5) {
+            return $cached.Data
+        }
+    }
+    
+    $manifestDir = Join-Path $ProjectRoot 'packs' 'manifests'
     $packs = @()
     
     if (Test-Path -LiteralPath $manifestDir) {
         $packFiles = Get-DashboardChildItems -Path $manifestDir -Filter '*.json' -ItemType File -Context 'Pack manifest scan'
         foreach ($file in $packFiles) {
             try {
-                $manifest = Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+                $manifest = Get-Content -LiteralPath $file.FullName -Raw -ErrorAction Stop | ConvertFrom-Json
                 $packs += @{
                     packId = $manifest.packId
                     domain = $manifest.domain
@@ -315,9 +326,17 @@ function Get-PackList {
                 }
             }
             catch {
-                Write-Verbose "Failed to parse manifest: $($file.Name)"
+                Write-Warning "Failed to parse manifest: $($file.Name) — $_"
             }
         }
+    }
+    
+    if (-not $script:PackListCache) {
+        $script:PackListCache = @{}
+    }
+    $script:PackListCache[$cacheKey] = @{
+        Timestamp = $now
+        Data = $packs
     }
     
     return $packs
@@ -831,7 +850,9 @@ function Get-RetrievalMetrics {
     param(
         [string]$PackId,
         [TimeSpan]$TimeSpan,
-        [string]$ProjectRoot = '.'
+        [string]$ProjectRoot = '.',
+        [string]$TelemetryDir = '',
+        [string]$CacheFile = ''
     )
     
     $metrics = @{
@@ -852,19 +873,28 @@ function Get-RetrievalMetrics {
         dataAvailable = $false
     }
     
-    # Try to get from telemetry
-    $telemetryDir = Join-Path $ProjectRoot '.llm-workflow/telemetry'
-    $telemetryFile = Join-Path $telemetryDir "$PackId/p95RetrievalLatencyMs.jsonl"
+    # Resolve telemetry directory (configurable or default)
+    $telemetryDir = if ($TelemetryDir) { $TelemetryDir } else { Join-Path $ProjectRoot '.llm-workflow' 'telemetry' }
+    $telemetryFile = Join-Path $telemetryDir "$PackId" "p95RetrievalLatencyMs.jsonl"
     
     if (Test-Path -LiteralPath $telemetryFile) {
         try {
             $cutoff = [DateTime]::UtcNow - $TimeSpan
-            $entries = Get-Content -LiteralPath $telemetryFile -Encoding UTF8 | 
+            $parseFailures = 0
+            $entries = Get-Content -LiteralPath $telemetryFile -Encoding UTF8 -ErrorAction Stop | 
                 ForEach-Object {
-                    try { $_ | ConvertFrom-Json } catch { $null }
+                    try { 
+                        $_ | ConvertFrom-Json -ErrorAction Stop 
+                    } catch { 
+                        $parseFailures++
+                        $null 
+                    }
                 } | 
                 Where-Object { $_ -and [DateTime]::Parse($_.timestamp) -gt $cutoff }
             
+            if ($parseFailures -gt 0) {
+                Write-Warning "Telemetry file for $PackId contained $parseFailures unparseable line(s)."
+            }
             if ($entries) {
                 $latencies = $entries | ForEach-Object { $_.value }
                 $metrics.p95Latency = Get-PercentileValue -Values $latencies -Percentile 95
@@ -881,16 +911,25 @@ function Get-RetrievalMetrics {
         Write-Verbose "Telemetry file not found for pack $PackId`: $telemetryFile"
     }
     
-    # Try cache metrics
-    $cacheFile = Join-Path $ProjectRoot '.llm-workflow/cache/retrieval-cache.jsonl'
+    # Resolve cache file (configurable or default)
+    $cacheFile = if ($CacheFile) { $CacheFile } else { Join-Path $ProjectRoot '.llm-workflow' 'cache' 'retrieval-cache.jsonl' }
     if (Test-Path -LiteralPath $cacheFile) {
         try {
-            $cacheEntries = Get-Content -LiteralPath $cacheFile -Encoding UTF8 | 
+            $parseFailures = 0
+            $cacheEntries = Get-Content -LiteralPath $cacheFile -Encoding UTF8 -ErrorAction Stop | 
                 ForEach-Object {
-                    try { $_ | ConvertFrom-Json } catch { $null }
+                    try { 
+                        $_ | ConvertFrom-Json -ErrorAction Stop 
+                    } catch { 
+                        $parseFailures++
+                        $null 
+                    }
                 } | 
                 Where-Object { $_ -and $_.packVersions -and $_.packVersions.$PackId }
             
+            if ($parseFailures -gt 0) {
+                Write-Warning "Cache file contained $parseFailures unparseable line(s)."
+            }
             if ($cacheEntries) {
                 $hitCount = ($cacheEntries | Measure-Object -Property { $_.metadata.hitCount } -Sum).Sum
                 $totalAccess = $cacheEntries.Count + $hitCount

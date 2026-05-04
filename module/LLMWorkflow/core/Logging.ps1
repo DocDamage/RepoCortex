@@ -120,12 +120,11 @@ function New-LogEntry {
     if ([string]::IsNullOrEmpty($RunId)) {
         try {
             # Try to get from RunId module if available
-            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction SilentlyContinue
-            if ($runIdCmd) {
-                $RunId = & $runIdCmd -ErrorAction SilentlyContinue
-            }
+            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction Stop
+            $RunId = & $runIdCmd -ErrorAction Stop
         }
         catch {
+            Write-Verbose "Could not get current run ID: $($_.Exception.Message)"
             $RunId = "unknown"
         }
         if ([string]::IsNullOrEmpty($RunId)) {

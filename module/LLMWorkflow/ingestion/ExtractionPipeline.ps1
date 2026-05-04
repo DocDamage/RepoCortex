@@ -437,7 +437,7 @@ function Get-FileMetadata {
     
     try {
         $fileInfo = Get-Item -LiteralPath $Path
-        $content = Get-Content -LiteralPath $Path -Raw -ErrorAction SilentlyContinue
+        $content = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
         $lineCount = if ($content) { @($content -split "`r?`n").Count } else { 0 }
         
         return @{
@@ -577,10 +577,10 @@ function Test-FileContentType {
     
     if ([string]::IsNullOrEmpty($Content) -and (Test-Path -LiteralPath $Path)) {
         try {
-            $Content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
+            $Content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 -ErrorAction Stop
         }
         catch {
-            # Continue with empty content
+            Write-Warning "Failed to read content from $Path`: $_"
         }
     }
     

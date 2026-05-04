@@ -147,8 +147,23 @@ function Invoke-TikaExtraction {
         [string]$Accept = 'text/plain'
     )
 
-    $resolvedPath = Resolve-Path -Path $FilePath -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path
-    if ([string]::IsNullOrWhiteSpace($resolvedPath) -or -not (Test-Path -LiteralPath $resolvedPath)) {
+    try {
+        $resolvedPath = Resolve-Path -Path $FilePath -ErrorAction Stop | Select-Object -ExpandProperty Path
+    } catch {
+        return [ordered]@{
+            success = $false
+            engine = 'tika'
+            sourcePath = $FilePath
+            format = $null
+            text = ''
+            pages = @()
+            confidence = 0.0
+            errors = @("File not found or inaccessible: $FilePath ($($_.Exception.Message))")
+            warnings = @()
+            extractedAt = [DateTime]::UtcNow.ToString('o')
+        }
+    }
+    if (-not (Test-Path -LiteralPath $resolvedPath)) {
         return [ordered]@{
             success = $false
             engine = 'tika'

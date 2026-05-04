@@ -454,12 +454,11 @@ function Send-Notification {
     # Get current run ID if not provided
     if ([string]::IsNullOrEmpty($RunId)) {
         try {
-            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction SilentlyContinue
-            if ($runIdCmd) {
-                $RunId = & $runIdCmd -ErrorAction SilentlyContinue
-            }
+            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction Stop
+            $RunId = & $runIdCmd -ErrorAction Stop
         }
         catch {
+            Write-Verbose "Could not get current run ID: $($_.Exception.Message)"
             $RunId = "unknown"
         }
         if ([string]::IsNullOrEmpty($RunId)) {
@@ -979,12 +978,11 @@ function New-NotificationPayload {
     # Get current run ID if not provided
     if ([string]::IsNullOrEmpty($RunId)) {
         try {
-            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction SilentlyContinue
-            if ($runIdCmd) {
-                $RunId = & $runIdCmd -ErrorAction SilentlyContinue
-            }
+            $runIdCmd = Get-Command Get-CurrentRunId -ErrorAction Stop
+            $RunId = & $runIdCmd -ErrorAction Stop
         }
         catch {
+            Write-Verbose "Could not get current run ID: $($_.Exception.Message)"
             $RunId = "unknown"
         }
         if ([string]::IsNullOrEmpty($RunId)) {
