@@ -1,7 +1,7 @@
 # Technical Debt Audit Summary
 
-Canonical implementation-side audit summary for the current repository structure.
-This document is the concise planning companion to the detailed working audit.
+Canonical implementation-side audit summary for the repository structure as reviewed during the 2026-04-14 hardening wave.
+This document is the concise planning companion to the detailed working audit and should be read as historical audit context, not as the current release status.
 
 Audit date: `2026-04-14`
 
@@ -13,8 +13,8 @@ Audit date: `2026-04-14`
 
 ## Summary
 
-The repo is no longer blocked by missing core capability.
-It is blocked by the quality gap between what the platform can do and how consistently, observably, and safely it does it.
+At audit time, the repo was no longer blocked by missing core capability.
+The remaining concern was the quality gap between what the platform could do and how consistently, observably, and safely it did it.
 
 Recent remediation already improved important areas:
 - explicit module exports replaced wildcard export behavior
@@ -23,14 +23,12 @@ Recent remediation already improved important areas:
 - docs and release truth alignment improved materially
 - mixed artifact and game-asset ingestion foundations now exist with real tests
 
-That progress matters.
-It also changes the audit posture.
-The main question is no longer whether the platform is broad enough.
-The main question is whether it is disciplined enough for `v1.0`.
+That progress mattered, and the 2026-05-04 remediation/certification pass moved the tracked release gates to green.
+This audit remains useful for maintenance prioritization, but its open-debt language should not be read as a fresh release blocker without new evidence.
 
 ## Current Audit Read
 
-The highest remaining debt is now concentrated in six release-priority areas:
+The audit grouped debt into six release-priority areas:
 1. failure visibility and unsafe execution patterns
 2. structural refactoring and canonical ownership
 3. module contracts and PowerShell hygiene
@@ -38,7 +36,15 @@ The highest remaining debt is now concentrated in six release-priority areas:
 5. mixed artifact and game-asset ingestion consistency
 6. security, portability, and promotion discipline
 
-This ordering is intentionally aligned with `REMAINING_WORK.md` and the strategic plan.
+This ordering is intentionally aligned with the hardening backlog and the strategic plan.
+
+## Certification Update (2026-05-04)
+
+- Release certification reached a 100% pass rate across the tracked categories.
+- Wildcard module export exposure is resolved by explicit manifest exports and certification checks.
+- Parallel subsystem forks are no longer treated as the primary architecture blocker.
+- Failure-visibility cleanup moved from release-blocking work to ongoing maintenance hardening.
+- Observability, policy, security, durable execution, MCP governance, mixed-artifact ingestion, and game-asset ingestion are represented in release gates.
 
 ---
 
@@ -46,8 +52,8 @@ This ordering is intentionally aligned with `REMAINING_WORK.md` and the strategi
 
 ### Priority 0: Failure Visibility and Unsafe Execution
 
-This is the most important open debt cluster.
-A feature-rich repo is still not release-ready if failures disappear into suppressed errors, empty catches, or UI-only logging.
+At audit time, this was the most important open debt cluster.
+A feature-rich repo is not release-ready if failures disappear into suppressed errors, empty catches, or UI-only logging.
 
 #### Current Signal
 - `219` uses of `-ErrorAction SilentlyContinue` were flagged in the detailed audit
@@ -61,11 +67,11 @@ A feature-rich repo is still not release-ready if failures disappear into suppre
 - non-pipeline-safe output patterns reduce composability and automation reliability
 
 #### Current Recommendation
-- treat failure visibility as a release gate, not as optional cleanup
+- keep failure visibility as a maintenance ratchet; release certification now enforces the critical-file set against unjustified `-ErrorAction SilentlyContinue` usage
 
 ### Priority 1: Structural Refactoring and Canonical Ownership
 
-Large files and helper duplication remain one of the biggest maintainability risks in the repo.
+Large files and helper duplication remain maintainability risks in the repo.
 This is especially important now that the platform is still expanding in ingestion and governance areas.
 
 #### Current Signal
@@ -79,12 +85,12 @@ This is especially important now that the platform is still expanding in ingesti
 - new features can inherit old structure problems unless the layout is improved deliberately
 
 #### Current Recommendation
-- refactor the largest high-change modules first and remove duplicate helper drift as part of that work
+- refactor the largest high-change modules opportunistically and remove duplicate helper drift as part of that work
 
 ### Priority 2: Module Contracts and PowerShell Hygiene
 
-This is broad but necessary debt.
-The repo should look and behave like an intentional module ecosystem rather than a collection of inherited scripts.
+This is broad but useful maintenance debt.
+The repo should continue moving toward an intentional module ecosystem rather than a collection of inherited scripts.
 
 #### Current Signal
 - many modules still lack `Set-StrictMode`
@@ -98,11 +104,11 @@ The repo should look and behave like an intentional module ecosystem rather than
 - help gaps make the public surface less self-documenting than it should be
 
 #### Current Recommendation
-- prioritize contract hygiene on high-value public surfaces and on newly added parser modules before drift compounds further
+- continue contract hygiene on high-value public surfaces and newly added parser modules before drift compounds further
 
 ### Priority 3: Release-Gate Testing and Evidence Coverage
 
-Test portability improved, but coverage is still uneven around core primitives and release-risk behavior.
+Test portability improved, and release certification now gates the current release path. Coverage can still broaden around core primitives and release-risk behavior as those areas change.
 
 #### Current Signal
 - foundational modules such as `AtomicWrite.ps1`, `CommandContract.ps1`, `FileLock.ps1`, `Journal.ps1`, `StateFile.ps1`, `TypeConverters.ps1`, and `Workspace.ps1` still belong in the test-hardening queue
@@ -113,7 +119,7 @@ Test portability improved, but coverage is still uneven around core primitives a
 - `v1.0` confidence depends on whether CI reflects real risk, not just whether a subset of suites are green
 
 #### Current Recommendation
-- convert foundational behavior and loader boundaries into explicit release-gate coverage
+- keep foundational behavior and loader boundaries under explicit release-gate coverage as they evolve
 
 ### Priority 4: Mixed Artifact and Game Asset Ingestion Consistency
 
@@ -134,7 +140,7 @@ This is now a real platform capability and therefore a real governance responsib
 
 ### Priority 5: Security, Portability, and Promotion Discipline
 
-Security and release evidence exist, but they still need to become unavoidable rather than aspirational.
+Security and release evidence exist and participate in certification. Continue making them unavoidable rather than aspirational during promotion.
 
 #### Current Signal
 - heuristic secret matches still require manual triage

@@ -97,6 +97,12 @@ Describe "Branding" {
     }
 }
 
+Describe "Failure Visibility" {
+    It "release-critical files do not use unjustified SilentlyContinue" {
+        Test-ReleaseCriticalFailureVisibility -ProjectRoot $script:ProjectRoot | Should -Be $true
+    }
+}
+
 Describe "Observability" {
     It "SpanFactory.ps1 exists" {
         $path = Join-Path $script:ModuleRoot "telemetry\SpanFactory.ps1"
@@ -217,9 +223,9 @@ Describe "Retrieval Backend" {
         Test-Path -LiteralPath $path | Should -Be $true
     }
 
-    It "release certification does not treat mock-only retrieval adapters as ready" {
+    It "release certification treats the real retrieval backend implementation as ready" {
         $path = Join-Path $script:ModuleRoot "retrieval\RetrievalBackendAdapter.ps1"
-        Test-RetrievalBackendImplementation -Path $path | Should -Be $false
+        Test-RetrievalBackendImplementation -Path $path | Should -Be $true
     }
 }
 

@@ -212,6 +212,43 @@ function Test-BrandingAssets {
     return ($hasBrandTitle -and $hasLogoReference -and $hasFormerNameDisclosure -and $hasPngHeader)
 }
 
+function Test-ReleaseCriticalFailureVisibility {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProjectRoot
+    )
+
+    $criticalPaths = @(
+        'module\LLMWorkflow\ingestion\DoclingAdapter.ps1',
+        'module\LLMWorkflow\ingestion\parsers\GeometryNodesParser.ps1',
+        'module\LLMWorkflow\LLMWorkflow.HealFunctions.ps1',
+        'module\LLMWorkflow\LLMWorkflow.Dashboard.ps1',
+        'module\LLMWorkflow\DashboardViews.ps1',
+        'module\LLMWorkflow\workflow\DurableOrchestrator.ps1',
+        'module\LLMWorkflow\mcp\MCPToolLifecycle.ps1'
+    )
+
+    foreach ($relativePath in $criticalPaths) {
+        $path = Join-Path $ProjectRoot $relativePath
+        if (-not (Test-Path -LiteralPath $path)) {
+            return $false
+        }
+
+        $lineNumber = 0
+        foreach ($line in Get-Content -LiteralPath $path) {
+            $lineNumber++
+            if ($line -match '-ErrorAction\s+SilentlyContinue' -and $line -notmatch '#\s*\[ALLOWED:') {
+                Write-Warning "Unjustified SilentlyContinue found in $relativePath at line $lineNumber."
+                return $false
+            }
+        }
+    }
+
+    return $true
+}
+
 function Get-CertificationStatus {
     [CmdletBinding()]
     [OutputType([string])]
@@ -276,6 +313,7 @@ function Test-ReleaseCriteria {
     $buildRoot = Join-Path $ProjectRoot "tools\build"
     $testRoot = Join-Path $ProjectRoot "tests"
     $branding = Test-BrandingAssets -ProjectRoot $ProjectRoot
+    $failureVisibility = Test-ReleaseCriticalFailureVisibility -ProjectRoot $ProjectRoot
 
     # --- Documentation Truth ---
     $versionPath = Join-Path $ProjectRoot "VERSION"
@@ -519,6 +557,7 @@ function Test-ReleaseCriteria {
     $overallPassed = (
         $documentationTruth -and
         $branding -and
+        $failureVisibility -and
         $observability -and
         $moduleContracts -and
         $policy -and
@@ -539,6 +578,7 @@ function Test-ReleaseCriteria {
         Categories = [ordered]@{
             DocumentationTruth = $documentationTruth
             Branding = $branding
+            FailureVisibility = $failureVisibility
             Observability = $observability
             ModuleContracts = $moduleContracts
             Policy = $policy

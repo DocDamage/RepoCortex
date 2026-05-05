@@ -10,17 +10,17 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Get-PesterModulePath {
-    $available = Get-Module -ListAvailable Pester | Sort-Object Version -Descending | Select-Object -First 1
-    if ($available) {
-        return $available.Path
-    }
-
     $repoLocal = Join-Path (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")).Path "modules\Pester\5.7.1\Pester.psd1"
     if (Test-Path -LiteralPath $repoLocal) {
         return $repoLocal
     }
 
-    throw "Pester is not available. Install Pester 5.5+ or provide modules/Pester/5.7.1/Pester.psd1."
+    $available = Get-Module -ListAvailable Pester | Sort-Object Version -Descending | Select-Object -First 1
+    if ($available) {
+        return $available.Path
+    }
+
+    throw "Pester is not available. Run tools/ci/install-local-pester.ps1 or provide modules/Pester/5.7.1/Pester.psd1."
 }
 
 $pesterPath = Get-PesterModulePath

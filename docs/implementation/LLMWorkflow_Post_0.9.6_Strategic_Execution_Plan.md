@@ -3,10 +3,9 @@
 
 ## Document Purpose
 
-This document defines the strategic execution plan for the LLM Workflow platform after the Phase 1-8 buildout and the 0.9.6-era documentation update.
+This document records the strategic execution plan for the LLM Workflow platform after the Phase 1-8 buildout and the 0.9.6-era documentation update.
 
-This is not a bootstrap plan.
-This is a stabilization, integration, ingestion-hardening, and v1.0-readiness plan.
+This is not the current release status page. It is a stabilization, integration, ingestion-hardening, and v1.0-readiness plan whose highest-priority release blockers were remediated by the 2026-05-04 certification pass. For current state, use `docs/releases/RELEASE_STATE.md`, `docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md`, and the root `README.md`.
 
 ## Related Docs
 - [Implementation Progress](./PROGRESS.md)
@@ -25,8 +24,8 @@ The next stage is about making the system:
 
 ## Executive Summary
 
-The correct move now is not another random expansion phase.
-It is a discipline phase.
+The correct move after the Phase 1-8 buildout was not another random expansion phase.
+It was a discipline phase.
 
 The platform already has a strong architecture across:
 - operational core and state safety
@@ -37,12 +36,12 @@ The platform already has a strong architecture across:
 - MCP and inter-pack capabilities
 - promoted domain packs and broad engine-facing coverage
 
-What it still needs is coherence at the program level.
-The main risks are no longer lack of ideas. The main risks are drift, ambiguity, weak observability, and uneven ingestion quality across non-code artifacts.
+At the time this plan was written, the remaining need was coherence at the program level.
+The main risks were no longer lack of ideas. The main risks were drift, ambiguity, weak observability, and uneven ingestion quality across non-code artifacts.
 
 The strategic plan still uses eight workstreams, but those workstreams should now be read through a release-priority lens.
 
-The current release priorities are:
+The release-priority lens used by the plan was:
 1. failure visibility and unsafe execution cleanup
 2. structural refactoring and canonical ownership
 3. module contracts, PowerShell hygiene, and release-gate testing
@@ -58,34 +57,37 @@ They are the implementation structure used to deliver those priorities coherentl
 The planning docs now share the same ordering on purpose.
 
 ### Priority 0 - Failure Visibility and Unsafe Execution
-- remove silent-failure patterns
-- eliminate empty catches
-- reduce `Write-Host` misuse in reusable modules
-- keep degraded behavior visible to tests and operators
+- Status after 2026-05-04 remediation: `release-gate remediated and enforced for critical files`
+- silent command and file probes were removed from several critical paths
+- degraded behavior is now more visible to tests and operators
+- release certification now blocks unjustified `-ErrorAction SilentlyContinue` usage in the tracked critical-file set
 
 ### Priority 1 - Structural Refactoring and Canonical Ownership
-- decompose the largest modules
-- replace duplicated helper definitions with canonical implementations
-- reduce review radius and file-level ambiguity
+- Status after 2026-05-04 remediation: `partially remediated; ongoing maintainability work`
+- major subsystem fork ambiguity was reduced
+- explicit exports and loader fixes bounded the public surface
+- large-module decomposition remains useful maintenance work
 
 ### Priority 2 - Module Contracts and Release-Gate Quality
-- add `Set-StrictMode`, `[CmdletBinding()]`, `.SYNOPSIS`, and `[OutputType()]` where they materially improve trust
-- tighten parameter contracts
-- turn foundational coverage into enforceable CI gates
+- Status after 2026-05-04 remediation: `release-gate remediated; continue contract quality improvements`
+- wildcard export exposure was removed
+- release certification now checks module export and alias parity
+- remaining PowerShell hygiene is incremental quality work
 
 ### Priority 3 - Observability and Policy on the Critical Path
-- make failures traceable across routing, retrieval, arbitration, extraction, and MCP paths
-- ensure policy is active in real runtime decisions
+- Status after 2026-05-04 remediation: `architecture and gates present; deepen runtime coverage over time`
+- observability, policy, and security artifacts participate in certification
+- future work should broaden runtime enforcement and incident traceability
 
 ### Priority 4 - Mixed Artifact and Game Asset Ingestion Hardening
-- keep document, descriptor, and asset outputs governable
-- distinguish inventory support from deep extraction support honestly
-- normalize provenance and license data across expanding asset surfaces
+- Status after 2026-05-04 remediation: `capability present and regression-tested; continue sample coverage`
+- document, descriptor, and asset outputs now have governed surfaces
+- future work should broaden real-corpus validation and provenance normalization
 
 ### Priority 5 - Security, Portability, Durable Execution, and MCP Governance
-- make security evidence part of promotion
-- reduce portability drift from local-path assumptions
-- make long-running recovery and MCP lifecycle rules enforceable
+- Status after 2026-05-04 remediation: `certification-covered; continue promotion discipline`
+- security baseline, durable execution, and MCP governance are represented in release gates
+- future work should keep evidence fresh and enforcement unavoidable
 
 ---
 
@@ -104,12 +106,20 @@ The planning docs now share the same ordering on purpose.
   - `RunId` script dispatch reliability fixed
   - PowerShell 5.1 compatibility improvements in pack modules
 
-### Remaining Program-Level Gaps
+### Program-Level Gaps Captured At The Time
 
-- silent-failure cleanup and exception visibility still need a focused sweep before v1.0 gates
-- large-module decomposition and duplicate helper reduction are still open maintenance risks
-- observability, policy, and security workstreams still need deeper runtime enforcement before release certification
-- mixed artifact and game-asset ingestion now has real momentum, but contract and provenance discipline need to catch up with the surface area
+- silent-failure cleanup and exception visibility needed a focused sweep before v1.0 gates
+- large-module decomposition and duplicate helper reduction remained maintenance risks
+- observability, policy, and security workstreams needed deeper runtime enforcement before the 2026-05-04 certification pass
+- mixed artifact and game-asset ingestion had real momentum, but contract and provenance discipline needed to catch up with the surface area
+
+### Certification Update (2026-05-04)
+
+- The v1.0 release certification suite achieved a 100% pass rate across the tracked certification categories.
+- Priority 0 failure-visibility work moved from release blocker to ongoing maintenance hardening.
+- The public module contract is bounded by explicit exports and certification export/alias parity checks.
+- Parallel subsystem ownership forks were materially reduced; remaining work is ordinary structural refactoring.
+- Observability, policy, security, durable execution, MCP governance, mixed-artifact ingestion, and game-asset ingestion are now release-gated surfaces rather than aspirational plan items.
 
 ---
 

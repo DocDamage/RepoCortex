@@ -56,12 +56,15 @@ function Get-CheckpointDirectory {
         [string]$ProjectRoot = "."
     )
 
-    $resolvedRoot = Resolve-Path -Path $ProjectRoot -ErrorAction SilentlyContinue
-    if (-not $resolvedRoot) {
-        $resolvedRoot = $ProjectRoot
+    try {
+        $resolvedRoot = Resolve-Path -Path $ProjectRoot -ErrorAction Stop
+    }
+    catch {
+        Write-Verbose "[DurableOrchestrator] ProjectRoot '$ProjectRoot' could not be resolved; using the literal value. $($_.Exception.Message)"
+        $resolvedRoot = [pscustomobject]@{ Path = $ProjectRoot }
     }
 
-    $dir = Join-Path $resolvedRoot $script:CheckpointDirName
+    $dir = Join-Path $resolvedRoot.Path $script:CheckpointDirName
     if (-not (Test-Path -LiteralPath $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
@@ -177,8 +180,13 @@ function Read-Checkpoint {
     }
     else {
         $pattern = "$WorkflowId.*.checkpoint.json"
-        $files = Get-ChildItem -Path $dir -Filter $pattern -File -ErrorAction SilentlyContinue |
-            Sort-Object -Property LastWriteTime -Descending
+        try {
+            $files = Get-ChildItem -Path $dir -Filter $pattern -File -ErrorAction Stop |
+                Sort-Object -Property LastWriteTime -Descending
+        }
+        catch {
+            throw "Failed to enumerate checkpoint files in '$dir' with pattern '$pattern': $($_.Exception.Message)"
+        }
 
         if ($files) {
             $content = Get-Content -LiteralPath $files[0].FullName -Raw

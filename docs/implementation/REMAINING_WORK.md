@@ -1,11 +1,11 @@
-# Remaining Work
+# Post-Certification Hardening Backlog
 
-This document tracks the practical work still left between the current documented head state and an honest `v1.0` release.
+This document tracks practical hardening work that remains useful after the 2026-05-04 release certification pass.
 
 It is intentionally narrower than the strategic plan and more execution-oriented than the audit.
 Use it to answer one question:
 
-**What still has to happen before this repo can be called release-ready with a straight face?**
+**What should keep improving after the release gates are green?**
 
 **Last Updated:** 2026-05-04
 
@@ -18,8 +18,8 @@ Use it to answer one question:
 
 ## Current Read
 
-The platform is no longer blocked on missing core capability.
-It is blocked on consistency, diagnosability, and release discipline.
+The platform is no longer blocked on missing core capability, and the 2026-05-04 certification pass means the tracked release gates are green.
+The remaining items below are not reopened blockers; they are the hardening backlog that keeps the release honest as the codebase evolves.
 
 The repo already has broad surface area across:
 - orchestration and workflow runtime
@@ -29,7 +29,7 @@ The repo already has broad surface area across:
 - game-engine and asset-facing tooling
 
 That breadth is now a strength and a maintenance risk at the same time.
-The remaining work is mostly about turning prototype-era success into operational trust.
+The remaining work is mostly about preserving operational trust after release certification.
 
 ### What Recently Improved
 
@@ -67,14 +67,15 @@ It also means the remaining work is now less about expansion and more about hard
 
 ---
 
-## Remaining Work by Release Priority
+## Hardening Backlog by Release Priority
 
 ### Priority 0: Failure Visibility and Unsafe Execution
 
-This is the most important work left.
-If the system can fail silently, suppress important diagnostics, or execute unpredictably, `v1.0` is not ready no matter how many features exist.
+Status: `Release-gate remediated and enforced for critical files`
 
-#### What Still Needs To Happen
+This was the most important pre-certification work. The 2026-05-04 remediation moved the tracked release risk to green, especially in dashboard, healing, Docling, and parser probe paths. The release certification suite now also blocks unjustified `-ErrorAction SilentlyContinue` usage in release-critical files, including durable execution and MCP lifecycle paths.
+
+#### Ongoing Cleanup
 - reduce and justify `-ErrorAction SilentlyContinue` usage in production modules
 - eliminate empty `catch` blocks and replace them with explicit handling or rethrow behavior
 - remove or tightly isolate `Invoke-Expression` usage from release-relevant paths
@@ -92,14 +93,15 @@ If the system can fail silently, suppress important diagnostics, or execute unpr
 - `LLMWorkflow.Dashboard.ps1`
 
 #### Exit Condition
-- critical modules no longer swallow failures or hide important state transitions from operators and tests
+- release-critical modules no longer swallow failures or hide important state transitions from operators and tests, and certification prevents regression in the tracked critical-file set
 
 ### Priority 1: Structural Refactoring and Canonical Ownership
 
-The repo still contains too many large modules and duplicated helpers.
-That slows review, increases regression radius, and makes it too easy for new work to repeat old patterns.
+Status: `Materially improved; ongoing maintainability work`
 
-#### What Still Needs To Happen
+The major public-contract and loader ambiguity has been remediated. The repo still contains large modules and some duplicated helper patterns, which should be reduced over time to keep review and regression radius manageable.
+
+#### Ongoing Cleanup
 - decompose the largest modules into coherent private helper files or submodules
 - replace duplicated utility functions with canonical shared implementations
 - make ownership boundaries clearer in file layout and loader wiring
@@ -120,10 +122,11 @@ That slows review, increases regression radius, and makes it too easy for new wo
 
 ### Priority 2: Module Contracts and PowerShell Hygiene
 
-A large amount of remaining work is basic contract quality.
-This is less dramatic than a silent failure bug, but it is everywhere and it affects operator trust, discoverability, and maintenance speed.
+Status: `Release-gate remediated; continue quality ratcheting`
 
-#### What Still Needs To Happen
+Explicit exports replaced wildcard exposure, and release certification now checks key contract surfaces. Remaining contract hygiene should be treated as a ratchet: improve modules as they are touched.
+
+#### Ongoing Cleanup
 - add `Set-StrictMode` to reusable modules that still lack it
 - add `[CmdletBinding()]` where functions are still script-style without proper contracts
 - add `.SYNOPSIS` help to public and important semi-public functions
@@ -148,10 +151,11 @@ This is less dramatic than a silent failure bug, but it is everywhere and it aff
 
 ### Priority 3: Test and Evidence Coverage
 
-The test story improved, but it is still uneven.
-`v1.0` requires stronger coverage around foundational behavior, not only around newly touched areas.
+Status: `Certification-covered; broaden as risk changes`
 
-#### What Still Needs To Happen
+The release certification suite is passing. Additional coverage remains valuable where foundational behavior changes or new public surfaces are added.
+
+#### Ongoing Cleanup
 - convert release-critical suites into explicit CI gates
 - add direct tests or strong evidence of coverage for state, locking, contract, and workspace primitives
 - add more negative and regression tests around exports, loader behavior, and policy fallback paths
@@ -174,9 +178,11 @@ The test story improved, but it is still uneven.
 
 ### Priority 4: Documentation and Release Truth
 
-Recent reconciliation work helped a lot, but this still needs to be treated as release infrastructure, not optional polish.
+Status: `Active release infrastructure`
 
-#### What Still Needs To Happen
+Documentation truth is now part of release discipline. Keep it aligned as head changes so planning docs do not accidentally read like current blockers after remediation has landed.
+
+#### Ongoing Cleanup
 - remove remaining version-label and release-state drift in top-level docs and dashboards
 - keep docs-truth checks active and expand them where they add real signal
 - standardize `released` versus `documented-head` wording across release-facing docs
@@ -187,10 +193,11 @@ Recent reconciliation work helped a lot, but this still needs to be treated as r
 
 ### Priority 5: Observability and Policy on the Critical Path
 
-The architecture exists.
-The remaining work is to make it operationally useful and visibly active where it matters.
+Status: `Gated architecture present; deepen runtime enforcement over time`
 
-#### What Still Needs To Happen
+The architecture and release gates exist. The ongoing work is to make the signal more useful in real incidents and mutation paths.
+
+#### Ongoing Cleanup
 - propagate trace and correlation IDs across routing, retrieval, arbitration, confidence, evidence, extraction, and MCP flows
 - make parser and tool failures diagnosable without log archaeology
 - ensure policy is invoked at real mutation and exposure boundaries, not just represented on disk
@@ -212,10 +219,11 @@ The remaining work is to make it operationally useful and visibly active where i
 
 ### Priority 6: Mixed Artifact and Game Asset Ingestion Hardening
 
-This area is now a real platform capability, not a speculative future add-on.
-That means it has remaining work of its own.
+Status: `Capability present and tested; continue real-corpus hardening`
 
-#### What Still Needs To Happen
+This area is now a real platform capability, not a speculative future add-on. Future work should focus on broader samples, provenance consistency, and honest scope boundaries.
+
+#### Ongoing Cleanup
 - keep provenance and license fields consistent across asset and document outputs
 - clearly distinguish inventory-only support from deep extraction support for engine-native formats
 - normalize marketplace and source-attribution metadata for external assets, including Epic or Fab-style sources
@@ -237,10 +245,11 @@ That means it has remaining work of its own.
 
 ### Priority 7: Security, Portability, and Promotion Discipline
 
-The repo has security and supply-chain pieces in place.
-The remaining work is making them unavoidable, reviewable, and portable.
+Status: `Certification-covered; keep evidence fresh`
 
-#### What Still Needs To Happen
+The repo has security and supply-chain pieces in place. The ongoing discipline is making current evidence normal for promotion and keeping portability assumptions visible.
+
+#### Ongoing Cleanup
 - triage heuristic secret findings to closure
 - remove or normalize hardcoded absolute paths where they affect portability or release tooling
 - make security scans and SBOM evidence part of normal promotion flow
@@ -260,9 +269,11 @@ The remaining work is making them unavoidable, reviewable, and portable.
 
 ### Priority 8: Durable Execution and MCP Lifecycle Governance
 
-These are important, but they should land after the failure-handling and structural work above because they depend on a more trustworthy base.
+Status: `Certification-covered; continue enforcement depth`
 
-#### What Still Needs To Happen
+These are represented in the release gates. Future work should deepen default adoption and lifecycle enforcement.
+
+#### Ongoing Cleanup
 - define which long-running workflows must use durability by default
 - document and test resume semantics in production-shaped scenarios
 - enforce MCP lifecycle transitions rather than just documenting them
@@ -297,7 +308,7 @@ These are no longer the main remaining-work drivers and should not keep reappear
 
 ## Suggested Execution Order
 
-If we follow one practical sequence, it should be this:
+If we follow one practical sequence after the certification pass, it should be this:
 
 1. Maintain 100% pass rate on `Invoke-ReleaseCertification.ps1`
 2. Finalize version bump to `v1.0.0`
@@ -309,20 +320,16 @@ It is meant to reduce disagreement between planning docs.
 
 ---
 
-## What Would Count as Done
+## What Counts as Done for Release
 
-This repo should be treated as honestly `v1.0` ready only when all of the following are true:
-- critical modules do not fail silently or swallow exceptions without visibility
-- the largest high-risk modules have been decomposed enough to reduce regression radius
-- core public surfaces have strict mode, function contracts, help, and reasonable output declarations
-- CI gates reflect real release risk and cover foundational runtime primitives
-- release docs and automation no longer contradict each other
-- critical answer and ingestion paths are traceable and explainable
-- mixed-artifact and game-asset ingestion outputs are governable, tested, and clearly scoped
-- security evidence is part of promotion, not an optional extra
-- durable execution and MCP lifecycle rules are enforceable where they matter
+For the current branch, release readiness is determined by:
+- 100% pass rate from `Invoke-ReleaseCertification.ps1`
+- green release preflight checks
+- aligned `README.md`, `VERSION`, module manifest, release state, changelog, and certification checklist
+- current security and certification evidence generated during promotion
+- release-owner sign-off
 
-Until then, the repo is strong and increasingly disciplined, but still in hardening mode rather than true release-final mode.
+The backlog above should not be read as evidence that the branch is unfinished. It is the maintenance queue that keeps the platform from drifting after certification.
 
 ---
 

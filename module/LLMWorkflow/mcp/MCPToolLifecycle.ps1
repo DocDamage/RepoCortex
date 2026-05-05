@@ -393,7 +393,12 @@ function Invoke-MCPToolRegistrySync {
     }
     catch {
         if (Test-Path -LiteralPath $tempPath) {
-            Remove-Item -LiteralPath $tempPath -Force -ErrorAction SilentlyContinue
+            try {
+                Remove-Item -LiteralPath $tempPath -Force -ErrorAction Stop
+            }
+            catch {
+                Write-Verbose "[MCPToolLifecycle] Failed to remove temporary registry file '$tempPath': $($_.Exception.Message)"
+            }
         }
         throw
     }
