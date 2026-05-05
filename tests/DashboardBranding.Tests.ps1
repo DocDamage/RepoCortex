@@ -13,6 +13,7 @@ Describe 'Dashboard branding' {
         $html | Should -Match '<title>Repo Cortex Pack Health</title>'
         $html | Should -Match 'class="brand-header"'
         $html | Should -Match 'data-modern-ui="true"'
+        $html | Should -Match 'class="modern-ui-rail"'
         $html | Should -Match 'Repo Cortex ModernUI mark'
         $html | Should -Match 'AI workflow operations, retrieval, governance, and memory telemetry'
         $html | Should -Not -Match '<title>Pack Health Dashboard</title>'
@@ -35,7 +36,9 @@ Describe 'Dashboard branding' {
         $html = Export-DashboardHTML -Views @('Health') -ProjectRoot $script:ProjectRoot -ExportPath $exportPath
 
         $html | Should -Match 'data-modern-ui="true"'
+        $html | Should -Match 'class="modern-ui-banner"'
         $html | Should -Match 'data:image/png;base64,'
+        ([regex]::Matches($html, 'data:image/(png|gif);base64,')).Count | Should -BeGreaterOrEqual 4
         $html | Should -Match 'Repo Cortex ModernUI mark'
     }
 

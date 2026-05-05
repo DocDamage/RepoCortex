@@ -41,6 +41,78 @@ function Get-DashboardHtmlStyles {
             padding: 8px; object-fit: contain; image-rendering: pixelated;
             background: color-mix(in srgb, var(--rc-surface) 82%, white);
         }
+        body[data-modern-ui="true"] {
+            --rc-bg: #162033; --rc-surface: #23314a; --rc-surface-strong: #f6f3df;
+            --rc-text: #fdf7e8; --rc-muted: #d7e0f2; --rc-border: #384a68;
+            --rc-accent: #22d3ee; --rc-accent-2: #ff5fb8;
+            --rc-stripe: rgba(255, 255, 255, 0.07);
+            background:
+                linear-gradient(90deg, rgba(34, 211, 238, 0.18) 0 16px, transparent 16px 32px),
+                linear-gradient(180deg, #162033 0%, #263655 52%, #1b263b 100%);
+        }
+        body[data-modern-ui="true"] .page-shell {
+            display: grid; grid-template-columns: 84px minmax(0, 1fr);
+            gap: 18px; max-width: 1520px;
+        }
+        body[data-modern-ui="true"] .brand-header {
+            grid-column: 2; align-items: center; min-height: 124px;
+            background:
+                linear-gradient(90deg, #ffdd57 0 10px, transparent 10px),
+                linear-gradient(135deg, #21324f 0%, #5a3f7b 46%, #234f5d 100%);
+            border: 3px solid #f6f3df; box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.36);
+        }
+        body[data-modern-ui="true"] .brand-mark {
+            width: 78px; height: 78px; border: 3px solid #1d2435;
+            border-radius: 6px; background: #f6f3df; box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.25);
+        }
+        body[data-modern-ui="true"] .brand-mark-image { padding: 11px; }
+        body[data-modern-ui="true"] .brand-title { color: #fff8e7; text-shadow: 2px 2px 0 #172033; }
+        body[data-modern-ui="true"] .brand-subtitle { color: #f6f3df; }
+        body[data-modern-ui="true"] .meta-chip {
+            color: #172033; background: #f6f3df; border: 2px solid #172033;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.22);
+        }
+        .modern-ui-rail {
+            grid-column: 1; grid-row: 1 / span 2; position: sticky; top: 18px;
+            align-self: start; display: flex; flex-direction: column; gap: 12px;
+            padding: 12px; min-height: 420px; background: #f6f3df;
+            border: 3px solid #172033; border-radius: 8px; box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.32);
+        }
+        .modern-ui-button {
+            min-height: 64px; display: grid; place-items: center; gap: 4px;
+            padding: 8px 4px; border: 2px solid #172033; border-radius: 6px;
+            background: #2d3f61; color: #fff8e7; font-size: 0.66rem;
+            font-weight: 800; text-transform: uppercase; box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.28);
+        }
+        .modern-ui-button.is-active { background: #ff5fb8; color: #172033; }
+        .modern-ui-button img,
+        .modern-ui-banner img,
+        .modern-ui-corner img {
+            width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated;
+        }
+        .modern-ui-banner {
+            grid-column: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px; margin-bottom: 18px;
+        }
+        .modern-ui-panel {
+            min-height: 86px; display: flex; align-items: center; gap: 14px;
+            padding: 14px; background: #f6f3df; color: #172033;
+            border: 3px solid #172033; border-radius: 8px; box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.24);
+        }
+        .modern-ui-panel img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; }
+        .modern-ui-panel strong { display: block; font-size: 0.82rem; text-transform: uppercase; }
+        .modern-ui-panel span { color: #46516a; font-size: 0.8rem; font-weight: 700; }
+        body[data-modern-ui="true"] .dashboard-grid { grid-column: 2; }
+        body[data-modern-ui="true"] .card {
+            background: #23314a; border: 3px solid #f6f3df;
+            box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.24);
+        }
+        body[data-modern-ui="true"] .metric {
+            background: #f6f3df; color: #172033; border: 2px solid #172033;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.22);
+        }
+        body[data-modern-ui="true"] .metric-value,
+        body[data-modern-ui="true"] .metric-label { color: #172033; }
         .brand-title { margin: 0; color: var(--rc-text); font-size: clamp(1.55rem, 2.4vw, 2.25rem); line-height: 1.05; letter-spacing: 0; }
         .brand-subtitle { margin-top: 6px; color: var(--rc-muted); font-size: 0.95rem; }
         .brand-meta {
@@ -95,6 +167,13 @@ function Get-DashboardHtmlStyles {
         .mermaid { text-align: left; padding: 0; }
         @media (max-width: 760px) {
             body { padding: 14px; }
+            body[data-modern-ui="true"] .page-shell { display: block; }
+            .modern-ui-rail {
+                position: static; min-height: 0; flex-direction: row;
+                overflow-x: auto; margin-bottom: 14px;
+            }
+            .modern-ui-button { min-width: 72px; }
+            .modern-ui-banner { grid-template-columns: 1fr; }
             .brand-header { align-items: flex-start; flex-direction: column; padding: 18px; }
             .brand-lockup { align-items: flex-start; flex-direction: column; gap: 12px; }
             .brand-meta { justify-content: flex-start; }
@@ -175,6 +254,35 @@ function New-DashboardHtmlHeader {
 "@
 }
 
+function New-DashboardModernUIChrome {
+    param(
+        [hashtable]$Assets
+    )
+
+    if (-not $Assets -or [string]::IsNullOrWhiteSpace([string]$Assets.Brand)) {
+        return ''
+    }
+
+    $styleOne = if ([string]::IsNullOrWhiteSpace([string]$Assets.StyleOne)) { $Assets.Brand } else { $Assets.StyleOne }
+    $styleTwo = if ([string]::IsNullOrWhiteSpace([string]$Assets.StyleTwo)) { $Assets.Brand } else { $Assets.StyleTwo }
+    $action = if ([string]::IsNullOrWhiteSpace([string]$Assets.Action)) { $Assets.Brand } else { $Assets.Action }
+
+    return @"
+<aside class="modern-ui-rail" aria-label="Repo Cortex views">
+    <div class="modern-ui-button is-active"><img src="$($Assets.Brand)" alt="Health"><span>Health</span></div>
+    <div class="modern-ui-button"><img src="$styleOne" alt="Retrieval"><span>Search</span></div>
+    <div class="modern-ui-button"><img src="$styleTwo" alt="Graph"><span>Graph</span></div>
+    <div class="modern-ui-button"><img src="$action" alt="Gateway"><span>MCP</span></div>
+    <div class="modern-ui-button"><img src="$($Assets.Brand)" alt="Federation"><span>Mesh</span></div>
+</aside>
+<section class="modern-ui-banner" aria-label="Repo Cortex summary">
+    <div class="modern-ui-panel"><img src="$($Assets.Brand)" alt="Pack health"><div><strong>Pack Health</strong><span>Live release surface</span></div></div>
+    <div class="modern-ui-panel"><img src="$styleOne" alt="Retrieval activity"><div><strong>Retrieval</strong><span>Evidence and memory flow</span></div></div>
+    <div class="modern-ui-panel"><img src="$styleTwo" alt="Governance"><div><strong>Governance</strong><span>Policy and MCP control</span></div></div>
+</section>
+"@
+}
+
 function New-DashboardHtmlDocument {
     param(
         [string]$Title,
@@ -196,12 +304,34 @@ function New-DashboardHtmlDocument {
     }
     $styles = Get-DashboardHtmlStyles -ThemeColors $themeColors
     $brandAssetUri = Get-DashboardModernUIAssetDataUri -ProjectRoot $ProjectRoot -RelativeCandidates @(
-        'ModernUI\16x16\Modern_UI_Gamepad.png',
+        'ModernUI\48x48\Modern_UI_Gamepad_48x48.png',
         'ModernUI\32x32\Modern_UI_Gamepad_32x32.png',
-        'ModernUI\48x48\Modern_UI_Gamepad_48x48.png'
+        'ModernUI\16x16\Modern_UI_Gamepad.png'
     )
+    $styleOneAssetUri = Get-DashboardModernUIAssetDataUri -ProjectRoot $ProjectRoot -RelativeCandidates @(
+        'ModernUI\48x48\Modern_UI_Style_1_48x48.png',
+        'ModernUI\32x32\Modern_UI_Style_1_32x32.png',
+        'ModernUI\16x16\Modern_UI_Style_1.png'
+    )
+    $styleTwoAssetUri = Get-DashboardModernUIAssetDataUri -ProjectRoot $ProjectRoot -RelativeCandidates @(
+        'ModernUI\48x48\Modern_UI_Style_2_48x48.png',
+        'ModernUI\32x32\Modern_UI_Style_2_32x32.png',
+        'ModernUI\16x16\Modern_UI_Style_2.png'
+    )
+    $actionAssetUri = Get-DashboardModernUIAssetDataUri -ProjectRoot $ProjectRoot -RelativeCandidates @(
+        'ModernUI\48x48\Animated_48x48\Modern_UI_Button_Trash_48x48_1.gif',
+        'ModernUI\32x32\Animated_32x32\Modern_UI_Button_Trash_32x32_1.gif',
+        'ModernUI\16x16\Animated\Modern_UI_Button_Trash_1.gif'
+    )
+    $modernUIAssets = @{
+        Brand = $brandAssetUri
+        StyleOne = $styleOneAssetUri
+        StyleTwo = $styleTwoAssetUri
+        Action = $actionAssetUri
+    }
     $modernUIEnabled = if ([string]::IsNullOrWhiteSpace($brandAssetUri)) { 'false' } else { 'true' }
     $header = New-DashboardHtmlHeader -Title $Title -Subtitle $Subtitle -MetaItems $MetaItems -BrandAssetUri $brandAssetUri
+    $modernUIChrome = if ($modernUIEnabled -eq 'true') { New-DashboardModernUIChrome -Assets $modernUIAssets } else { '' }
 
     return @"
 <!DOCTYPE html>
@@ -218,6 +348,7 @@ $styles
 <body data-modern-ui="$modernUIEnabled">
 <main class="page-shell">
 $header
+$modernUIChrome
 $content
 </main>
 </body>
