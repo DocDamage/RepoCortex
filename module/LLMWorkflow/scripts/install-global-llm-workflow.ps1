@@ -1,6 +1,10 @@
 [CmdletBinding()]
 param(
-    [string]$InstallRoot = "$HOME\.llm-workflow"
+    [string]$InstallRoot = "$HOME\.llm-workflow",
+    [string]$ToolkitSource = "",
+    [string]$ProfilePath = $PROFILE,
+    [switch]$NoProfileUpdate,
+    [switch]$SkipUserEnvPersist
 )
 
 $ErrorActionPreference = "Stop"
@@ -51,7 +55,7 @@ function Set-Or-ReplaceProfileBlock {
 
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $scriptRoot ".." "..")).Path
-$sourceToolsRoot = Join-Path $repoRoot "tools"
+$sourceToolsRoot = if ([string]::IsNullOrWhiteSpace($ToolkitSource)) { Join-Path $repoRoot "tools" } else { [System.IO.Path]::GetFullPath($ToolkitSource) }
 
 $requiredToolDirs = @("codemunch", "contextlattice", "memorybridge")
 foreach ($name in $requiredToolDirs) {
@@ -79,14 +83,23 @@ foreach ($name in $requiredToolDirs) {
 }
 
 $bootstrapSrc = Join-Path $sourceToolsRoot "workflow" "bootstrap-llm-workflow.ps1"
+if (-not (Test-Path -LiteralPath $bootstrapSrc)) {
+    $bootstrapSrc = Join-Path $scriptRoot "bootstrap-llm-workflow.ps1"
+}
 $bootstrapDst = Join-Path $scriptsRoot "bootstrap-llm-workflow.ps1"
 Copy-Item -LiteralPath $bootstrapSrc -Destination $bootstrapDst -Force
 $checkSrc = Join-Path $sourceToolsRoot "workflow" "check-llm-workflow.ps1"
+if (-not (Test-Path -LiteralPath $checkSrc)) {
+    $checkSrc = Join-Path $scriptRoot "check-llm-workflow.ps1"
+}
 $checkDst = Join-Path $scriptsRoot "check-llm-workflow.ps1"
 if (Test-Path -LiteralPath $checkSrc) {
     Copy-Item -LiteralPath $checkSrc -Destination $checkDst -Force
 }
 $doctorSrc = Join-Path $sourceToolsRoot "workflow" "doctor-llm-workflow.ps1"
+if (-not (Test-Path -LiteralPath $doctorSrc)) {
+    $doctorSrc = Join-Path $scriptRoot "doctor-llm-workflow.ps1"
+}
 $doctorDst = Join-Path $scriptsRoot "doctor-llm-workflow.ps1"
 if (Test-Path -LiteralPath $doctorSrc) {
     Copy-Item -LiteralPath $doctorSrc -Destination $doctorDst -Force
@@ -197,9 +210,11 @@ if (`$Strict) { `$invokeArgs["Strict"] = `$true }
 & `$scriptPath @invokeArgs
 "@ | Set-Content -LiteralPath $doctorLauncherPath -Encoding UTF8
 
-[System.Environment]::SetEnvironmentVariable("LLM_WORKFLOW_TOOLKIT_SOURCE", $templatesRoot, "User")
+if (-not $SkipUserEnvPersist) {
+    [System.Environment]::SetEnvironmentVariable("LLM_WORKFLOW_TOOLKIT_SOURCE", $templatesRoot, "User")
+}
 [System.Environment]::SetEnvironmentVariable("LLM_WORKFLOW_TOOLKIT_SOURCE", $templatesRoot, "Process")
-Write-Step "Set user env LLM_WORKFLOW_TOOLKIT_SOURCE=$templatesRoot"
+Write-Step "Set env LLM_WORKFLOW_TOOLKIT_SOURCE=$templatesRoot"
 
 $startMarker = "# >>> llm-workflow >>>"
 $endMarker = "# <<< llm-workflow <<<"
@@ -302,10 +317,14 @@ Set-Alias llmdoctor llm-workflow-doctor -Scope Global
 $endMarker
 "@
 
-Set-Or-ReplaceProfileBlock -ProfilePath $PROFILE -BlockText $profileBlock -StartMarker $startMarker -EndMarker $endMarker
+if (-not $NoProfileUpdate) {
+    Set-Or-ReplaceProfileBlock -ProfilePath $ProfilePath -BlockText $profileBlock -StartMarker $startMarker -EndMarker $endMarker
+}
 
 Write-Step "Installed launcher: $upLauncherPath"
 Write-Step "Installed launcher: $checkLauncherPath"
 Write-Step "Installed launcher: $doctorLauncherPath"
-Write-Step "Updated PowerShell profile: $PROFILE"
+if (-not $NoProfileUpdate) {
+    Write-Step "Updated PowerShell profile: $ProfilePath"
+}
 Write-Step "Open a new shell, then run: llm-workflow-up, llm-workflow-check, or llm-workflow-doctor"

@@ -102,7 +102,7 @@ function Write-ConsoleHealthDashboard {
     
     # Header
     Write-Host "$bold$cyan========================================$reset"
-    Write-Host "$bold$cyan   PACK HEALTH DASHBOARD$reset"
+    Write-Host "$bold$cyan   $($script:ProductBrandName) Pack Health$reset"
     Write-Host "$bold$cyan   Generated: $($Data.generatedAt)$reset"
     Write-Host "$bold$cyan========================================$reset"
     Write-Host ''

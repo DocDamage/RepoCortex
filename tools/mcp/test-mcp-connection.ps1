@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Tests MCP server connections for LLM Workflow platform.
+    Tests MCP server connections for Repo Cortex platform.
 
 .DESCRIPTION
     Tests connectivity to MCP servers, executes individual tools, measures
@@ -44,7 +44,7 @@
 
 .NOTES
     File Name      : test-mcp-connection.ps1
-    Author         : LLM Workflow Team
+    Author         : Repo Cortex Team
     Version        : 1.0.0
     Requires       : PowerShell 5.1+
 #>

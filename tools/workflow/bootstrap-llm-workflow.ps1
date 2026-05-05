@@ -314,14 +314,14 @@ function Import-EnvFile {
             }
             if ($isSensitive) {
                 $secrets[$name] = $value
-                Write-Verbose "Skipping process-scoped env var for sensitive key: $name"
+                [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
                 continue
             }
             [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
         }
     }
 
-    Write-Step "Loaded env vars from $Path"
+    Write-Verbose "Loaded env vars from $Path"
     return $secrets
 }
 

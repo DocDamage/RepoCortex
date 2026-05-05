@@ -15,11 +15,11 @@
     Run-AllExamples
 #>
 
-# Import all pipeline modules
-Import-Module "f:\stuff from desktop\CodeMunch-ContextLattice-MemPalace---All-in-one\module\LLMWorkflow\interpack\VoiceAnimationPipeline.ps1" -Force
-Import-Module "f:\stuff from desktop\CodeMunch-ContextLattice-MemPalace---All-in-one\module\LLMWorkflow\interpack\AIGenerationPipeline.ps1" -Force
-Import-Module "f:\stuff from desktop\CodeMunch-ContextLattice-MemPalace---All-in-one\module\LLMWorkflow\interpack\MLModelDeploymentPipeline.ps1" -Force
-Import-Module "f:\stuff from desktop\CodeMunch-ContextLattice-MemPalace---All-in-one\module\LLMWorkflow\interpack\ProvenanceTracker.ps1" -Force
+# Import all pipeline modules relative to this example file.
+Import-Module (Join-Path $PSScriptRoot 'VoiceAnimationPipeline.ps1') -Force
+Import-Module (Join-Path $PSScriptRoot 'AIGenerationPipeline.ps1') -Force
+Import-Module (Join-Path $PSScriptRoot 'MLModelDeploymentPipeline.ps1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ProvenanceTracker.ps1') -Force
 
 #region Voice Animation Pipeline Examples
 

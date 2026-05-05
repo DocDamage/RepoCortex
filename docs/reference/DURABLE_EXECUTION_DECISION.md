@@ -3,7 +3,7 @@
 **Workstream:** 6 – Durable Orchestration for Long-Running Work  
 **Date:** 2026-04-13  
 **Status:** Approved  
-**Author:** LLM Workflow Team
+**Author:** Repo Cortex Team
 
 ## Related Docs
 - [Recovery Playbooks](../operations/RECOVERY_PLAYBOOKS.md)

@@ -11,6 +11,13 @@ BeforeAll {
     $script:ModulePath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\Journal.ps1'
     $script:RunIdPath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\RunId.ps1'
 
+    if (Test-Path $script:RunIdPath) {
+        try { . $script:RunIdPath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }
+    }
+    else {
+        throw "Module not found: $script:RunIdPath"
+    }
+
     if (Test-Path $script:ModulePath) {
         try { . $script:ModulePath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }
     }

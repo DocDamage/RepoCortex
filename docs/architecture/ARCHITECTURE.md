@@ -24,7 +24,7 @@ This document provides detailed architectural diagrams and explanations of the R
 
 ## Overview
 
-The LLM Workflow is a unified toolkit that integrates three core components:
+Repo Cortex is a unified toolkit that integrates three core components:
 
 - **CodeMunch**: Project indexing and MCP wrapper setup
 - **ContextLattice**: Project bootstrap and connectivity verification

@@ -1,6 +1,6 @@
 # Evaluation Operations
 
-This document describes how evaluation events link to distributed traces, the dashboards operators require, and the priority instrumentation targets for the LLMWorkflow observability backbone.
+This document describes how evaluation events link to distributed traces, the dashboards operators require, and the priority instrumentation targets for the Repo Cortex observability backbone.
 
 ## Related Docs
 - [Observability Architecture](../architecture/OBSERVABILITY_ARCHITECTURE.md)

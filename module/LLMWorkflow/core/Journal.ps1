@@ -467,9 +467,9 @@ function New-JournalEntry {
         
         if ($beforeEntry) {
             try {
-                $beforeTime = [DateTime]::Parse($beforeEntry.timestamp)
-                $afterTime = [DateTime]::Parse($entry['timestamp'])
-                $entry['durationMs'] = [int]($afterTime - $beforeTime).TotalMilliseconds
+                $beforeTime = ([DateTimeOffset]::Parse($beforeEntry.timestamp)).UtcDateTime
+                $afterTime = ([DateTimeOffset]::Parse($entry['timestamp'])).UtcDateTime
+                $entry['durationMs'] = [Math]::Max(0, [int]($afterTime - $beforeTime).TotalMilliseconds)
             }
             catch {
                 Write-Verbose "[Journal] Failed to calculate duration: $_"
@@ -1337,9 +1337,9 @@ function Write-JournalEntry {
                     
                     if ($beforeEntry) {
                         try {
-                            $beforeTime = [DateTime]::Parse($beforeEntry.timestamp)
-                            $afterTime = [DateTime]::Parse($entry['timestamp'])
-                            $entry['durationMs'] = [int]($afterTime - $beforeTime).TotalMilliseconds
+                            $beforeTime = ([DateTimeOffset]::Parse($beforeEntry.timestamp)).UtcDateTime
+                            $afterTime = ([DateTimeOffset]::Parse($entry['timestamp'])).UtcDateTime
+                            $entry['durationMs'] = [Math]::Max(0, [int]($afterTime - $beforeTime).TotalMilliseconds)
                         }
                         catch {
                             Write-Verbose "[Journal] Failed to calculate duration: $_"

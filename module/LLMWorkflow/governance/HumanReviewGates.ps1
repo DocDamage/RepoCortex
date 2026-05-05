@@ -217,9 +217,498 @@ $script:ValidStatuses = @('pending', 'approved', 'rejected', 'needs-work', 'expi
 # Review State Management
 #===============================================================================
 
+function ConvertTo-ReviewHashtable {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)]
+        $InputObject
+    )
+
+    process {
+        if ($null -eq $InputObject) { return $null }
+        if ($InputObject -is [hashtable]) { return $InputObject }
+        if ($InputObject -is [System.Collections.IDictionary]) {
+            $result = @{}
+            foreach ($key in $InputObject.Keys) {
+                $result[$key] = ConvertTo-ReviewHashtable -InputObject $InputObject[$key]
+            }
+            return $result
+        }
+        if ($InputObject -is [array]) {
+            return @($InputObject | ForEach-Object { ConvertTo-ReviewHashtable -InputObject $_ })
+        }
+        if ($InputObject -is [pscustomobject]) {
+            $result = @{}
+            foreach ($property in $InputObject.PSObject.Properties) {
+                $result[$property.Name] = ConvertTo-ReviewHashtable -InputObject $property.Value
+            }
+            return $result
+        }
+
+        return $InputObject
+    }
+}
+
+function Get-ReviewStatePath {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([string]$ProjectRoot = ".")
+
+    $stateDir = Join-Path (Join-Path $ProjectRoot ".llm-workflow") "state"
+    if (-not (Test-Path -LiteralPath $stateDir)) {
+        New-Item -ItemType Directory -Path $stateDir -Force | Out-Null
+    }
+    return (Join-Path $stateDir $script:ReviewStateFileName)
+}
+
+function New-EmptyReviewState {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param()
+
+    return @{
+        schema = $script:ReviewStateSchemaName
+        schemaVersion = $script:ReviewStateSchemaVersion
+        requests = @{}
+        policies = @{}
+        stats = @{
+            totalRequests = 0
+            pendingCount = 0
+            approvedCount = 0
+            rejectedCount = 0
+            expiredCount = 0
+            escalatedCount = 0
+        }
+        createdAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        lastUpdated = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+    }
+}
+
+function Repair-ReviewStateShape {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([hashtable]$State)
+
+    if ($null -eq $State) { $State = New-EmptyReviewState }
+    if (-not $State.ContainsKey('schema')) { $State['schema'] = $script:ReviewStateSchemaName }
+    if (-not $State.ContainsKey('schemaVersion')) { $State['schemaVersion'] = $script:ReviewStateSchemaVersion }
+    if (-not $State.ContainsKey('requests') -or $null -eq $State.requests) { $State['requests'] = @{} }
+    if (-not $State.ContainsKey('policies') -or $null -eq $State.policies) { $State['policies'] = @{} }
+    if (-not $State.ContainsKey('stats') -or $null -eq $State.stats) { $State['stats'] = @{} }
+    if (-not $State.ContainsKey('createdAt')) { $State['createdAt'] = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ") }
+    if (-not $State.ContainsKey('lastUpdated')) { $State['lastUpdated'] = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ") }
+
+    foreach ($key in @('totalRequests', 'pendingCount', 'approvedCount', 'rejectedCount', 'expiredCount', 'escalatedCount')) {
+        if (-not $State.stats.ContainsKey($key) -or $null -eq $State.stats[$key]) {
+            $State.stats[$key] = 0
+        }
+    }
+
+    return $State
+}
+
+function Get-ReviewState {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([string]$ProjectRoot = ".")
+
+    $statePath = Get-ReviewStatePath -ProjectRoot $ProjectRoot
+    if (-not (Test-Path -LiteralPath $statePath)) {
+        return (New-EmptyReviewState)
+    }
+
+    try {
+        $raw = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8
+        if ([string]::IsNullOrWhiteSpace($raw)) {
+            return (New-EmptyReviewState)
+        }
+
+        $state = ConvertTo-ReviewHashtable -InputObject ($raw | ConvertFrom-Json)
+        return (Repair-ReviewStateShape -State $state)
+    }
+    catch {
+        Write-Warning "Failed to read review state at ${statePath}: $_"
+        return (New-EmptyReviewState)
+    }
+}
+
+function Save-ReviewState {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$State,
+
+        [string]$ProjectRoot = "."
+    )
+
+    $statePath = Get-ReviewStatePath -ProjectRoot $ProjectRoot
+    $State = Repair-ReviewStateShape -State $State
+    $State.lastUpdated = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $State | ConvertTo-Json -Depth 50 | Set-Content -LiteralPath $statePath -Encoding UTF8
+    return $statePath
+}
+
+function Get-ReviewLogPath {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([string]$ProjectRoot = ".")
+
+    $stateDir = Split-Path -Parent (Get-ReviewStatePath -ProjectRoot $ProjectRoot)
+    return (Join-Path $stateDir $script:ReviewLogFileName)
+}
+
+function Write-ReviewLogEntry {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Entry,
+
+        [string]$ProjectRoot = "."
+    )
+
+    $logPath = Get-ReviewLogPath -ProjectRoot $ProjectRoot
+    $logEntry = $Entry.Clone()
+    $logEntry['timestamp'] = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+    if (-not $logEntry.ContainsKey('runId')) { $logEntry['runId'] = Get-CurrentRunId }
+    Add-Content -LiteralPath $logPath -Encoding UTF8 -Value ($logEntry | ConvertTo-Json -Depth 20 -Compress)
+    return $logPath
+}
+
 #===============================================================================
 # Helper Functions
 #===============================================================================
+
+function Get-CurrentRunId {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param()
+
+    if ($env:LLMWORKFLOW_RUN_ID) { return $env:LLMWORKFLOW_RUN_ID }
+    if ($env:GITHUB_RUN_ID) { return "github-$($env:GITHUB_RUN_ID)" }
+    return "local-$PID"
+}
+
+function Get-ReviewPolicy {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Operation,
+
+        [hashtable]$Policy = $null,
+
+        [string]$ProjectRoot = "."
+    )
+
+    if ($Policy) { return $Policy }
+
+    $state = Get-ReviewState -ProjectRoot $ProjectRoot
+    if ($state.policies.ContainsKey($Operation)) { return $state.policies[$Operation] }
+    if ($script:DefaultReviewPolicies.ContainsKey($Operation)) { return $script:DefaultReviewPolicies[$Operation] }
+
+    return @{
+        name = "Default Review Policy"
+        operationType = 'unknown'
+        triggers = @{}
+        conditions = @{ minApprovers = 1; autoExpireHours = 72 }
+        defaultReviewers = @()
+    }
+}
+
+function New-ReviewPolicy {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [hashtable]$Triggers = @{},
+
+        [hashtable]$Conditions = @{ minApprovers = 1; autoExpireHours = 72 },
+
+        [array]$DefaultReviewers = @(),
+
+        [string]$OperationType = 'unknown',
+
+        [string]$ProjectRoot = "."
+    )
+
+    $policy = @{
+        name = $Name
+        operationType = $OperationType
+        triggers = $Triggers
+        conditions = $Conditions
+        defaultReviewers = $DefaultReviewers
+        createdAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+    }
+    $state = Get-ReviewState -ProjectRoot $ProjectRoot
+    $state.policies[$Name] = $policy
+    [void](Save-ReviewState -State $state -ProjectRoot $ProjectRoot)
+    return (New-Object -TypeName PSObject -Property $policy)
+}
+
+function Test-LargeSourceDelta {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [hashtable]$ChangeSet,
+        [double]$ThresholdPercent = 30
+    )
+
+    if (-not $ChangeSet -or -not $ChangeSet.ContainsKey('delta') -or $null -eq $ChangeSet.delta) { return $false }
+    $delta = $ChangeSet.delta
+    if (-not $delta.ContainsKey('linesChanged') -or -not $delta.ContainsKey('totalLines') -or [double]$delta.totalLines -le 0) { return $false }
+    return ((([double]$delta.linesChanged / [double]$delta.totalLines) * 100) -ge $ThresholdPercent)
+}
+
+function Test-MajorVersionJump {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([hashtable]$ChangeSet)
+
+    if (-not $ChangeSet -or -not ($ChangeSet.ContainsKey('oldVersion') -and $ChangeSet.ContainsKey('newVersion'))) { return $false }
+    try {
+        $oldMajor = ([version]$ChangeSet.oldVersion).Major
+        $newMajor = ([version]$ChangeSet.newVersion).Major
+        return ($newMajor -gt $oldMajor)
+    }
+    catch {
+        return $false
+    }
+}
+
+function Test-TrustTierChange {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([hashtable]$ChangeSet)
+
+    return ($ChangeSet -and $ChangeSet.ContainsKey('oldTrustTier') -and $ChangeSet.ContainsKey('newTrustTier') -and $ChangeSet.oldTrustTier -ne $ChangeSet.newTrustTier)
+}
+
+function Test-EvalRegression {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [hashtable]$ChangeSet,
+        [double]$Threshold = 0.05
+    )
+
+    if (-not $ChangeSet) { return $false }
+    $eval = $null
+    if ($ChangeSet.ContainsKey('eval') -and $null -ne $ChangeSet.eval) {
+        $eval = $ChangeSet.eval
+    }
+    elseif ($ChangeSet.ContainsKey('evalResults') -and $null -ne $ChangeSet.evalResults) {
+        $eval = $ChangeSet.evalResults
+    }
+    if ($null -eq $eval) { return $false }
+    if ($eval.ContainsKey('previousScore') -and $eval.ContainsKey('currentScore')) {
+        return (([double]$eval.previousScore - [double]$eval.currentScore) -ge $Threshold)
+    }
+    if ($eval.ContainsKey('previousPassRate') -and $eval.ContainsKey('currentPassRate')) {
+        return (([double]$eval.previousPassRate - [double]$eval.currentPassRate) -ge $Threshold)
+    }
+    return $false
+}
+
+function Test-HumanReviewRequired {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Operation,
+
+        [Parameter(Mandatory = $true)]
+        [hashtable]$ChangeSet,
+
+        [hashtable]$Policy = $null,
+
+        [string]$ProjectRoot = "."
+    )
+
+    $resolvedPolicy = Get-ReviewPolicy -Operation $Operation -Policy $Policy -ProjectRoot $ProjectRoot
+    $triggers = @()
+
+    $policyTriggers = if ($resolvedPolicy.ContainsKey('triggers')) { $resolvedPolicy.triggers } else { @{} }
+    $largeDeltaThreshold = 30
+    if ($policyTriggers.ContainsKey('largeSourceDelta') -and $policyTriggers.largeSourceDelta.ContainsKey('thresholdPercent')) {
+        $largeDeltaThreshold = [double]$policyTriggers.largeSourceDelta.thresholdPercent
+    }
+
+    if (Test-LargeSourceDelta -ChangeSet $ChangeSet -ThresholdPercent $largeDeltaThreshold) { $triggers += 'large-source-delta' }
+    if (Test-MajorVersionJump -ChangeSet $ChangeSet) { $triggers += 'major-version-jump' }
+    if (Test-TrustTierChange -ChangeSet $ChangeSet) { $triggers += 'trust-tier-change' }
+    if (Test-EvalRegression -ChangeSet $ChangeSet) { $triggers += 'eval-regression' }
+    if ($ChangeSet.ContainsKey('isNewSource') -and $ChangeSet.isNewSource) { $triggers += 'new-source' }
+    if ($ChangeSet.ContainsKey('lowConfidenceExtraction') -and $ChangeSet.lowConfidenceExtraction) { $triggers += 'low-confidence-extraction' }
+    if ($ChangeSet.ContainsKey('visibilityBoundaryChanged') -and $ChangeSet.visibilityBoundaryChanged) { $triggers += 'visibility-boundary-change' }
+
+    if ($policyTriggers.ContainsKey('alwaysReview') -and $policyTriggers.alwaysReview.ContainsKey('enabled') -and $policyTriggers.alwaysReview.enabled) {
+        $triggers += 'policy-required'
+    }
+
+    $requestChangeSet = $ChangeSet.Clone()
+    $requestChangeSet['triggers'] = @($triggers)
+
+    $conditions = if ($resolvedPolicy.ContainsKey('conditions')) { $resolvedPolicy.conditions } else { @{ minApprovers = 1; autoExpireHours = 72 } }
+    $reviewers = if ($resolvedPolicy.ContainsKey('defaultReviewers')) { @($resolvedPolicy.defaultReviewers) } else { @() }
+    $operationType = if ($resolvedPolicy.ContainsKey('operationType')) { $resolvedPolicy.operationType } else { 'unknown' }
+
+    return New-Object -TypeName PSObject -Property @{
+        Required = (@($triggers).Count -gt 0)
+        Triggers = @($triggers)
+        Policy = $resolvedPolicy
+        RequestParams = @{
+            Operation = $Operation
+            OperationType = $operationType
+            ChangeSet = $requestChangeSet
+            Conditions = $conditions
+            Reviewers = $reviewers
+        }
+    }
+}
+
+function Test-ReviewCompleteInternal {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory = $true)][hashtable]$Request)
+
+    $decisions = @($Request.decisions)
+    $approvals = @($decisions | Where-Object { $_ -and $_.decision -eq 'approved' }).Count
+    $rejections = @($decisions | Where-Object { $_ -and $_.decision -eq 'rejected' }).Count
+
+    $minApprovers = 1
+    if ($Request.ContainsKey('conditions') -and $Request.conditions -and $Request.conditions.ContainsKey('minApprovers')) {
+        $minApprovers = [int]$Request.conditions.minApprovers
+    }
+
+    if ($rejections -gt 0) {
+        return New-Object -TypeName PSObject -Property @{ IsComplete = $true; FinalStatus = 'rejected' }
+    }
+
+    if ($approvals -ge $minApprovers) {
+        return New-Object -TypeName PSObject -Property @{ IsComplete = $true; FinalStatus = 'approved' }
+    }
+
+    return New-Object -TypeName PSObject -Property @{ IsComplete = $false; FinalStatus = 'pending' }
+}
+
+function Invoke-ReviewNotification {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Request,
+
+        [string]$EventType = 'updated',
+
+        [string]$ProjectRoot = "."
+    )
+
+    return New-Object -TypeName PSObject -Property @{
+        Sent = $false
+        EventType = $EventType
+        RequestId = $Request.requestId
+        ProjectRoot = $ProjectRoot
+    }
+}
+
+function Invoke-ReviewEscalation {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RequestId,
+
+        [string]$ProjectRoot = "."
+    )
+
+    $state = Get-ReviewState -ProjectRoot $ProjectRoot
+    if (-not $state.requests.ContainsKey($RequestId)) {
+        throw "Review request not found: $RequestId"
+    }
+
+    $request = $state.requests[$RequestId]
+    $request.status = 'escalated'
+    $request.escalatedAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $request.updatedAt = $request.escalatedAt
+    $state.stats.escalatedCount++
+    [void](Save-ReviewState -State $state -ProjectRoot $ProjectRoot)
+    [void](Write-ReviewLogEntry -Entry @{ eventType = 'request-escalated'; requestId = $RequestId; operation = $request.operation } -ProjectRoot $ProjectRoot)
+    return (New-Object -TypeName PSObject -Property $request)
+}
+
+function Test-ReviewPolicy {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Operation,
+
+        [Parameter(Mandatory = $true)]
+        [hashtable]$ChangeSet,
+
+        [hashtable]$Policy = $null,
+
+        [string]$ProjectRoot = "."
+    )
+
+    return Test-HumanReviewRequired -Operation $Operation -ChangeSet $ChangeSet -Policy $Policy -ProjectRoot $ProjectRoot
+}
+
+function Test-ReviewGate {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$OperationType,
+
+        [hashtable]$Context = @{},
+
+        [string]$ProjectRoot = "."
+    )
+
+    return Test-HumanReviewRequired -Operation $OperationType -ChangeSet $Context -ProjectRoot $ProjectRoot
+}
+
+function Invoke-ReviewGate {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$OperationType,
+
+        [hashtable]$Context = @{},
+
+        [switch]$AutoApproveIfClean,
+
+        [string]$ProjectRoot = "."
+    )
+
+    $check = Test-ReviewGate -OperationType $OperationType -Context $Context -ProjectRoot $ProjectRoot
+    return New-Object -TypeName PSObject -Property @{
+        Approved = (-not $check.Required -and $AutoApproveIfClean.IsPresent)
+        Required = $check.Required
+        Triggers = $check.Triggers
+    }
+}
+
+function Invoke-GateCheck {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Operation,
+
+        [hashtable]$ChangeSet = @{},
+
+        [string]$ProjectRoot = "."
+    )
+
+    return Test-HumanReviewRequired -Operation $Operation -ChangeSet $ChangeSet -ProjectRoot $ProjectRoot
+}
 
 #===============================================================================
 # Core Review Functions (22 functions as specified)
@@ -619,7 +1108,7 @@ function New-ReviewGateRequest {
     [void](Save-ReviewState -State $state -ProjectRoot $ProjectRoot)
     
     # Write to persistent log
-    Write-ReviewLogEntry -Entry @{
+    [void](Write-ReviewLogEntry -Entry @{
         eventType = 'request-created'
         requestId = $requestId
         operation = $Operation
@@ -627,7 +1116,7 @@ function New-ReviewGateRequest {
         requester = $Requester
         priority = $Priority
         triggers = if ($ChangeSet.ContainsKey('triggers')) { $ChangeSet.triggers } else { @() }
-    } -ProjectRoot $ProjectRoot
+    } -ProjectRoot $ProjectRoot)
     
     # Trigger notification hooks (suppress output)
     [void](Invoke-ReviewNotification -Request $request -EventType "created" -ProjectRoot $ProjectRoot)
@@ -740,14 +1229,14 @@ function Submit-ReviewDecision {
     $request['decisions'] = $decisionsArray
     
     # Write to persistent log
-    Write-ReviewLogEntry -Entry @{
+    [void](Write-ReviewLogEntry -Entry @{
         eventType = 'decision-submitted'
         requestId = $RequestId
         operation = $request.operation
         reviewer = $Reviewer
         decision = $Decision
         comments = $Comments
-    } -ProjectRoot $ProjectRoot
+    } -ProjectRoot $ProjectRoot)
     
     # Check if review is complete
     $completionCheck = Test-ReviewCompleteInternal -Request $request
@@ -766,13 +1255,13 @@ function Submit-ReviewDecision {
         $state.stats.pendingCount--
         
         # Log completion
-        Write-ReviewLogEntry -Entry @{
+        [void](Write-ReviewLogEntry -Entry @{
             eventType = 'request-completed'
             requestId = $RequestId
             operation = $request.operation
             finalStatus = $completionCheck.FinalStatus
             totalDecisions = $request.decisions.Count
-        } -ProjectRoot $ProjectRoot
+        } -ProjectRoot $ProjectRoot)
     }
     elseif ($Decision -eq 'needs-work') {
         $request.status = 'needs-work'
@@ -1025,15 +1514,15 @@ function Remove-ReviewRequest {
     if ($PSCmdlet.ShouldProcess($RequestId, "Remove review request")) {
         if ($Force -or $request.status -in @('approved', 'rejected', 'expired')) {
             $state.requests.Remove($RequestId)
-            Save-ReviewState -State $state -ProjectRoot $ProjectRoot
+            [void](Save-ReviewState -State $state -ProjectRoot $ProjectRoot)
             
             # Log removal
-            Write-ReviewLogEntry -Entry @{
+            [void](Write-ReviewLogEntry -Entry @{
                 eventType = 'request-removed'
                 requestId = $RequestId
                 operation = $request.operation
                 removedBy = $env:USER
-            } -ProjectRoot $ProjectRoot
+            } -ProjectRoot $ProjectRoot)
             
             Write-Verbose "Removed review request $RequestId"
         }
@@ -1144,15 +1633,15 @@ function New-HumanReviewGate {
     # Store in state
     $state = Get-ReviewState -ProjectRoot $ProjectRoot
     $state.policies[$GateName] = $gateConfig
-    Save-ReviewState -State $state -ProjectRoot $ProjectRoot
+    [void](Save-ReviewState -State $state -ProjectRoot $ProjectRoot)
     
     # Log gate creation
-    Write-ReviewLogEntry -Entry @{
+    [void](Write-ReviewLogEntry -Entry @{
         eventType = 'gate-created'
         gateName = $GateName
         operationType = $OperationType
         createdBy = $env:USER
-    } -ProjectRoot $ProjectRoot
+    } -ProjectRoot $ProjectRoot)
     
     Write-Verbose "Created human review gate '$GateName' for operation type '$OperationType'"
     
@@ -1447,12 +1936,12 @@ function Reject-ReviewRequest {
         -ProjectRoot $ProjectRoot
     
     # Log rejection with reasons
-    Write-ReviewLogEntry -Entry @{
+    [void](Write-ReviewLogEntry -Entry @{
         eventType = 'request-rejected'
         requestId = $RequestId
         reviewer = $Reviewer
         reasons = $Reasons
-    } -ProjectRoot $ProjectRoot
+    } -ProjectRoot $ProjectRoot)
     
     return $result
 }

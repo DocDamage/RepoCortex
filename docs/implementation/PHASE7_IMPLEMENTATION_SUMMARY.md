@@ -16,7 +16,7 @@
 
 ## Overview
 
-Phase 7 implements the platform expansion features that enable the LLM Workflow system to integrate with external AI tools, share knowledge across teams, and operate at scale. This phase was implemented using an **agent swarm** approach with 9 parallel development tracks.
+Phase 7 implements the platform expansion features that enable the Repo Cortex system to integrate with external AI tools, share knowledge across teams, and operate at scale. This phase was implemented using an **agent swarm** approach with 9 parallel development tracks.
 
 ---
 
@@ -414,9 +414,9 @@ Phase 7 is now complete. The platform has achieved:
 7. ✅ **Natural-language config generation** for ease of use
 8. ✅ **Inter-pack transport** for asset pipelines
 
-The LLM Workflow platform is now feature-complete per the canonical document specifications.
+The Repo Cortex platform is now feature-complete per the canonical document specifications.
 
 ---
 
-*For full architecture details, see the LLM Workflow Canonical Document Set.*
+*For full architecture details, see the Repo Cortex Canonical Document Set.*
 

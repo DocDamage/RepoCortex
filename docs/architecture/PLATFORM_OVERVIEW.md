@@ -1,4 +1,4 @@
-﻿# Repo Cortex Platform — Overview
+# Repo Cortex Platform — Overview
 
 
 **Version:** 0.9.6  
@@ -15,11 +15,11 @@
 
 ## 1. Executive Summary
 
-### What is the LLM Workflow Platform?
+### What is the Repo Cortex platform?
 
-The **LLM Workflow Platform** is a comprehensive, enterprise-grade system for structured knowledge management, AI-assisted development, and domain-specific tool integration. It unifies three core capabilities:
+The **Repo Cortex platform** is a comprehensive, enterprise-grade system for structured knowledge management, AI-assisted development, and domain-specific tool integration. It unifies three core capabilities:
 
-- **CodeMunch Pro** â€” Project indexing and MCP wrapper for AI tool integration
+- **Repo Cortex indexing layer** â€” Project indexing and MCP wrapper for AI tool integration
 - **ContextLattice** â€” Project bootstrap and connectivity verification
 - **MemPalace** â€” Incremental memory bridge with persistent context across sessions
 

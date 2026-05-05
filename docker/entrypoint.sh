@@ -1,5 +1,5 @@
 #!/bin/bash
-# LLM Workflow Toolkit - Container Entrypoint
+# Repo Cortex - Container Entrypoint
 # Handles initialization and runs llmup or custom commands
 
 set -e
@@ -163,7 +163,7 @@ load_env_files() {
 # Display help
 show_help() {
     cat << 'EOF'
-LLM Workflow Toolkit - Container Usage
+Repo Cortex - Container Usage
 
 Commands:
   llmup, up              Run llmup workflow bootstrap (default)
@@ -207,7 +207,7 @@ EOF
 
 # Main entrypoint logic
 main() {
-    log_info "LLM Workflow Toolkit Container v0.9.6"
+    log_info "Repo Cortex Container v0.9.6"
     
     # Check container environment
     check_container_env || log_warn "May not be running in container"

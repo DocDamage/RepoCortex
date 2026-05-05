@@ -1,6 +1,6 @@
-# LLM Workflow Dashboard
+# Repo Cortex Dashboard
 
-Interactive Terminal UI dashboard for monitoring LLM Workflow health.
+Interactive terminal and HTML dashboard surfaces for monitoring Repo Cortex health. The underlying PowerShell module and command names still use `LLMWorkflow` for compatibility.
 
 ## Related Docs
 - [Platform Overview](../architecture/PLATFORM_OVERVIEW.md)
@@ -77,7 +77,8 @@ When running in interactive mode:
 
 ```
 ========================================
-   LLM WORKFLOW DASHBOARD v0.9.6
+   Repo Cortex Dashboard v1.0.0
+   LLMWorkflow operations telemetry
 ========================================
 
 [OK]   python_command       Found: C:\Python311\python.exe
@@ -150,7 +151,7 @@ The dashboard uses `$Host.UI.RawUI.ReadKey()` which requires:
 ### Azure DevOps / GitHub Actions
 
 ```yaml
-- name: Run LLM Workflow Health Check
+- name: Run Repo Cortex Health Check
   shell: pwsh
   run: |
     Show-LLMWorkflowDashboard -NoInteractive
@@ -163,7 +164,7 @@ The dashboard uses `$Host.UI.RawUI.ReadKey()` which requires:
 Import-Module LLMWorkflow
 $result = Show-LLMWorkflowDashboard -NoInteractive
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Health checks failed"
+    Write-Error "Repo Cortex health checks failed"
     exit 1
 }
 ```
@@ -178,7 +179,7 @@ $logFile = "logs\health-$timestamp.log"
 Show-LLMWorkflowDashboard -NoInteractive | Tee-Object -FilePath $logFile
 
 if ($LASTEXITCODE -ne 0) {
-    Send-MailMessage -To "admin@example.com" -Subject "LLM Workflow Health Alert" -Body "Check logs at $logFile"
+    Send-MailMessage -To "admin@example.com" -Subject "Repo Cortex Health Alert" -Body "Check logs at $logFile"
 }
 ```
 

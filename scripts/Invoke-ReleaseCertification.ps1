@@ -173,11 +173,19 @@ function Test-BrandingAssets {
 
     $readmePath = Join-Path $ProjectRoot "README.md"
     $logoPath = Join-Path $ProjectRoot "repo_cortex_transparent_logo.png"
+    $dashboardConstantsPath = Join-Path $ProjectRoot "module\LLMWorkflow\contexts\Telemetry\internal\_Constants.ps1"
+    $dashboardHtmlPath = Join-Path $ProjectRoot "module\LLMWorkflow\contexts\Telemetry\internal\HtmlConverters.ps1"
 
     if (-not (Test-Path -LiteralPath $readmePath)) {
         return $false
     }
     if (-not (Test-Path -LiteralPath $logoPath)) {
+        return $false
+    }
+    if (-not (Test-Path -LiteralPath $dashboardConstantsPath)) {
+        return $false
+    }
+    if (-not (Test-Path -LiteralPath $dashboardHtmlPath)) {
         return $false
     }
 
@@ -189,6 +197,17 @@ function Test-BrandingAssets {
     $hasBrandTitle = $readme -match '(?m)^# .*\bRepo Cortex\b'
     $hasLogoReference = $readme -match '<img\s+[^>]*src="repo_cortex_transparent_logo\.png"[^>]*alt="Repo Cortex logo"'
     $hasFormerNameDisclosure = $readme -match '\*\*Formerly:\*\* CodeMunch'
+    $dashboardConstants = Get-Content -LiteralPath $dashboardConstantsPath -Raw -ErrorAction SilentlyContinue
+    $dashboardHtml = Get-Content -LiteralPath $dashboardHtmlPath -Raw -ErrorAction SilentlyContinue
+    $hasDashboardBrandConstants = (
+        $dashboardConstants -match "\`$script:ProductBrandName\s*=\s*'Repo Cortex'" -and
+        $dashboardConstants -match "\`$script:ProductBrandTagline\s*="
+    )
+    $hasDashboardBrandShell = (
+        $dashboardHtml -match 'brand-header' -and
+        $dashboardHtml -match 'brand-mark' -and
+        $dashboardHtml -match 'ProductBrandName'
+    )
 
     try {
         $logoBytes = [System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $logoPath).Path)
@@ -209,7 +228,7 @@ function Test-BrandingAssets {
         $logoBytes[7] -eq 0x0A
     )
 
-    return ($hasBrandTitle -and $hasLogoReference -and $hasFormerNameDisclosure -and $hasPngHeader)
+    return ($hasBrandTitle -and $hasLogoReference -and $hasFormerNameDisclosure -and $hasPngHeader -and $hasDashboardBrandConstants -and $hasDashboardBrandShell)
 }
 
 function Test-ReleaseCriticalFailureVisibility {

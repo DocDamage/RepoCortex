@@ -1,6 +1,6 @@
 # Self-Healing Guide (llmheal)
 
-The `llmheal` command provides automatic diagnosis and repair capabilities for common LLM Workflow issues.
+The `llmheal` command provides automatic diagnosis and repair capabilities for common Repo Cortex issues.
 
 ## Related Docs
 - [Troubleshooting Guide](./TROUBLESHOOTING.md)
@@ -180,7 +180,7 @@ Export-LLMWorkflowRepairHistory -OutputPath repairs.csv -Format csv
 
 ```
 ========================================
-   LLM Workflow Self-Healing
+   Repo Cortex Self-Healing
 ========================================
 
 Project: C:\Projects\MyApp
@@ -292,7 +292,7 @@ Detailed logs are written to:
 
 ```yaml
 # .github/workflows/heal-check.yml
-name: LLM Workflow Health Check
+name: Repo Cortex Health Check
 
 on: [push, pull_request]
 
@@ -302,7 +302,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install LLM Workflow Module
+      - name: Install Repo Cortex module
         run: |
           Install-Module LLMWorkflow -Scope CurrentUser -Force
           Import-Module LLMWorkflow

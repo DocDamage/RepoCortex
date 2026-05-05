@@ -1,10 +1,10 @@
 # Example Plugin
 
-This is an example plugin demonstrating the LLM Workflow plugin architecture.
+This is an example plugin demonstrating the Repo Cortex plugin architecture.
 
 ## Purpose
 
-Shows how to create custom plugins that integrate with the LLM Workflow bootstrap and check processes.
+Shows how to create custom plugins that integrate with the Repo Cortex bootstrap and check processes.
 
 ## Installation
 

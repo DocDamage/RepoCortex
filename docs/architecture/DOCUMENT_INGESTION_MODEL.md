@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the document ingestion pipeline for the LLM Workflow platform, covering mixed-document artifact intake, engine routing, normalization, evidence quality classification, and quarantine paths for low-quality extraction.
+This document defines the document ingestion pipeline for the Repo Cortex platform, covering mixed-document artifact intake, engine routing, normalization, evidence quality classification, and quarantine paths for low-quality extraction.
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)

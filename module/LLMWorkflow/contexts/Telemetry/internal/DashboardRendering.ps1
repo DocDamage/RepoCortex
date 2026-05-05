@@ -7,15 +7,18 @@ function Write-DashboardHeader {
     if ($UseAnsi) {
         $a = $script:Ansi
         Write-Host "$($a.Bold)$($a.Cyan)========================================$($a.Reset)"
-        Write-Host "$($a.Bold)$($a.Cyan)   LLM WORKFLOW DASHBOARD $($a.BrightYellow)v0.9.6$($a.Reset)"
+        Write-Host "$($a.Bold)$($a.Cyan)   $($script:ProductBrandName) Dashboard $($a.BrightYellow)v$($script:DashboardVersion)$($a.Reset)"
+        Write-Host "$($a.Dim)   $($script:ProductModuleName) operations telemetry$($a.Reset)"
         Write-Host "$($a.Bold)$($a.Cyan)========================================$($a.Reset)"
     } elseif ($UseColors) {
         Write-Host "========================================" -ForegroundColor Cyan
-        Write-Host "   LLM WORKFLOW DASHBOARD v0.9.6" -ForegroundColor Cyan
+        Write-Host "   $($script:ProductBrandName) Dashboard v$($script:DashboardVersion)" -ForegroundColor Cyan
+        Write-Host "   $($script:ProductModuleName) operations telemetry" -ForegroundColor Gray
         Write-Host "========================================" -ForegroundColor Cyan
     } else {
         Write-Output "========================================"
-        Write-Output "   LLM WORKFLOW DASHBOARD v0.9.6"
+        Write-Output "   $($script:ProductBrandName) Dashboard v$($script:DashboardVersion)"
+        Write-Output "   $($script:ProductModuleName) operations telemetry"
         Write-Output "========================================"
     }
 }

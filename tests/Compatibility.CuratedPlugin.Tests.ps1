@@ -123,10 +123,10 @@ Describe "Compatibility curated-plugin fixtures" {
 
             $result.overallStatus | Should -Be "incompatible"
             $result.sources.Count | Should -Be 3
-            ($result.sources | Where-Object { $_.status -eq "compatible" }).Count | Should -Be 1
-            ($result.sources | Where-Object { $_.status -eq "warning" }).Count | Should -Be 1
-            ($result.sources | Where-Object { $_.status -eq "incompatible" }).Count | Should -Be 1
-            ($result.conflicts | Where-Object { $_.sourceId -eq "curated-plugin-behavior-override" }).Count | Should -Be 1
+            @($result.sources | Where-Object { $_.status -eq "compatible" }).Count | Should -Be 1
+            @($result.sources | Where-Object { $_.status -eq "warning" }).Count | Should -Be 1
+            @($result.sources | Where-Object { $_.status -eq "incompatible" }).Count | Should -Be 1
+            @($result.conflicts | Where-Object { $_.sourceId -eq "curated-plugin-behavior-override" }).Count | Should -Be 1
         }
         finally {
             Pop-Location

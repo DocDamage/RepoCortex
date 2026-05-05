@@ -13,14 +13,14 @@ This document tracks implementation progress against the post-0.9.6 architecture
 
 | Phase | Description | Status | Progress |
 |-------|-------------|--------|----------|
-| Phase 1 | Reliability and control foundation | âœ… Complete | 100% |
-| Phase 2 | Pack framework and source registry | âœ… Complete | 100% |
-| Phase 3 | Operator workflow and guarded execution | âœ… Complete | 100% |
-| Phase 4 | Structured extraction pipeline | âœ… Complete | 100% |
-| Phase 5 | Retrieval and answer integrity | âœ… Complete | 100% |
-| Phase 6 | Human trust, replay, and governance | âœ… Complete | 100% |
-| Phase 7 | Platform expansion (MCP, inter-pack, federation) | âœ… Complete | 100% |
-| Phase 8 | Extended packs | âœ… Complete | 100% |
+| Phase 1 | Reliability and control foundation | Complete | 100% |
+| Phase 2 | Pack framework and source registry | Complete | 100% |
+| Phase 3 | Operator workflow and guarded execution | Complete | 100% |
+| Phase 4 | Structured extraction pipeline | Complete | 100% |
+| Phase 5 | Retrieval and answer integrity | Complete | 100% |
+| Phase 6 | Human trust, replay, and governance | Complete | 100% |
+| Phase 7 | Platform expansion (MCP, inter-pack, federation) | Complete | 100% |
+| Phase 8 | Extended packs | Complete | 100% |
 
 **Last Updated:** 2026-05-04 (release remediation completed)
 
@@ -112,7 +112,7 @@ Use the CI baseline above as the authoritative validation posture. Legacy named 
 
 ## Phase Summary
 
-### Phase 1: Reliability and Control Foundation âœ…
+### Phase 1: Reliability and Control Foundation
 Implemented:
 - run IDs, manifests, journaling, structured logging
 - file locks, atomic writes, state file handling
@@ -120,14 +120,14 @@ Implemented:
 - policy gates, execution modes, command contracts
 - workspaces, visibility, secret/PII scanning
 
-### Phase 2: Pack Framework and Source Registry âœ…
+### Phase 2: Pack Framework and Source Registry
 Implemented:
 - pack manifests and lifecycle states
 - source registries with trust tiers and priorities
 - pack transactions and lockfiles
 - install profiles and collection definitions
 
-### Phase 3: Operator Workflow and Guarded Execution âœ…
+### Phase 3: Operator Workflow and Guarded Execution
 Implemented:
 - health scores and workspace summaries
 - planner/executor previews and dry-run flows
@@ -135,13 +135,13 @@ Implemented:
 - compatibility validation and lock export
 - filters and notifications
 
-### Phase 4: Structured Extraction Pipeline âœ…
+### Phase 4: Structured Extraction Pipeline
 Implemented:
 - Godot, RPG Maker, Blender, OpenAPI, shader, schema, YAML, JSON, SQL, Docker, and related parsers
 - incremental and parallel extraction support
 - cache, source-map, and output/report support
 
-### Phase 5: Retrieval and Answer Integrity âœ…
+### Phase 5: Retrieval and Answer Integrity
 Implemented:
 - query routing and retrieval profiles
 - answer planning and traces
@@ -151,7 +151,7 @@ Implemented:
 - retrieval cache
 - incident bundles
 
-### Phase 6: Human Trust, Replay, and Governance âœ…
+### Phase 6: Human Trust, Replay, and Governance
 Implemented:
 - human annotations and overrides
 - pack SLOs and telemetry
@@ -159,7 +159,7 @@ Implemented:
 - golden task evaluation
 - replay harness and feedback loop
 
-### Phase 7: Platform Expansion âœ…
+### Phase 7: Platform Expansion
 Implemented:
 - MCP toolkit server and composite gateway
 - MCP deployment, security, and monitoring
@@ -169,7 +169,7 @@ Implemented:
 - natural-language config
 - inter-pack transport and orchestration
 
-### Phase 8: Extended Packs âœ…
+### Phase 8: Extended Packs
 Implemented promoted pack families for:
 - API reverse tooling
 - notebook/data workflow

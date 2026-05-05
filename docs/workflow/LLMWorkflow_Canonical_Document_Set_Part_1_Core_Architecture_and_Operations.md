@@ -1,4 +1,4 @@
-# LLM Workflow — Canonical Architecture, Pack Framework, and Delivery Plan
+# Repo Cortex - Canonical Architecture, Pack Framework, and Delivery Plan
 
 ## Status
 
@@ -15,7 +15,7 @@ It supersedes the earlier implementation plans, review passes, and RPG Maker pac
 
 ## 1. Purpose
 
-This document defines the complete architecture, governance model, delivery order, and first domain-pack specification for the LLM Workflow platform.
+This document defines the complete architecture, governance model, delivery order, and first domain-pack specification for the Repo Cortex platform.
 
 The platform is no longer just a bootstrap script or a convenience wrapper. It is a **stateful operational layer** for:
 

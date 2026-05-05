@@ -21,7 +21,7 @@ function Write-ConsoleGatewayStatus {
     $cyan = if ($UseAnsi) { $a.Cyan } else { '' }
     
     Write-Host "$bold$cyan========================================$reset"
-    Write-Host "$bold$cyan   MCP GATEWAY STATUS$reset"
+    Write-Host "$bold$cyan   $($script:ProductBrandName) MCP Gateway$reset"
     Write-Host "$bold$cyan========================================$reset"
     Write-Host ''
     

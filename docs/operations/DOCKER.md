@@ -1,6 +1,6 @@
 # Docker Containerization Guide
 
-Complete guide for running LLM Workflow Toolkit in Docker containers.
+Complete guide for running Repo Cortex in Docker containers.
 
 ## Related Docs
 - [Platform Architecture](../architecture/ARCHITECTURE.md)
@@ -158,7 +158,7 @@ services:
 ### GitHub Actions
 
 ```yaml
-name: LLM Workflow
+name: Repo Cortex
 
 on: [push, pull_request]
 
@@ -170,7 +170,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Run LLM Workflow
+      - name: Run Repo Cortex
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: llmup
@@ -218,7 +218,7 @@ pipeline {
         }
     }
     stages {
-        stage('LLM Workflow') {
+        stage('Repo Cortex') {
             steps {
                 sh 'llmup'
             }

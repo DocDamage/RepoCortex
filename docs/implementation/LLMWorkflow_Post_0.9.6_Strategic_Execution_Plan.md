@@ -3,7 +3,7 @@
 
 ## Document Purpose
 
-This document records the strategic execution plan for the LLM Workflow platform after the Phase 1-8 buildout and the 0.9.6-era documentation update.
+This document records the strategic execution plan for the Repo Cortex platform after the Phase 1-8 buildout and the 0.9.6-era documentation update.
 
 This is not the current release status page. It is a stabilization, integration, ingestion-hardening, and v1.0-readiness plan whose highest-priority release blockers were remediated by the 2026-05-04 certification pass. For current state, use `docs/releases/RELEASE_STATE.md`, `docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md`, and the root `README.md`.
 

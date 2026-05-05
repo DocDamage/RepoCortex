@@ -21,7 +21,7 @@ function Write-ConsoleFederationStatus {
     $cyan = if ($UseAnsi) { $a.Cyan } else { '' }
     
     Write-Host "$bold$cyan========================================$reset"
-    Write-Host "$bold$cyan   FEDERATED MEMORY STATUS$reset"
+    Write-Host "$bold$cyan   $($script:ProductBrandName) Federated Memory$reset"
     Write-Host "$bold$cyan========================================$reset"
     Write-Host ''
     

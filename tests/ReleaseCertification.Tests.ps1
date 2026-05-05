@@ -95,6 +95,68 @@ Describe "Branding" {
     It "release certification includes the branding gate" {
         Test-BrandingAssets -ProjectRoot $script:ProjectRoot | Should -Be $true
     }
+
+    It "dashboard UI uses the Repo Cortex brand shell" {
+        $constantsPath = Join-Path $script:ModuleRoot "contexts\Telemetry\internal\_Constants.ps1"
+        $htmlPath = Join-Path $script:ModuleRoot "contexts\Telemetry\internal\HtmlConverters.ps1"
+        $constants = Get-Content -LiteralPath $constantsPath -Raw
+        $html = Get-Content -LiteralPath $htmlPath -Raw
+
+        $constants | Should -Match "\`$script:ProductBrandName\s*=\s*'Repo Cortex'"
+        $html | Should -Match 'brand-header'
+        $html | Should -Match 'brand-mark'
+        $html | Should -Match 'ProductBrandName'
+    }
+
+    It "module and container metadata point at the RepoCortex GitHub repository" {
+        $manifestPath = Join-Path $script:ModuleRoot "LLMWorkflow.psd1"
+        $modulePath = Join-Path $script:ModuleRoot "LLMWorkflow.psm1"
+        $dockerfilePath = Join-Path $script:ProjectRoot "Dockerfile"
+
+        $manifest = Get-Content -LiteralPath $manifestPath -Raw
+        $module = Get-Content -LiteralPath $modulePath -Raw
+        $dockerfile = Get-Content -LiteralPath $dockerfilePath -Raw
+
+        $manifest | Should -Match 'https://github\.com/DocDamage/RepoCortex'
+        $module | Should -Match 'DocDamage/RepoCortex'
+        $dockerfile | Should -Match 'https://github\.com/DocDamage/RepoCortex'
+        $manifest | Should -Not -Match 'CodeMunch-ContextLattice-MemPalace---All-in-one'
+        $module | Should -Not -Match 'CodeMunch-ContextLattice-MemPalace---All-in-one'
+        $dockerfile | Should -Not -Match 'CodeMunch-ContextLattice-MemPalace---All-in-one'
+    }
+
+    It "documentation uses Repo Cortex as the current product name" {
+        $docRoots = @(
+            $script:DocsRoot,
+            (Join-Path $script:ProjectRoot "tools"),
+            (Join-Path $script:ModuleRoot "templates")
+        )
+        $docFiles = foreach ($root in $docRoots) {
+            Get-ChildItem -LiteralPath $root -Recurse -File -Include *.md -ErrorAction SilentlyContinue
+        }
+
+        $disallowedProductPhrases = @(
+            'LLM Workflow Toolkit',
+            'LLM Workflow Platform',
+            'LLM Workflow platform',
+            'LLM Workflow system',
+            'LLM Workflow runtime',
+            'LLM Workflow Dashboard',
+            'LLM Workflow Team',
+            'LLMWorkflow platform',
+            'LLMWorkflow canonical document set',
+            'CodeMunch Pro',
+            'CodeMunch-ContextLattice',
+            'RepoCortext'
+        )
+
+        foreach ($file in $docFiles) {
+            $content = Get-Content -LiteralPath $file.FullName -Raw
+            foreach ($phrase in $disallowedProductPhrases) {
+                $content | Should -Not -Match ([regex]::Escape($phrase)) -Because "$($file.FullName) should use Repo Cortex as the current product name"
+            }
+        }
+    }
 }
 
 Describe "Failure Visibility" {

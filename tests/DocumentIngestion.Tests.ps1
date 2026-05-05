@@ -296,7 +296,7 @@ Describe "TikaAdapter (Mocked / Availability)" {
         It "Returns failure for missing file" {
             $result = Invoke-TikaExtraction -FilePath 'C:\NoSuchFile.pdf'
             $result.success | Should -Be $false
-            $result.errors | Should -Contain "File not found: C:\NoSuchFile.pdf"
+            $result.errors[0] | Should -Match "File not found or inaccessible: C:\\NoSuchFile\.pdf"
         }
 
         It "Returns tika-unavailable when server is down" {

@@ -76,7 +76,7 @@ function Write-ConsoleGraph {
     )
     
     $a = $script:AnsiColors
-    Write-Host "$($a.Bold)$($a.Cyan)CROSS-PACK RELATIONSHIP GRAPH$($a.Reset)"
+    Write-Host "$($a.Bold)$($a.Cyan)$($script:ProductBrandName) Cross-Pack Relationship Graph$($a.Reset)"
     Write-Host ''
     
     # Nodes

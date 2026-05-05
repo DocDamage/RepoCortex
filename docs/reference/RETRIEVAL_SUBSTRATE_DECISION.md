@@ -5,7 +5,7 @@
 **Status:** Approved  
 **Date:** 2026-04-13  
 **Author:** LLMWorkflow Architecture Team  
-**Scope:** Primary vector retrieval backend and embedded/local fallback for the LLMWorkflow platform.
+**Scope:** Primary vector retrieval backend and embedded/local fallback for the Repo Cortex platform.
 
 ## Related Docs
 - [MCP Governance Model](../architecture/MCP_GOVERNANCE_MODEL.md)
@@ -153,4 +153,4 @@ If `backend` is not explicitly set, the adapter attempts Qdrant first and degrad
 
 ---
 
-*This memo is part of the LLMWorkflow canonical document set. Changes require a PR and human review gate.*
+*This memo is part of the Repo Cortex canonical document set. Changes require a PR and human review gate.*

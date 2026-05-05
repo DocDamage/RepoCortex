@@ -1,6 +1,6 @@
 # Recovery Playbooks
 
-This document provides operator playbooks for the most common failure modes encountered during durable workflow execution in the LLM Workflow platform.
+This document provides operator playbooks for the most common failure modes encountered during durable workflow execution in the Repo Cortex platform.
 
 ## Related Docs
 - [Self-Healing Guide](./SELF_HEALING.md)

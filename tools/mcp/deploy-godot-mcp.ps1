@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Deploys the Godot MCP server for LLM Workflow platform.
+    Deploys the Godot MCP server for Repo Cortex platform.
 
 .DESCRIPTION
     Installs and configures the godot-mcp server from npm, sets up environment variables,
@@ -38,7 +38,7 @@
 
 .NOTES
     File Name      : deploy-godot-mcp.ps1
-    Author         : LLM Workflow Team
+    Author         : Repo Cortex Team
     Version        : 1.0.0
     Requires       : PowerShell 5.1+, Node.js 16+, npm
 #>

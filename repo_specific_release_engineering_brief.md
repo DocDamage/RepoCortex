@@ -1,7 +1,7 @@
 # Repo-Specific Release Engineering Brief — Repo Cortex
 
 
-Repository: `DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one`  
+Repository: `DocDamage/RepoCortex`  
 Target branch: `ci-fixes-attempt`  
 Primary product: `LLMWorkflow`, a PowerShell 5.1+ module and release/tooling platform for CodeMunch, ContextLattice, and MemPalace workflows.
 
@@ -76,7 +76,7 @@ module/LLMWorkflow/templates/ install/bootstrap templates
 tools/ci/                   CI validators and Pester runner
 tools/release/              version bumping and release tag tooling
 tools/workflow/             global bootstrap/check/doctor/install wrappers
-tools/codemunch/            CodeMunch project tooling templates
+tools/codemunch/            Repo Cortex indexing-layer tooling templates
 tools/contextlattice/       ContextLattice project tooling templates
 tools/memorybridge/         MemPalace sync tooling templates
 scripts/security/           SBOM, secret scan, vulnerability scan, security baseline

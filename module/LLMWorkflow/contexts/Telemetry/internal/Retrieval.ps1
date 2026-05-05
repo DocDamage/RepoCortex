@@ -154,7 +154,7 @@ function Write-ConsoleRetrievalDashboard {
     $cyan = if ($UseAnsi) { $a.Cyan } else { '' }
     
     Write-Host "$bold$cyan========================================$reset"
-    Write-Host "$bold$cyan   RETRIEVAL ACTIVITY DASHBOARD$reset"
+    Write-Host "$bold$cyan   $($script:ProductBrandName) Retrieval Activity$reset"
     Write-Host "$bold$cyan   Time Range: $($Data.timeRange)$reset"
     Write-Host "$bold$cyan========================================$reset"
     Write-Host ''

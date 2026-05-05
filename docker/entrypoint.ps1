@@ -1,4 +1,4 @@
-# LLM Workflow Toolkit - Windows Container Entrypoint
+# Repo Cortex - Windows Container Entrypoint
 # Handles initialization and runs llmup or custom commands
 
 param(
@@ -167,7 +167,7 @@ function Import-EnvironmentFiles {
 # Display help
 function Show-Help {
     @"
-LLM Workflow Toolkit - Windows Container Usage
+Repo Cortex - Windows Container Usage
 
 Commands:
   llmup, up              Run llmup workflow bootstrap (default)
@@ -200,7 +200,7 @@ Examples:
 }
 
 # Main execution
-Write-Info "LLM Workflow Toolkit Container v0.9.6 (Windows)"
+Write-Info "Repo Cortex Container v0.9.6 (Windows)"
 
 # Initialize
 Test-ContainerEnvironment

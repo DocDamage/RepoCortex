@@ -1,4 +1,4 @@
-# LLM Workflow Toolkit - Docker Compose
+# Repo Cortex - Docker Compose
 # Multi-service orchestration for containerized deployment
 
 version: "3.8"

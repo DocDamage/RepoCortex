@@ -5,7 +5,7 @@
 **Version:** 1.0.0  
 **Date:** 2026-04-13  
 **Status:** Draft  
-**Scope:** Model Context Protocol (MCP) tool registry, capability taxonomy, metadata requirements, lifecycle rules, and governance policies for the LLMWorkflow platform.
+**Scope:** Model Context Protocol (MCP) tool registry, capability taxonomy, metadata requirements, lifecycle rules, and governance policies for the Repo Cortex platform.
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
@@ -17,7 +17,7 @@
 
 ## 1. Overview
 
-The LLMWorkflow platform exposes functionality to external callers (including LLM agents) through an MCP-compatible tool surface. To ensure safety, observability, and controlled evolution, every MCP tool must be registered in a **canonical tool registry** and governed by the rules in this document.
+The Repo Cortex platform exposes functionality to external callers (including LLM agents) through an MCP-compatible tool surface. To ensure safety, observability, and controlled evolution, every MCP tool must be registered in a **canonical tool registry** and governed by the rules in this document.
 
 ---
 
@@ -223,4 +223,4 @@ The MCP governance model is a specialization of the general policy system (`Poli
 
 ---
 
-*This document is part of the LLMWorkflow canonical document set. Changes require a PR and human review gate.*
+*This document is part of the Repo Cortex canonical document set. Changes require a PR and human review gate.*

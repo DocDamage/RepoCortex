@@ -33,6 +33,7 @@ function Get-DashboardCommand {
     [OutputType([System.Management.Automation.CommandInfo])]
     param(
         [Parameter(Mandatory = $true)]
+        [Alias('Name')]
         [string]$CommandName
     )
 

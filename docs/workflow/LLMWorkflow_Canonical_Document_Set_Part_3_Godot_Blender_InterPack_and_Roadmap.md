@@ -1,4 +1,4 @@
-﻿# LLM Workflow â€” Canonical Architecture, Pack Framework, and Delivery Plan
+# Repo Cortex - Canonical Architecture, Pack Framework, and Delivery Plan
 
 ## Status
 

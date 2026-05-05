@@ -1,4 +1,4 @@
-# LLM Workflow Toolkit - Dockerfile
+# Repo Cortex - Dockerfile
 # Multi-stage build for Linux containers (default)
 # Supports: PowerShell + Python 3.10+ + ChromaDB + codemunch-pro
 
@@ -88,8 +88,8 @@ ENTRYPOINT ["/bin/bash", "/opt/llm-workflow/entrypoint.sh"]
 CMD ["llmup"]
 
 # Labels
-LABEL org.opencontainers.image.title="LLM Workflow Toolkit" \
-      org.opencontainers.image.description="All-in-one workflow toolkit for CodeMunch Pro, ContextLattice, and MemPalace" \
+LABEL org.opencontainers.image.title="Repo Cortex" \
+      org.opencontainers.image.description="Repo Cortex workflow toolkit for AI-assisted development, retrieval, governance, and persistent project memory" \
       org.opencontainers.image.version="0.9.6" \
-      org.opencontainers.image.source="https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one" \
+      org.opencontainers.image.source="https://github.com/DocDamage/RepoCortex" \
       org.opencontainers.image.licenses="MIT"

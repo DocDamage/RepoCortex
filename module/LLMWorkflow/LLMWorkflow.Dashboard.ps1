@@ -27,4 +27,14 @@ foreach ($shimFile in (Get-ChildItem -Path (Join-Path $ctxDir 'api') -Filter '*.
     . $shimFile.FullName
 }
 
-Invoke-LLMWorkflowDashboardMain -ProjectRoot $ProjectRoot -Provider $Provider -CheckContext:$CheckContext -TimeoutSec $TimeoutSec -NoInteractive:$NoInteractive -RefreshInterval $RefreshInterval
+if (-not (Get-Command -Name Resolve-ProviderProfile -CommandType Function -ErrorAction SilentlyContinue)) { # [ALLOWED: optional module fallback]
+    function Resolve-ProviderProfile {
+        [CmdletBinding()]
+        param([string]$RequestedProvider = "auto")
+        return $null
+    }
+}
+
+if ($MyInvocation.InvocationName -ne '.') {
+    Invoke-LLMWorkflowDashboardMain -ProjectRoot $ProjectRoot -Provider $Provider -CheckContext:$CheckContext -TimeoutSec $TimeoutSec -NoInteractive:$NoInteractive -RefreshInterval $RefreshInterval
+}

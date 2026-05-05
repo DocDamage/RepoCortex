@@ -34,11 +34,8 @@ if ($major -lt 5) {
 
 $config = New-PesterConfiguration
 $config.Run.Path = $Path
+$config.Run.PassThru = $true
 $config.Output.Verbosity = $Verbosity
-
-if ($CI) {
-    $config.Run.Exit = $true
-}
 
 if (-not $EnableTestRegistry) {
     $config.TestRegistry.Enabled = $false
@@ -49,4 +46,11 @@ if (-not [string]::IsNullOrWhiteSpace($TestResultPath)) {
     $config.TestResult.OutputPath = $TestResultPath
 }
 
-Invoke-Pester -Configuration $config
+$result = Invoke-Pester -Configuration $config
+
+if ($result -and $result.FailedCount -gt 0) {
+    if ($CI) {
+        exit 1
+    }
+    throw "Pester failed with $($result.FailedCount) failing test(s)."
+}

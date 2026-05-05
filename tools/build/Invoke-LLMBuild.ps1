@@ -262,15 +262,23 @@ if ($Test) {
     $testsToRun = $testsToRun | Select-Object -Unique
     Write-Information "Running tests: $($testsToRun | ForEach-Object { Split-Path -Leaf $_ } | Join-String -Separator ', ')" -InformationAction Continue
 
+    $pesterRunner = Join-Path $ProjectRoot 'tools\ci\invoke-pester-safe.ps1'
+    if (-not (Test-Path -LiteralPath $pesterRunner)) {
+        throw "Pester runner not found: $pesterRunner"
+    }
+
     foreach ($t in $testsToRun) {
-        $pesterParams = @{
-            Path = $t
-            Output = 'Detailed'
+        $pesterArgs = @{
+            Path = @($t)
+            Verbosity = 'Detailed'
         }
         if ($CI) {
-            $pesterParams['CI'] = $true
+            $pesterArgs['CI'] = $true
         }
-        Invoke-Pester @pesterParams
+        & $pesterRunner @pesterArgs
+        if ($LASTEXITCODE -ne 0) {
+            throw "Pester failed for test file: $t"
+        }
     }
 }
 

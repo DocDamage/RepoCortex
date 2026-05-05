@@ -1,6 +1,6 @@
 # Security Baseline Pipeline
 
-This document describes the **Workstream 5** security baseline for the LLM Workflow platform. The baseline runs secret scanning, SBOM generation, and vulnerability scanning without requiring external security tools to be installed.
+This document describes the **Workstream 5** security baseline for the Repo Cortex platform. The baseline runs secret scanning, SBOM generation, and vulnerability scanning without requiring external security tools to be installed.
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
@@ -34,7 +34,7 @@ All scans are implemented as PowerShell 5.1-compatible scripts under `scripts/se
 
 ## Tools and Equivalents
 
-| Industry Tool | LLM Workflow Equivalent | Purpose |
+| Industry Tool | Repo Cortex Equivalent | Purpose |
 |---------------|------------------------|---------|
 | **TruffleHog** | `Invoke-SecretScan.ps1` | Regex-based secret detection |
 | **Syft** | `Invoke-SBOMBuild.ps1` | CycloneDX-compatible SBOM generation |
@@ -176,7 +176,7 @@ All reports are written as UTF-8 JSON files.
 ```json
 {
   "timestamp": "2026-04-13T10:48:09Z",
-  "projectRoot": "F:\\...\\CodeMunch-ContextLattice-MemPalace---All-in-one",
+  "projectRoot": "F:\\...\\RepoCortex",
   "outputDirectory": "F:\\...\\security-reports",
   "overallPassed": true,
   "promotionGate": {

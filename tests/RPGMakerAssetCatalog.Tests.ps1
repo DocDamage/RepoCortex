@@ -2,7 +2,7 @@
 
 Describe "RPG Maker Asset Catalog Parser" {
     BeforeAll {
-        $parserPath = Join-Path (Join-Path $PSScriptRoot "..") "module\LLMWorkflow\extraction\RPGMakerAssetCatalogParser.ps1"
+        $parserPath = Join-Path (Join-Path $PSScriptRoot "..") "module\LLMWorkflow\ingestion\parsers\RPGMakerAssetCatalogParser.ps1"
         if (Test-Path $parserPath) {
             try { . $parserPath } catch { if ($_.Exception.Message -notlike "*Export-ModuleMember*") { throw } }
         }

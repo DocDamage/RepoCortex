@@ -1,6 +1,6 @@
 ﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/main/.memorybridge/bridge.config.schema.json",
+  "$id": "https://raw.githubusercontent.com/DocDamage/RepoCortex/main/.memorybridge/bridge.config.schema.json",
   "title": "MemoryBridge Configuration",
   "description": "Configuration for the MemPalace to ContextLattice bridge sync process",
   "type": "object",
@@ -55,7 +55,7 @@
       "title": "Schema Reference",
       "description": "URL to this JSON schema file for IDE validation",
       "format": "uri",
-      "default": "https://raw.githubusercontent.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/main/.memorybridge/bridge.config.schema.json"
+      "default": "https://raw.githubusercontent.com/DocDamage/RepoCortex/main/.memorybridge/bridge.config.schema.json"
     },
     "version": {
       "type": "string",

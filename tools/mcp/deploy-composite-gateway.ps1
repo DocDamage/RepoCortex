@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Deploys the MCP Composite Gateway for LLM Workflow platform.
+    Deploys the MCP Composite Gateway for Repo Cortex platform.
 
 .DESCRIPTION
     Configures and starts the composite gateway that routes MCP requests to
@@ -48,7 +48,7 @@
 
 .NOTES
     File Name      : deploy-composite-gateway.ps1
-    Author         : LLM Workflow Team
+    Author         : Repo Cortex Team
     Version        : 1.0.0
     Requires       : PowerShell 5.1+, .NET Framework 4.7.2+ (Windows) or PowerShell 7+ (Linux/macOS)
 #>

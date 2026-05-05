@@ -1,6 +1,6 @@
 # Supply-Chain Policy
 
-This document defines the supply-chain security policy for the **LLM Workflow** platform. It governs how Software Bill of Materials (SBOM) artifacts are produced, how vulnerability thresholds gate promotion, and how security findings block release advancement.
+This document defines the supply-chain security policy for the **Repo Cortex** platform. It governs how Software Bill of Materials (SBOM) artifacts are produced, how vulnerability thresholds gate promotion, and how security findings block release advancement.
 
 ## Related Docs
 - [Security Baseline Pipeline](../architecture/SECURITY_BASELINE.md)

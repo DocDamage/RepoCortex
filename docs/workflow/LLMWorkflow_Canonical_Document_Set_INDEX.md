@@ -1,6 +1,6 @@
-﻿# LLM Workflow â€” Canonical Document Set (v3)
+# Repo Cortex - Canonical Document Set (v3)
 
-This is the active canonical document set for the LLM Workflow platform.
+This is the active canonical document set for the Repo Cortex platform.
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)

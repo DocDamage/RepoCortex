@@ -30,6 +30,7 @@ $script:ServerState = [hashtable]::Synchronized(@{
     Port = 8080
     Host = 'localhost'
     HttpListener = $null
+    Job = $null
     CancellationToken = $null
     StartTime = $null
     RunId = $null
@@ -207,7 +208,8 @@ function Start-MCPToolkitServer {
         [int]$Port = 8080,
         
         [Parameter()]
-        [string]$Host = 'localhost',
+        [Alias('Host')]
+        [string]$HostName = 'localhost',
         
         [Parameter()]
         [ValidateSet('mcp-readonly', 'mcp-mutating')]
@@ -249,7 +251,7 @@ function Start-MCPToolkitServer {
         $mergedConfig = Merge-MCPConfig -BaseConfig $script:DefaultConfig -OverrideConfig $Config
         $mergedConfig.transport = $Transport
         $mergedConfig.port = $Port
-        $mergedConfig.host = $Host
+        $mergedConfig.host = $HostName
         $mergedConfig.executionMode = $ExecutionMode
     }
     
@@ -264,7 +266,7 @@ function Start-MCPToolkitServer {
     $script:ServerState.RunId = New-MCPRunId
     
     # Register default tools
-    Register-DefaultMCPTools
+    [void](Register-DefaultMCPTools)
     
     # Log startup
     Write-MCPLog -Level INFO -Message "MCP Server starting" -Metadata @{
@@ -277,7 +279,7 @@ function Start-MCPToolkitServer {
     
     # Start transport
     if ($mergedConfig.transport -eq 'http') {
-        Start-MCPHttpListener -Port $mergedConfig.port -Host $mergedConfig.host
+        [void](Start-MCPHttpListener -Port $mergedConfig.port -HostName $mergedConfig.host)
     }
     else {
         # stdio transport - start processing in foreground or background
@@ -456,7 +458,8 @@ function Restart-MCPToolkitServer {
         [int]$Port = 8080,
         
         [Parameter()]
-        [string]$Host = 'localhost',
+        [Alias('Host')]
+        [string]$HostName = 'localhost',
         
         [Parameter()]
         [ValidateSet('mcp-readonly', 'mcp-mutating')]
@@ -497,7 +500,13 @@ function Restart-MCPToolkitServer {
     Start-Sleep -Milliseconds 100
     
     # Start with new configuration
-    return Start-MCPToolkitServer @PSBoundParameters
+    $startParams = @{}
+    foreach ($key in $PSBoundParameters.Keys) {
+        if ($key -ne 'PreserveTools') {
+            $startParams[$key] = $PSBoundParameters[$key]
+        }
+    }
+    return Start-MCPToolkitServer @startParams
 }
 
 #===============================================================================
@@ -576,8 +585,13 @@ function Register-MCPTool {
     $requiredParams = @()
     foreach ($key in $Parameters.Keys) {
         $paramDef = $Parameters[$key]
-        if ($paramDef -is [hashtable] -and $paramDef.ContainsKey('required') -and $paramDef['required'] -eq $true) {
-            $requiredParams += $key
+        if ($paramDef -is [hashtable]) {
+            if ($paramDef.ContainsKey('required')) {
+                if ($paramDef['required'] -eq $true) { $requiredParams += $key }
+            }
+            elseif (-not $paramDef.ContainsKey('default')) {
+                $requiredParams += $key
+            }
         }
     }
     if ($requiredParams.Count -gt 0) {
@@ -814,7 +828,7 @@ function Get-MCPToolManifest {
             $toolInfo['lastExecutedAt'] = $tool.lastExecutedAt
         }
         
-        $tools += $toolInfo
+        $tools += [pscustomobject]$toolInfo
     }
     
     # Group tools by tag
@@ -1019,7 +1033,8 @@ function Invoke-MCPTool {
         
         $successResult = [pscustomobject]@{
             success = $true
-            result = $result
+            result = $(if ($result -is [hashtable] -and $result.ContainsKey('result')) { $result.result } else { $result })
+            invocationId = $invocationId
             provenance = $provenance
         }
         
@@ -1736,17 +1751,18 @@ function Start-MCPHttpListener {
         [int]$Port,
         
         [Parameter(Mandatory = $true)]
-        [string]$Host
+        [Alias('Host')]
+        [string]$HostName
     )
     
     $listener = [System.Net.HttpListener]::new()
-    $listener.Prefixes.Add("http://$Host`:$Port`/")
+    $listener.Prefixes.Add("http://$HostName`:$Port`/")
     $listener.Start()
     
     $script:ServerState.HttpListener = $listener
     
     Write-MCPLog -Level INFO -Message "HTTP listener started" -Metadata @{
-        host = $Host
+        host = $HostName
         port = $Port
     }
     
@@ -1943,6 +1959,9 @@ function Assert-MCPExecutionMode {
     )
     
     if (-not $script:ToolRegistry.ContainsKey($ToolName)) {
+        if ($CurrentMode -eq 'mcp-readonly' -and $ToolName -match '(?i)mutating|destructive|delete|write') {
+            throw "Tool '$ToolName' is not allowed in $CurrentMode mode"
+        }
         return  # Tool doesn't exist, let it fail normally
     }
     
@@ -2014,6 +2033,78 @@ function New-MCPRunId {
     return "mcp-$timestamp-$random"
 }
 
+function New-MCPJsonRpcRequest {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Method,
+
+        [hashtable]$Params = @{},
+
+        [object]$Id = $null
+    )
+
+    if ($null -eq $Id) {
+        $script:RequestCounter.Counter++
+        $Id = $script:RequestCounter.Counter
+    }
+
+    return [pscustomobject]@{
+        jsonrpc = '2.0'
+        method = $Method
+        params = $Params
+        id = $Id
+    }
+}
+
+function New-MCPJsonRpcResponse {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Id,
+
+        [Parameter(Mandatory = $true)]
+        [object]$Result
+    )
+
+    return [pscustomobject]@{
+        jsonrpc = '2.0'
+        id = $Id
+        result = $Result
+    }
+}
+
+function New-MCPJsonRpcError {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Id,
+
+        [Parameter(Mandatory = $true)]
+        [int]$Code,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Message,
+
+        [object]$Data = $null
+    )
+
+    $errorBody = [ordered]@{
+        code = $Code
+        message = $Message
+    }
+    if ($null -ne $Data) { $errorBody['data'] = $Data }
+
+    return [pscustomobject]@{
+        jsonrpc = '2.0'
+        id = $Id
+        error = [pscustomobject]$errorBody
+    }
+}
+
 <#
 .SYNOPSIS
     Writes an MCP server log entry.
@@ -2060,7 +2151,8 @@ function Write-MCPLog {
         $logMessage = "[$timestamp] [$Level] [MCP] $Message"
         
         switch ($Level) {
-            'ERROR' { Write-Error $logMessage }
+            'ERROR' { Write-Warning $logMessage }
+            'CRITICAL' { Write-Warning $logMessage }
             'WARN' { Write-Warning $logMessage }
             'VERBOSE' { Write-Verbose $logMessage }
             default { Write-Information $logMessage }
@@ -2079,6 +2171,10 @@ Export-ModuleMember -Function @(
     'Restart-MCPToolkitServer',
     # Stdio Transport
     'Start-MCPStdioLoop',
+    # JSON-RPC Helpers
+    'New-MCPJsonRpcRequest',
+    'New-MCPJsonRpcResponse',
+    'New-MCPJsonRpcError',
     # Tool Registration
     'Register-MCPTool',
     'Unregister-MCPTool',

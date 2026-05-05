@@ -1,4 +1,4 @@
-# LLM Workflow Toolkit - Windows Container Dockerfile
+# Repo Cortex - Windows Container Dockerfile
 # For Windows Server Core or Nanoserver containers
 
 # Base image with PowerShell
@@ -81,7 +81,7 @@ ENTRYPOINT ["pwsh", "-NoProfile", "-File", "C:\\llm-workflow\\entrypoint.ps1"]
 CMD ["llmup"]
 
 # Labels
-LABEL org.opencontainers.image.title="LLM Workflow Toolkit (Windows)" `
-      org.opencontainers.image.description="All-in-one workflow toolkit for Windows containers" `
+LABEL org.opencontainers.image.title="Repo Cortex (Windows)" `
+      org.opencontainers.image.description="Repo Cortex workflow toolkit for Windows containers" `
       org.opencontainers.image.version="0.9.6" `
-      org.opencontainers.image.source="https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one"
+      org.opencontainers.image.source="https://github.com/DocDamage/RepoCortex"

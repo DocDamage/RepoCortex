@@ -531,7 +531,7 @@ Describe "MCPToolkitServer Module Tests" {
             $result = Test-MCPParameterSchema -Parameters @{} -Schema $schema
             
             $result.valid | Should -Be $false
-            $result.error | Should -Match "*required*"
+            $result.error | Should -BeLike "*required*"
         }
 
         It "Should validate parameter types" {

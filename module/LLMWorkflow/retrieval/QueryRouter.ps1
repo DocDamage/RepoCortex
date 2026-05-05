@@ -47,6 +47,18 @@
 
 Set-StrictMode -Version Latest
 
+if (-not (Get-Command -Name Write-FunctionTelemetry -ErrorAction SilentlyContinue)) {
+    function Write-FunctionTelemetry {
+        [CmdletBinding()]
+        param(
+            [string]$CorrelationId,
+            [string]$FunctionName,
+            [hashtable]$Attributes = @{}
+        )
+        return $null
+    }
+}
+
 #region Configuration Data
 
 # Schema version for routing results

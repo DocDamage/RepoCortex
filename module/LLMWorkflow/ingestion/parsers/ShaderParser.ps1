@@ -28,7 +28,7 @@
     $shaderData | ConvertTo-Json -Depth 10
 
 .LINK
-    https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one
+    https://github.com/DocDamage/RepoCortex
 #>
 
 Set-StrictMode -Version Latest

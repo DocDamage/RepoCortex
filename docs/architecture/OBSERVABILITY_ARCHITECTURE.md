@@ -1,6 +1,6 @@
 # Observability Architecture
 
-This document describes the observability backbone for the LLMWorkflow platform, including trace schema, correlation ID propagation, module interactions, and collector configuration.
+This document describes the observability backbone for the Repo Cortex platform, including trace schema, correlation ID propagation, module interactions, and collector configuration.
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
@@ -25,7 +25,7 @@ This document describes the observability backbone for the LLMWorkflow platform,
 
 ## Overview
 
-The observability backbone consists of three PowerShell telemetry modules and a minimal OpenTelemetry Collector configuration. The system emits W3C-compatible trace contexts over HTTP to a collector endpoint, enabling operators to diagnose latency, failures, and cross-component interactions across the LLMWorkflow platform.
+The observability backbone consists of three PowerShell telemetry modules and a minimal OpenTelemetry Collector configuration. The system emits W3C-compatible trace contexts over HTTP to a collector endpoint, enabling operators to diagnose latency, failures, and cross-component interactions across the Repo Cortex platform.
 
 ---
 

@@ -6,11 +6,11 @@
 - [Technical Debt Audit](../../../docs/implementation/TECHNICAL_DEBT_AUDIT.md)
 - [Remaining Work](../../../docs/implementation/REMAINING_WORK.md)
 
-This is an example plugin demonstrating the LLM Workflow plugin architecture.
+This is an example plugin demonstrating the Repo Cortex plugin architecture.
 
 ## Purpose
 
-Shows how to create custom plugins that integrate with the LLM Workflow bootstrap and check processes.
+Shows how to create custom plugins that integrate with the Repo Cortex bootstrap and check processes.
 
 ## Installation
 

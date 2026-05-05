@@ -161,11 +161,16 @@ function New-LockContent {
         $hostname = "unknown"
     }
 
+    $executionMode = "interactive"
+    if (Get-Command Get-CurrentExecutionMode -ErrorAction Ignore) {
+        $executionMode = Get-CurrentExecutionMode
+    }
+
     return @{
         schemaVersion = $script:LockSchemaVersion
         pid = $PID
         host = $hostname.ToLowerInvariant()
-        executionMode = Get-ExecutionMode
+        executionMode = $executionMode
         runId = $RunId
         timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         user = [Environment]::UserName

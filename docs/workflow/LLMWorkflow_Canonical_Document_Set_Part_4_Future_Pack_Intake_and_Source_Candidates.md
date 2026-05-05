@@ -1,4 +1,4 @@
-# LLM Workflow — Canonical Document Set — Part 4: Future Pack Intake and Source Candidates
+# Repo Cortex - Canonical Document Set — Part 4: Future Pack Intake and Source Candidates
 
 > **Document Status:** All candidate packs documented in this Part 4 have been **IMPLEMENTED** and promoted to active packs. See [Section 29.13 Implemented Packs Reference](#2913-implemented-packs-reference) for quick links.
 

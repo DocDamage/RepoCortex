@@ -15,6 +15,9 @@ function Measure-LLMStrictModeRequired {
     if ($ScriptBlockAst.Parent -ne $null) { return $results }
 
     $text = ($ScriptBlockAst.Extent.Text -replace '^[\s\uFEFF]+')
+    $text = ($text -replace '^(?im)(\s*#requires[^\r\n]*(\r?\n))+', '')
+    $text = ($text -replace '^(?m)(\s*#[^\r\n]*(\r?\n))+', '')
+    $text = ($text -replace '^[\s\uFEFF]+')
     if ($text -notmatch '^Set-StrictMode\s+-Version\s+Latest') {
         $results += [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord]@{
             Message  = "Missing 'Set-StrictMode -Version Latest'. Add it at the top of the file."

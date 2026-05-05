@@ -1,5 +1,5 @@
 #!/bin/bash
-# LLM Workflow Toolkit - Container Bootstrap Script
+# Repo Cortex - Container Bootstrap Script
 # Runs inside container to set up the environment
 
 set -e
@@ -86,7 +86,7 @@ ensure_dir "/workspace/.contextlattice"
 if [ ! -f "/workspace/.env" ]; then
     echo "[llm-workflow] Creating default .env file..."
     cat > /workspace/.env << 'EOF'
-# LLM Workflow Toolkit - Environment Configuration
+# Repo Cortex - Environment Configuration
 # Add your API keys here or mount an existing .env file
 
 # OpenAI

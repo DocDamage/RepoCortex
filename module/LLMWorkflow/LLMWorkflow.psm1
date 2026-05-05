@@ -75,6 +75,7 @@ $CoreFiles = @(
     "ConfigPath.ps1",
     "Config.ps1",
     "ConfigCLI.ps1",
+    "NaturalLanguageConfig.ps1",
     # Policy and execution (Priority 4: Policy + execution modes)
     "Policy.ps1",
     "ExecutionMode.ps1",
@@ -417,7 +418,7 @@ function Update-LLMWorkflow {
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
-        [string]$Repository = "DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one",
+        [string]$Repository = "DocDamage/RepoCortex",
         [string]$Version = "",
         [switch]$IncludeGlobalLauncher,
         [string]$InstallRoot = "$HOME\.llm-workflow",
@@ -953,7 +954,7 @@ function Resolve-ProviderProfile {
             Profile = $profile
             ApiKey = if ($apiKeyInfo) { $apiKeyInfo.Key } else { "" }
             ApiKeyVar = if ($apiKeyInfo) { $apiKeyInfo.Var } else { "" }
-            ApiKeySet = -not [string]::IsNullOrWhiteSpace($apiKeyInfo.Key)
+            ApiKeySet = $null -ne $apiKeyInfo -and -not [string]::IsNullOrWhiteSpace($apiKeyInfo.Key)
             BaseUrl = $baseUrlInfo.Url
             BaseUrlVar = $baseUrlInfo.Var
         }
@@ -1589,6 +1590,45 @@ Set-Alias -Name llmsync -Value Sync-LLMWorkflowAllPalaces
 Set-Alias -Name llmdashboard -Value Show-LLMWorkflowDashboard
 Set-Alias -Name llmheal -Value Invoke-LLMWorkflowHeal
 
+function Get-GoldenTasks {
+    [CmdletBinding()]
+    [OutputType([array])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$PackId = ''
+    )
+
+    Get-PredefinedGoldenTasks -PackId $PackId
+}
+
+function Test-GoldenTaskCompleteness {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [hashtable]$Task
+    )
+
+    process {
+        $requiredKeys = @('taskId', 'name', 'packId', 'query', 'expectedResult', 'validationRules')
+        foreach ($key in $requiredKeys) {
+            if (-not $Task.ContainsKey($key)) {
+                return $false
+            }
+
+            if ($null -eq $Task[$key]) {
+                return $false
+            }
+
+            if ($Task[$key] -is [string] -and [string]::IsNullOrWhiteSpace($Task[$key])) {
+                return $false
+            }
+        }
+
+        return $true
+    }
+}
+
 # Loader Validation Guard (AAA Release Audit: HIGH-A1)
 # Validates that critical functions were actually defined after all dot-sourcing.
 $criticalFunctions = @(
@@ -1612,6 +1652,7 @@ Export-ModuleMember -Function @(
     # Core workflow
     'Invoke-LLMWorkflowUp', 'Uninstall-LLMWorkflow', 'Install-LLMWorkflow', 'Update-LLMWorkflow',
     'Get-LLMWorkflowVersion', 'Test-LLMWorkflowSetup',
+    'Get-ProviderProfile', 'Get-ProviderPreferenceOrder', 'Resolve-ProviderProfile', 'Test-ProviderKey', 'Get-EnvFileMap',
     # Retrieval & routing
     'Invoke-QueryRouting', 'Get-RetrievalProfile', 'Get-RetrievalProfileList', 'Get-QueryIntent', 'Get-RoutingExplanation',
     'New-AnswerPlan', 'Add-PlanEvidence', 'Test-AnswerPlanCompleteness',

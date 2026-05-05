@@ -1,36 +1,22 @@
 {
-  "overall": "AAA Production Release Audit - Blocker & Critical High Fixes",
-  "last_updated": "2026-05-04",
-  "note": "This file reflects the state as of the ci-fixes-attempt branch on 2026-05-04. See AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md and AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md for the full current audit.",
+  "overall": "Repo Cortex branding and release hardening",
+  "last_updated": "2026-05-05",
+  "note": "Current state after Repo Cortex repository rename, UI/dashboard branding, documentation branding sweep, release hardening fixes, and renewed local gate execution.",
   "completed": [
-    "BLOCKER-B1: Version fragmentation - fix Dockerfile (0.2.0 -> 0.9.6), compatibility.lock.json (0.2.0 -> 0.9.6)",
-    "BLOCKER-D2: External CDN dependency in HTML export (DashboardViews.ps1) - FIXED in commit 00e55b5",
-    "BLOCKER-D2b: External CDN dependency in MLModelDeploymentPipeline.ps1 - FIXED in commit 00e55b5",
-    "BLOCKER-L1: API keys leaked to process env vars (HealFunctions.ps1, Dashboard.ps1) - FIXED in commit 373a15e",
-    "BLOCKER-D1: Hardcoded mock/demo data in DashboardViews.ps1 - VERIFIED API-DRIVEN (2026-05-04)",
-    "BLOCKER-M1: Missing required documentation files - VERIFIED COMPLETE (2026-05-04)",
-    "BLOCKER-R1: Retrieval backend mocks - FIXED (Real Qdrant/REST + Local LanceDB/File) (2026-05-04)",
-    "BLOCKER-C1: Release Certification Pass - PASSED (2026-05-04)",
-    "HIGH-A1: Module loader guard in LLMWorkflow.psm1 - FIXED in commit a091412",
-    "HIGH-A2: Module export surface for palace commands - FIXED (2026-05-04)",
-    "HIGH-P1: Provider support consistency (claude, ollama) - FIXED (2026-05-04)",
-    "HIGH-B2: Dockerfile hardcoded module version path - resolved via dynamic detection",
-    "HIGH-C1: Remove exit() call from Dashboard.ps1 module context - FIXED in commit f438119",
-    "HIGH-D3: Remove duplicate function definitions from Dashboard.ps1 - FIXED in commit f438119",
-    "HIGH-E3: Throw on JSON parse error in Get-LLMWorkflowPalaces - FIXED in commit f438119",
-    "HIGH-M2: Fix Invoke-ReleaseCertification.ps1 parameter reference - FIXED in commit a091412",
-    "HIGH-M3: Fix MCP governance file name references in docs - FIXED",
-    "P0-BUILD: tools/build/Invoke-LLMBuild.ps1 missing - file existed; enriched with mojibake guard and probe-file gate",
-    "P0-ARTIFACTS: _content_probe.txt and f stale artifacts - removed via git rm",
-    "P0-MOJIBAKE: README.md encoding corruption - repaired via byte-level fix (2026-05-04)",
-    "RELEASE-CERT: Invoke-ReleaseCertification.ps1 -Strict full pass VERIFIED (2026-05-04)",
-    "MODULE-IMPORT: Import-Module LLMWorkflow.psd1 -Force clean import VERIFIED",
-    "DOCS-TRUTH: validate-docs-truth.ps1 full pass VERIFIED",
-    "TEMPLATE-DRIFT: check-template-drift.ps1 full pass VERIFIED",
-    "SECURITY-BASELINE: Invoke-SecurityBaseline -FailOnCritical VERIFIED",
-    "CHANGELOG: CHANGELOG.md exists and updated"
+    "BRANDING-UI: Dashboard HTML shell and console dashboard headings updated to Repo Cortex branding",
+    "BRANDING-DOCS: README and documentation current-product references updated to Repo Cortex while preserving intentional historical former-name disclosures",
+    "REPO-RENAME: GitHub metadata, schema URLs, manifest URIs, and remote origin updated to DocDamage/RepoCortex",
+    "P0-BUILD: tools/build/Invoke-LLMBuild.ps1 exists on branch",
+    "P0-ARTIFACTS: _content_probe.txt and f stale scratch artifacts are absent",
+    "P0-MOJIBAKE: Release-facing docs scanned and active mojibake findings are being remediated",
+    "LOCAL-DEPS: Pester 5.7.1 is available in modules/Pester/5.7.1; PSScriptAnalyzer 1.25.0 installed for the current user",
+    "LOCAL-GATES: check-template-drift, validate-compatibility-lock, and validate-docs-truth pass",
+    "BUILD-GATES: Invoke-LLMBuild -WhatIf, -Docs, -Lint, and -Test -CI pass with size warnings only",
+    "RELEASE-CERT: Invoke-ReleaseCertification -Strict produced overall PASS at certification-reports/certification-report-2026-05-05T05-03-45Z.json",
+    "SECURITY-EVIDENCE: SBOM, secret scan, vulnerability scan, and security baseline artifacts generated under security-reports; promotion gate still reports high generated/self-test findings for review"
   ],
   "pending": [
-    "V1.0-STABLE: Final merge to main and tagging"
+    "Review security baseline promotion-gate findings and decide whether to exclude generated reports/SBOM/test fixtures or document accepted false positives",
+    "Review and commit the branding/release-hardening change set, then push ci-fixes-attempt to DocDamage/RepoCortex"
   ]
 }

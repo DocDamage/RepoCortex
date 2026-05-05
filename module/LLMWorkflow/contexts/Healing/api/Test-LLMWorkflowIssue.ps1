@@ -173,7 +173,8 @@ function Test-LLMWorkflowIssue {
                 $envContent = Get-Content -LiteralPath $envFile -Raw
                 $hasKeyInEnv = $envContent -match "CONTEXTLATTICE_ORCHESTRATOR_API_KEY\s*="
             }
-            $hasKeyInScriptScope = $null -ne $script:LLMWorkflowContextLatticeApiKey
+            $scriptScopeKey = Get-Variable -Name LLMWorkflowContextLatticeApiKey -Scope Script -ErrorAction SilentlyContinue
+            $hasKeyInScriptScope = $null -ne $scriptScopeKey -and $null -ne $scriptScopeKey.Value
             $detected = [string]::IsNullOrWhiteSpace($key) -and -not $hasKeyInEnv -and -not $hasKeyInScriptScope
             return @{
                 Detected = $detected

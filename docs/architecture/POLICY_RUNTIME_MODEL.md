@@ -1,6 +1,6 @@
 # Policy Runtime Model
 
-This document describes the policy externalization and enforcement architecture for the LLM Workflow platform. It covers the policy adapter, decision cache, explainability model, and guidance for adding new policy domains.
+This document describes the policy externalization and enforcement architecture for the Repo Cortex platform. It covers the policy adapter, decision cache, explainability model, and guidance for adding new policy domains.
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
@@ -23,7 +23,7 @@ This document describes the policy externalization and enforcement architecture 
 
 ## Overview
 
-The LLM Workflow platform implements a policy gate before any destructive or agent-invokable operation (Invariant 3.6). To support scalable governance, the policy system is externalized through an OPA-style adapter layer. When an external engine is unavailable, the adapter transparently falls back to an in-process evaluator so that safety checks are never skipped.
+The Repo Cortex platform implements a policy gate before any destructive or agent-invokable operation (Invariant 3.6). To support scalable governance, the policy system is externalized through an OPA-style adapter layer. When an external engine is unavailable, the adapter transparently falls back to an in-process evaluator so that safety checks are never skipped.
 
 Key design goals:
 
@@ -38,7 +38,7 @@ Key design goals:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     LLM Workflow Runtime                        │
+│                     Repo Cortex runtime                        │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
 │  │ Policy Gate  │─▶│ PolicyAdapter│─▶│ External OPA Engine  │  │
 │  │ (Invoker)    │  │ (Client)     │  │ (HTTP endpoint)      │  │

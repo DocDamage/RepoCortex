@@ -10,6 +10,21 @@ Describe 'Primitive.FileLock Tests' {
 BeforeAll {
     $script:ModulePath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\FileLock.ps1'
     $script:RunIdPath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\RunId.ps1'
+    $script:ExecutionModePath = Join-Path $PSScriptRoot '..\module\LLMWorkflow\core\ExecutionMode.ps1'
+
+    if (Test-Path $script:RunIdPath) {
+        try { . $script:RunIdPath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }
+    }
+    else {
+        throw "Module not found: $script:RunIdPath"
+    }
+
+    if (Test-Path $script:ExecutionModePath) {
+        try { . $script:ExecutionModePath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }
+    }
+    else {
+        throw "Module not found: $script:ExecutionModePath"
+    }
 
     if (Test-Path $script:ModulePath) {
         try { . $script:ModulePath } catch { if ($_.Exception.Message -notlike '*Export-ModuleMember*') { throw } }

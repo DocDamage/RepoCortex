@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This guide helps you diagnose and resolve common issues with the CodeMunch + ContextLattice + MemPalace workflow toolkit.
+This guide helps you diagnose and resolve common issues with Repo Cortex.
 
 ## Related Docs
 - [Self-Healing Guide](./SELF_HEALING.md)

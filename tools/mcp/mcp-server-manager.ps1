@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Manages MCP servers for LLM Workflow platform.
+    Manages MCP servers for Repo Cortex platform.
 
 .DESCRIPTION
     Provides commands to start, stop, restart MCP servers, view server status,
@@ -53,7 +53,7 @@
 
 .NOTES
     File Name      : mcp-server-manager.ps1
-    Author         : LLM Workflow Team
+    Author         : Repo Cortex Team
     Version        : 1.0.0
     Requires       : PowerShell 5.1+
 #>

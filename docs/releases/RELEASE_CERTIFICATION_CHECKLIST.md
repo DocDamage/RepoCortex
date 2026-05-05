@@ -150,3 +150,25 @@ scripts\Invoke-ReleaseCertification.ps1 -ProjectRoot . -OutputPath .\certificati
 Expected artifacts:
 - `certification-report-<timestamp>.json`
 - `certification-report-<timestamp>.md`
+
+---
+
+## Current Candidate Evidence — 2026-05-05
+
+Status: **Automated certification PASS** for Repo Cortex release hardening evidence.
+
+Latest certification artifacts:
+- `certification-reports/certification-report-2026-05-05T05-03-45Z.json`
+- `certification-reports/certification-report-2026-05-05T05-03-45Z.md`
+
+Verified gates:
+- `tools/build/Invoke-LLMBuild.ps1 -WhatIf` passed with size warnings only.
+- `tools/build/Invoke-LLMBuild.ps1 -Docs` passed.
+- `tools/build/Invoke-LLMBuild.ps1 -Lint` passed with size warnings only.
+- `tools/build/Invoke-LLMBuild.ps1 -Test -CI` passed across the configured build suite.
+- `tools/ci/check-template-drift.ps1` passed.
+- `tools/ci/validate-compatibility-lock.ps1` passed.
+- `tools/ci/validate-docs-truth.ps1` passed.
+- `Invoke-ReleaseCertification -ProjectRoot . -OutputPath .\certification-reports -Strict` passed all certification categories.
+
+Security note: the certification category passed, but the embedded security baseline promotion gate still reports high findings from generated reports/SBOM/test fixtures and known scanner self-patterns. Treat those as residual release-review evidence, not as a clean security promotion gate.

@@ -3,6 +3,9 @@ Set-StrictMode -Version Latest
 $script:DashboardVersion = '1.0.0'
 $script:DefaultDashboardDir = '.llm-workflow/dashboards'
 $script:DefaultExportDir = '.llm-workflow/exports'
+$script:ProductBrandName = 'Repo Cortex'
+$script:ProductModuleName = 'LLMWorkflow'
+$script:ProductBrandTagline = 'AI workflow operations, retrieval, governance, and memory telemetry'
 
 # ANSI Color Codes for Console Output
 $script:AnsiColors = @{
@@ -47,25 +50,33 @@ $script:StatusColors = @{
 # HTML Theme Colors (Dark/Light)
 $script:HtmlThemes = @{
     dark = @{
-        bgColor = '#1e1e1e'
-        cardBg = '#252526'
-        textColor = '#d4d4d4'
-        borderColor = '#3e3e42'
-        healthyColor = '#4ec9b0'
-        warningColor = '#dcdcaa'
-        criticalColor = '#f44747'
-        headerBg = '#2d2d30'
-        accentColor = '#569cd6'
+        bgColor = '#0b1020'
+        cardBg = '#121a2f'
+        textColor = '#edf4ff'
+        mutedTextColor = '#9fb0ca'
+        borderColor = '#263653'
+        healthyColor = '#36d6a5'
+        warningColor = '#f6c85f'
+        criticalColor = '#ff6b7a'
+        headerBg = '#10182d'
+        accentColor = '#68d8ff'
+        accentColor2 = '#9ef0c7'
+        shadowColor = 'rgba(2, 8, 23, 0.38)'
+        tableStripe = 'rgba(104, 216, 255, 0.05)'
     }
     light = @{
-        bgColor = '#ffffff'
-        cardBg = '#f5f5f5'
-        textColor = '#333333'
-        borderColor = '#e0e0e0'
-        healthyColor = '#28a745'
-        warningColor = '#ffc107'
-        criticalColor = '#dc3545'
-        headerBg = '#f8f9fa'
-        accentColor = '#007bff'
+        bgColor = '#f7fafc'
+        cardBg = '#ffffff'
+        textColor = '#172033'
+        mutedTextColor = '#5b6b83'
+        borderColor = '#d8e1ee'
+        healthyColor = '#118864'
+        warningColor = '#a86500'
+        criticalColor = '#c73045'
+        headerBg = '#eef6fb'
+        accentColor = '#096c91'
+        accentColor2 = '#157a5b'
+        shadowColor = 'rgba(23, 32, 51, 0.10)'
+        tableStripe = 'rgba(9, 108, 145, 0.05)'
     }
 }

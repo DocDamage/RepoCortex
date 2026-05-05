@@ -14,6 +14,7 @@
     FunctionsToExport = @(
         'Invoke-LLMWorkflowUp', 'Uninstall-LLMWorkflow', 'Install-LLMWorkflow', 'Update-LLMWorkflow', 
         'Get-LLMWorkflowVersion', 'Test-LLMWorkflowSetup',
+        'Get-ProviderProfile', 'Get-ProviderPreferenceOrder', 'Resolve-ProviderProfile', 'Test-ProviderKey', 'Get-EnvFileMap',
         'Invoke-QueryRouting', 'Get-RetrievalProfile', 'Get-RetrievalProfileList', 'Get-QueryIntent', 'Get-RoutingExplanation',
         'New-AnswerPlan', 'Add-PlanEvidence', 'Test-AnswerPlanCompleteness',
         'New-AnswerTrace', 'Add-TraceEvidence', 'Export-AnswerTrace',
@@ -43,8 +44,8 @@
     PrivateData = @{
         PSData = @{
             Tags = @('RepoCortex', 'workflow', 'RPGMaker', 'Godot', 'Blender', 'pack-framework', 'llm')
-            ProjectUri = 'https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one'
-            LicenseUri = 'https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/blob/main/LICENSE'
+            ProjectUri = 'https://github.com/DocDamage/RepoCortex'
+            LicenseUri = 'https://github.com/DocDamage/RepoCortex/blob/main/LICENSE'
             ReleaseNotes = 'v0.9.6: Rebranded to Repo Cortex. Technical debt reduction, consolidation of extraction/MCP modules, bounded context and testing portability improvements.'
         }
     }

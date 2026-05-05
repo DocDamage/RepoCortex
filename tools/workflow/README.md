@@ -1,4 +1,4 @@
-# Unified LLM Workflow Launcher
+# Unified Repo Cortex Launcher
 
 ## Related Docs
 - [Repository README](../../README.md)
@@ -14,7 +14,7 @@ This folder provides a one-shot setup command for any project:
   - `tools/contextlattice`
   - `tools/memorybridge`
 - Install required runtime dependencies when missing:
-  - `codemunch-pro`
+  - legacy indexing package
   - `chromadb`
 - Normalize provider credentials for tool compatibility:
   - OpenAI (`OPENAI_API_KEY`, optional `OPENAI_BASE_URL`)
@@ -22,7 +22,7 @@ This folder provides a one-shot setup command for any project:
   - Gemini (`GEMINI_API_KEY`, optional `GEMINI_BASE_URL`)
   - GLM (`GLM_API_KEY`, optional `GLM_BASE_URL`)
 - Bootstrap and verify:
-  - CodeMunch project files
+  - legacy indexer project files
   - ContextLattice project files + connectivity check
   - MemPalace bridge files + dry-run sync
 
@@ -73,7 +73,7 @@ llmdoctor
 `llm-workflow-check` runs a strict end-to-end validation:
 
 - provider normalization
-- codemunch index run (`-Embed`)
+- legacy indexer run (`-Embed`)
 - ContextLattice smoke write+search (warns if search is delayed by async indexing)
 - MemPalace bridge dry-run (`-Strict`)
 

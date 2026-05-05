@@ -1,29 +1,29 @@
-﻿Set-StrictMode -Version Latest
+Set-StrictMode -Version Latest
 
-$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
-$manifestPath = Join-Path $repoRoot "module\LLMWorkflow\LLMWorkflow.psd1"
+$script:repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot ".." )).Path
+$script:manifestPath = Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) "module\LLMWorkflow\LLMWorkflow.psd1"
 
 Describe "LLMWorkflow Module" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "exports expected commands" {
-        (Get-Command Install-LLMWorkflow -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Uninstall-LLMWorkflow -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Update-LLMWorkflow -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Get-LLMWorkflowVersion -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Test-LLMWorkflowSetup -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Invoke-LLMWorkflowUp -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Get-LLMWorkflowPalaces -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Test-LLMWorkflowPalace -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Sync-LLMWorkflowPalace -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command Sync-LLMWorkflowAllPalaces -ErrorAction Stop).Source | Should Be "LLMWorkflow"
-        (Get-Command llmup -ErrorAction Stop).CommandType | Should Be "Alias"
-        (Get-Command llmdown -ErrorAction Stop).CommandType | Should Be "Alias"
-        (Get-Command llmver -ErrorAction Stop).CommandType | Should Be "Alias"
-        (Get-Command llmupdate -ErrorAction Stop).CommandType | Should Be "Alias"
-        (Get-Command llmcheck -ErrorAction Stop).CommandType | Should Be "Alias"
+        (Get-Command Install-LLMWorkflow -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Uninstall-LLMWorkflow -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Update-LLMWorkflow -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Get-LLMWorkflowVersion -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Test-LLMWorkflowSetup -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Invoke-LLMWorkflowUp -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Get-LLMWorkflowPalaces -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Test-LLMWorkflowPalace -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Sync-LLMWorkflowPalace -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command Sync-LLMWorkflowAllPalaces -ErrorAction Stop).Source | Should -Be "LLMWorkflow"
+        (Get-Command llmup -ErrorAction Stop).CommandType | Should -Be "Alias"
+        (Get-Command llmdown -ErrorAction Stop).CommandType | Should -Be "Alias"
+        (Get-Command llmver -ErrorAction Stop).CommandType | Should -Be "Alias"
+        (Get-Command llmupdate -ErrorAction Stop).CommandType | Should -Be "Alias"
+        (Get-Command llmcheck -ErrorAction Stop).CommandType | Should -Be "Alias"
     }
 
     It "bootstraps missing tool folders and loads .env values" {
@@ -67,8 +67,8 @@ GLM_BASE_URL=https://example.test/glm
 "@ | Set-Content -LiteralPath (Join-Path $projectRoot ".env") -Encoding UTF8
 
         $setup = Test-LLMWorkflowSetup -ProjectRoot $projectRoot
-        $setup.failCount | Should Be 0
-        $setup.passCount | Should BeGreaterThan 0
+        $setup.failCount | Should -Be 0
+        $setup.passCount | Should -BeGreaterThan 0
 
         $version = Get-LLMWorkflowVersion
         $version.manifestVersion | Should -Match "^\d+\.\d+\.\d+$"
@@ -89,8 +89,8 @@ GLM_BASE_URL=https://example.test/glm
             -SkipUserEnvPersist
 
         $profileContent = Get-Content -LiteralPath $profilePath -Raw
-        ([regex]::Matches($profileContent, "# >>> llm-workflow >>>")).Count | Should Be 1
-        ([regex]::Matches($profileContent, "# <<< llm-workflow <<<")).Count | Should Be 1
+        ([regex]::Matches($profileContent, "# >>> llm-workflow >>>")).Count | Should -Be 1
+        ([regex]::Matches($profileContent, "# <<< llm-workflow <<<")).Count | Should -Be 1
         $profileContent | Should -Match "Set-Alias llmup llm-workflow-up -Scope Global"
 
         $uninstall = Uninstall-LLMWorkflow `
@@ -109,7 +109,7 @@ GLM_BASE_URL=https://example.test/glm
 
 Describe "Provider Resolution" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
         # Save original environment variables to restore later
         $script:OriginalEnvVars = @{}
         $envVarsToSave = @(
@@ -156,50 +156,50 @@ Describe "Provider Resolution" {
     Context "Get-ProviderProfile" {
         It "returns correct profile for openai provider" {
             $profile = Get-ProviderProfile -Name "openai"
-            $profile.Name | Should Be "openai"
-            $profile.ApiKeyVars | Should Be @("OPENAI_API_KEY")
-            $profile.BaseUrlVars | Should Be @("OPENAI_BASE_URL")
-            $profile.DefaultBaseUrl | Should Be "https://api.openai.com/v1"
+            $profile.Name | Should -Be "openai"
+            $profile.ApiKeyVars | Should -Be @("OPENAI_API_KEY")
+            $profile.BaseUrlVars | Should -Be @("OPENAI_BASE_URL")
+            $profile.DefaultBaseUrl | Should -Be "https://api.openai.com/v1"
         }
 
         It "returns correct profile for claude provider" {
             $profile = Get-ProviderProfile -Name "claude"
-            $profile.Name | Should Be "claude"
-            $profile.ApiKeyVars | Should Be @("ANTHROPIC_API_KEY", "CLAUDE_API_KEY")
-            $profile.BaseUrlVars | Should Be @("ANTHROPIC_BASE_URL", "CLAUDE_BASE_URL")
-            $profile.DefaultBaseUrl | Should Be "https://api.anthropic.com/v1"
+            $profile.Name | Should -Be "claude"
+            $profile.ApiKeyVars | Should -Be @("ANTHROPIC_API_KEY", "CLAUDE_API_KEY")
+            $profile.BaseUrlVars | Should -Be @("ANTHROPIC_BASE_URL", "CLAUDE_BASE_URL")
+            $profile.DefaultBaseUrl | Should -Be "https://api.anthropic.com/v1"
         }
 
         It "returns correct profile for kimi provider" {
             $profile = Get-ProviderProfile -Name "kimi"
-            $profile.Name | Should Be "kimi"
-            $profile.ApiKeyVars | Should Be @("KIMI_API_KEY", "MOONSHOT_API_KEY")
-            $profile.BaseUrlVars | Should Be @("KIMI_BASE_URL", "MOONSHOT_BASE_URL")
-            $profile.DefaultBaseUrl | Should Be "https://api.moonshot.cn/v1"
+            $profile.Name | Should -Be "kimi"
+            $profile.ApiKeyVars | Should -Be @("KIMI_API_KEY", "MOONSHOT_API_KEY")
+            $profile.BaseUrlVars | Should -Be @("KIMI_BASE_URL", "MOONSHOT_BASE_URL")
+            $profile.DefaultBaseUrl | Should -Be "https://api.moonshot.cn/v1"
         }
 
         It "returns correct profile for gemini provider" {
             $profile = Get-ProviderProfile -Name "gemini"
-            $profile.Name | Should Be "gemini"
-            $profile.ApiKeyVars | Should Be @("GEMINI_API_KEY", "GOOGLE_API_KEY")
-            $profile.BaseUrlVars | Should Be @("GEMINI_BASE_URL")
-            $profile.DefaultBaseUrl | Should Be "https://generativelanguage.googleapis.com/v1beta/openai"
+            $profile.Name | Should -Be "gemini"
+            $profile.ApiKeyVars | Should -Be @("GEMINI_API_KEY", "GOOGLE_API_KEY")
+            $profile.BaseUrlVars | Should -Be @("GEMINI_BASE_URL")
+            $profile.DefaultBaseUrl | Should -Be "https://generativelanguage.googleapis.com/v1beta/openai"
         }
 
         It "returns correct profile for glm provider" {
             $profile = Get-ProviderProfile -Name "glm"
-            $profile.Name | Should Be "glm"
-            $profile.ApiKeyVars | Should Be @("GLM_API_KEY", "ZHIPU_API_KEY")
-            $profile.BaseUrlVars | Should Be @("GLM_BASE_URL")
-            $profile.DefaultBaseUrl | Should Be "https://open.bigmodel.cn/api/paas/v4"
+            $profile.Name | Should -Be "glm"
+            $profile.ApiKeyVars | Should -Be @("GLM_API_KEY", "ZHIPU_API_KEY")
+            $profile.BaseUrlVars | Should -Be @("GLM_BASE_URL")
+            $profile.DefaultBaseUrl | Should -Be "https://open.bigmodel.cn/api/paas/v4"
         }
 
         It "returns correct profile for ollama provider" {
             $profile = Get-ProviderProfile -Name "ollama"
-            $profile.Name | Should Be "ollama"
-            $profile.ApiKeyVars | Should Be @("OLLAMA_API_KEY")
-            $profile.BaseUrlVars | Should Be @("OLLAMA_BASE_URL", "OLLAMA_HOST")
-            $profile.DefaultBaseUrl | Should Be "http://localhost:11434/v1"
+            $profile.Name | Should -Be "ollama"
+            $profile.ApiKeyVars | Should -Be @("OLLAMA_API_KEY")
+            $profile.BaseUrlVars | Should -Be @("OLLAMA_BASE_URL", "OLLAMA_HOST")
+            $profile.DefaultBaseUrl | Should -Be "http://localhost:11434/v1"
         }
 
         It "throws error for unsupported provider" {
@@ -208,10 +208,10 @@ Describe "Provider Resolution" {
 
         It "handles case-insensitive provider names" {
             $profileUpper = Get-ProviderProfile -Name "OPENAI"
-            $profileUpper.Name | Should Be "openai"
+            $profileUpper.Name | Should -Be "openai"
             
             $profileMixed = Get-ProviderProfile -Name "OpenAi"
-            $profileMixed.Name | Should Be "openai"
+            $profileMixed.Name | Should -Be "openai"
         }
     }
 
@@ -225,9 +225,9 @@ Describe "Provider Resolution" {
             # Set only GLM key (lowest priority)
             [System.Environment]::SetEnvironmentVariable("GLM_API_KEY", "glm_test_key", "Process")
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result.Profile.Name | Should Be "glm"
-            $result.ApiKey | Should Be "glm_test_key"
-            $result.ApiKeyVar | Should Be "GLM_API_KEY"
+            $result.Profile.Name | Should -Be "glm"
+            $result.ApiKey | Should -Be "glm_test_key"
+            $result.ApiKeyVar | Should -Be "GLM_API_KEY"
         }
 
         It "respects auto-detection priority order (openai > claude > kimi > gemini > glm > ollama)" {
@@ -238,8 +238,8 @@ Describe "Provider Resolution" {
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
             # Should pick openai first (highest priority)
-            $result.Profile.Name | Should Be "openai"
-            $result.ApiKey | Should Be "openai_test_key"
+            $result.Profile.Name | Should -Be "openai"
+            $result.ApiKey | Should -Be "openai_test_key"
         }
 
         It "respects LLM_PROVIDER env override when key is set" {
@@ -248,8 +248,8 @@ Describe "Provider Resolution" {
             [System.Environment]::SetEnvironmentVariable("LLM_PROVIDER", "gemini", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result.Profile.Name | Should Be "gemini"
-            $result.ApiKey | Should Be "gemini_test_key"
+            $result.Profile.Name | Should -Be "gemini"
+            $result.ApiKey | Should -Be "gemini_test_key"
         }
 
         It "falls back to priority order when LLM_PROVIDER override has no key" {
@@ -259,7 +259,7 @@ Describe "Provider Resolution" {
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
             # Should fall back to openai since gemini has no key
-            $result.Profile.Name | Should Be "openai"
+            $result.Profile.Name | Should -Be "openai"
         }
 
         It "ignores invalid LLM_PROVIDER value and falls back to auto-detection" {
@@ -267,22 +267,22 @@ Describe "Provider Resolution" {
             [System.Environment]::SetEnvironmentVariable("LLM_PROVIDER", "invalid_provider", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result.Profile.Name | Should Be "openai"
+            $result.Profile.Name | Should -Be "openai"
         }
 
         It "returns specific provider when requested directly" {
             [System.Environment]::SetEnvironmentVariable("GEMINI_API_KEY", "gemini_test_key", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "gemini"
-            $result.Profile.Name | Should Be "gemini"
-            $result.ApiKey | Should Be "gemini_test_key"
+            $result.Profile.Name | Should -Be "gemini"
+            $result.ApiKey | Should -Be "gemini_test_key"
         }
 
         It "returns specific provider even without key when explicitly requested" {
             # Note: No API keys set at all
             $result = Resolve-ProviderProfile -RequestedProvider "openai"
-            $result.Profile.Name | Should Be "openai"
-            $result.ApiKey | Should Be ""
+            $result.Profile.Name | Should -Be "openai"
+            $result.ApiKey | Should -Be ""
         }
 
         It "falls back to default base URL when not set" {
@@ -290,8 +290,8 @@ Describe "Provider Resolution" {
             # Note: OPENAI_BASE_URL is NOT set
             
             $result = Resolve-ProviderProfile -RequestedProvider "openai"
-            $result.BaseUrl | Should Be "https://api.openai.com/v1"
-            $result.BaseUrlVar | Should Be ""
+            $result.BaseUrl | Should -Be "https://api.openai.com/v1"
+            $result.BaseUrlVar | Should -Be ""
         }
 
         It "uses custom base URL when set" {
@@ -299,35 +299,35 @@ Describe "Provider Resolution" {
             [System.Environment]::SetEnvironmentVariable("OPENAI_BASE_URL", "https://custom.openai.com/v1", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "openai"
-            $result.BaseUrl | Should Be "https://custom.openai.com/v1"
-            $result.BaseUrlVar | Should Be "OPENAI_BASE_URL"
+            $result.BaseUrl | Should -Be "https://custom.openai.com/v1"
+            $result.BaseUrlVar | Should -Be "OPENAI_BASE_URL"
         }
 
         It "checks alternative env var names for kimi (MOONSHOT_API_KEY)" {
             [System.Environment]::SetEnvironmentVariable("MOONSHOT_API_KEY", "moonshot_test_key", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result.Profile.Name | Should Be "kimi"
-            $result.ApiKey | Should Be "moonshot_test_key"
-            $result.ApiKeyVar | Should Be "MOONSHOT_API_KEY"
+            $result.Profile.Name | Should -Be "kimi"
+            $result.ApiKey | Should -Be "moonshot_test_key"
+            $result.ApiKeyVar | Should -Be "MOONSHOT_API_KEY"
         }
 
         It "checks alternative env var names for gemini (GOOGLE_API_KEY)" {
             [System.Environment]::SetEnvironmentVariable("GOOGLE_API_KEY", "google_test_key", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result.Profile.Name | Should Be "gemini"
-            $result.ApiKey | Should Be "google_test_key"
-            $result.ApiKeyVar | Should Be "GOOGLE_API_KEY"
+            $result.Profile.Name | Should -Be "gemini"
+            $result.ApiKey | Should -Be "google_test_key"
+            $result.ApiKeyVar | Should -Be "GOOGLE_API_KEY"
         }
 
         It "checks alternative env var names for glm (ZHIPU_API_KEY)" {
             [System.Environment]::SetEnvironmentVariable("ZHIPU_API_KEY", "zhipu_test_key", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "auto"
-            $result.Profile.Name | Should Be "glm"
-            $result.ApiKey | Should Be "zhipu_test_key"
-            $result.ApiKeyVar | Should Be "ZHIPU_API_KEY"
+            $result.Profile.Name | Should -Be "glm"
+            $result.ApiKey | Should -Be "zhipu_test_key"
+            $result.ApiKeyVar | Should -Be "ZHIPU_API_KEY"
         }
 
         It "uses OLLAMA_HOST as fallback base URL var" {
@@ -335,8 +335,8 @@ Describe "Provider Resolution" {
             [System.Environment]::SetEnvironmentVariable("OLLAMA_HOST", "http://192.168.1.100:11434", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "ollama"
-            $result.BaseUrl | Should Be "http://192.168.1.100:11434"
-            $result.BaseUrlVar | Should Be "OLLAMA_HOST"
+            $result.BaseUrl | Should -Be "http://192.168.1.100:11434"
+            $result.BaseUrlVar | Should -Be "OLLAMA_HOST"
         }
 
         It "prefers OLLAMA_BASE_URL over OLLAMA_HOST" {
@@ -345,22 +345,22 @@ Describe "Provider Resolution" {
             [System.Environment]::SetEnvironmentVariable("OLLAMA_HOST", "http://192.168.1.100:11434", "Process")
             
             $result = Resolve-ProviderProfile -RequestedProvider "ollama"
-            $result.BaseUrl | Should Be "http://custom.example.com/v1"
-            $result.BaseUrlVar | Should Be "OLLAMA_BASE_URL"
+            $result.BaseUrl | Should -Be "http://custom.example.com/v1"
+            $result.BaseUrlVar | Should -Be "OLLAMA_BASE_URL"
         }
     }
 
     Context "Get-ProviderPreferenceOrder" {
         It "returns expected provider priority order" {
             $order = Get-ProviderPreferenceOrder
-            $order | Should Be @("openai", "claude", "kimi", "gemini", "glm", "ollama")
+            $order | Should -Be @("openai", "claude", "kimi", "gemini", "glm", "ollama")
         }
     }
 }
 
 Describe "Test-ProviderKey" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     Context "Input validation" {
@@ -384,7 +384,7 @@ Describe "Test-ProviderKey" {
         It "documents gemini uses x-goog-api-key header with correct endpoint" {
             # Document the expected URI pattern for gemini
             $profile = Get-ProviderProfile -Name "gemini"
-            $profile.DefaultBaseUrl | Should Be "https://generativelanguage.googleapis.com/v1beta/openai"
+            $profile.DefaultBaseUrl | Should -Be "https://generativelanguage.googleapis.com/v1beta/openai"
             # Note: The Test-ProviderKey function for gemini uses:
             # - Base: https://generativelanguage.googleapis.com (strips /v1beta/openai suffix)
             # - Endpoint: /v1beta/models?pageSize=1
@@ -393,7 +393,7 @@ Describe "Test-ProviderKey" {
 
         It "documents claude uses x-api-key and anthropic-version headers" {
             $profile = Get-ProviderProfile -Name "claude"
-            $profile.DefaultBaseUrl | Should Be "https://api.anthropic.com/v1"
+            $profile.DefaultBaseUrl | Should -Be "https://api.anthropic.com/v1"
             # Note: The Test-ProviderKey function for claude uses:
             # - Header: x-api-key
             # - Header: anthropic-version=2023-06-01
@@ -402,22 +402,22 @@ Describe "Test-ProviderKey" {
 
         It "documents openai default base URL" {
             $profile = Get-ProviderProfile -Name "openai"
-            $profile.DefaultBaseUrl | Should Be "https://api.openai.com/v1"
+            $profile.DefaultBaseUrl | Should -Be "https://api.openai.com/v1"
         }
 
         It "documents kimi default base URL" {
             $profile = Get-ProviderProfile -Name "kimi"
-            $profile.DefaultBaseUrl | Should Be "https://api.moonshot.cn/v1"
+            $profile.DefaultBaseUrl | Should -Be "https://api.moonshot.cn/v1"
         }
 
         It "documents glm default base URL" {
             $profile = Get-ProviderProfile -Name "glm"
-            $profile.DefaultBaseUrl | Should Be "https://open.bigmodel.cn/api/paas/v4"
+            $profile.DefaultBaseUrl | Should -Be "https://open.bigmodel.cn/api/paas/v4"
         }
 
         It "documents ollama default base URL" {
             $profile = Get-ProviderProfile -Name "ollama"
-            $profile.DefaultBaseUrl | Should Be "http://localhost:11434/v1"
+            $profile.DefaultBaseUrl | Should -Be "http://localhost:11434/v1"
         }
     }
 
@@ -437,7 +437,7 @@ Describe "Test-ProviderKey" {
 
 Describe "Error Handling - Missing Python" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Test-LLMWorkflowSetup reports python check as fail when python not found" {
@@ -469,7 +469,7 @@ Describe "Error Handling - Missing Python" {
 
 Describe "Error Handling - Invalid .env Format" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Get-EnvFileMap gracefully handles malformed .env lines" {
@@ -484,12 +484,12 @@ export EXPORTED_KEY=exported_value
   INDENTED_KEY=indented_value
 "@ | Set-Content -LiteralPath $envFile -Encoding UTF8
 
-        $result = Test-EnvFileMap -Path $envFile
+        $result = Get-EnvFileMap -Path $envFile
         
-        $result["VALID_KEY"] | Should Be "valid_value"
-        $result["ALSO_VALID"] | Should Be "quoted_value"
-        $result["EXPORTED_KEY"] | Should Be "exported_value"
-        $result["INDENTED_KEY"] | Should Be "indented_value"
+        $result["VALID_KEY"] | Should -Be "valid_value"
+        $result["ALSO_VALID"] | Should -Be "quoted_value"
+        $result["EXPORTED_KEY"] | Should -Be "exported_value"
+        $result["INDENTED_KEY"] | Should -Be "indented_value"
         
         # Malformed lines should be skipped
         $result.ContainsKey("INVALID") | Should -Be $false
@@ -499,10 +499,10 @@ export EXPORTED_KEY=exported_value
     It "Get-EnvFileMap returns empty hashtable for non-existent file" {
         $nonExistentFile = Join-Path $TestDrive "does-not-exist.env"
         
-        $result = Test-EnvFileMap -Path $nonExistentFile
+        $result = Get-EnvFileMap -Path $nonExistentFile
         
         $result | Should -Not -Be $null
-        $result.Count | Should Be 0
+        $result.Count | Should -Be 0
     }
 
     It "Get-EnvFileMap skips empty lines and comments only file" {
@@ -515,15 +515,15 @@ export EXPORTED_KEY=exported_value
 
 "@ | Set-Content -LiteralPath $envFile -Encoding UTF8
 
-        $result = Test-EnvFileMap -Path $envFile
+        $result = Get-EnvFileMap -Path $envFile
         
-        $result.Count | Should Be 0
+        $result.Count | Should -Be 0
     }
 }
 
 Describe "Error Handling - Invalid Provider Name" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
         $script:OriginalProvider = [System.Environment]::GetEnvironmentVariable("LLM_PROVIDER", "Process")
     }
 
@@ -550,13 +550,13 @@ Describe "Error Handling - Invalid Provider Name" {
         # Should fall back to auto-detection and find openai
         $result = Resolve-ProviderProfile -RequestedProvider "auto"
         
-        $result.Profile.Name | Should Be "openai"
+        $result.Profile.Name | Should -Be "openai"
     }
 }
 
 Describe "Error Handling - Missing API Key" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
         # Save and clear all provider-related env vars
         $script:OriginalEnvVars = @{}
         $envVarsToSave = @(
@@ -621,7 +621,7 @@ CONTEXTLATTICE_ORCHESTRATOR_URL=http://127.0.0.1:8075
 
 Describe "Error Handling - Invalid Project Root" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Test-LLMWorkflowSetup handles non-existent project root gracefully" {
@@ -630,23 +630,23 @@ Describe "Error Handling - Invalid Project Root" {
         $setup = Test-LLMWorkflowSetup -ProjectRoot $nonExistentPath
         
         $setup.passed | Should -Be $false
-        $setup.failCount | Should BeGreaterThan 0
+        $setup.failCount | Should -BeGreaterThan 0
         
         $rootCheck = $setup.checks | Where-Object { $_.name -eq "project_root" }
-        $rootCheck.status | Should Be "fail"
+        $rootCheck.status | Should -Be "fail"
         $rootCheck.details | Should -Match "does not exist"
     }
 
     It "Test-LLMWorkflowSetup -Strict throws when validation fails" {
         $nonExistentPath = Join-Path $TestDrive "strict-test-project"
         
-        { Test-LLMWorkflowSetup -ProjectRoot $nonExistentPath -Strict } | Should -Throw "Setup validation failed"
+        { Test-LLMWorkflowSetup -ProjectRoot $nonExistentPath -Strict } | Should -Throw "*Setup validation failed*"
     }
 }
 
 Describe "Error Handling - Toolkit Source Validation" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Install-LLMWorkflow validates toolkit source exists" {
@@ -670,14 +670,14 @@ Describe "Error Handling - Toolkit Source Validation" {
 
         # Test will validate error handling for missing internal scripts
         # The actual bootstrap script validates its own existence
-        $scriptPath = Join-Path (Join-Path (Join-Path (Join-Path $repoRoot "module") "LLMWorkflow") "scripts") "bootstrap-llm-workflow.ps1"
+        $scriptPath = Join-Path (Join-Path (Join-Path (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) "module") "LLMWorkflow") "scripts") "bootstrap-llm-workflow.ps1"
         $scriptPath | Should -Exist
     }
 }
 
 Describe "Error Handling - Environment Variable Loading" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
 
@@ -692,12 +692,12 @@ KEY_WITH_DOUBLE="double quotes"
 KEY_WITH_SPECIALS=!@#`$%^&*()
 "@ | Set-Content -LiteralPath $envFile -Encoding UTF8
 
-        $result = Test-EnvFileMapSpecial -Path $envFile
+        $result = Get-EnvFileMap -Path $envFile
         
-        $result["KEY_WITH_SPACES"] | Should Be "value with spaces"
-        $result["KEY_WITH_EQUALS"] | Should Be "val=ue"
-        $result["KEY_WITH_QUOTES"] | Should Be "single quotes"
-        $result["KEY_WITH_DOUBLE"] | Should Be "double quotes"
+        $result["KEY_WITH_SPACES"] | Should -Be "value with spaces"
+        $result["KEY_WITH_EQUALS"] | Should -Be "val=ue"
+        $result["KEY_WITH_QUOTES"] | Should -Be "single quotes"
+        $result["KEY_WITH_DOUBLE"] | Should -Be "double quotes"
     }
 
     It "handles .env file with invalid variable names" {
@@ -709,17 +709,17 @@ VALID_KEY=valid_value
 SPACE BETWEEN=value
 "@ | Set-Content -LiteralPath $envFile -Encoding UTF8
 
-        $result = Test-EnvFileMapSpecial -Path $envFile
+        $result = Get-EnvFileMap -Path $envFile
         
         # Only valid key names should be parsed
-        $result["VALID_KEY"] | Should Be "valid_value"
+        $result["VALID_KEY"] | Should -Be "valid_value"
         $result.ContainsKey("123_INVALID_STARTS_WITH_NUMBER") | Should -Be $false
     }
 }
 
 Describe "Error Handling - Update-LLMWorkflow" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "throws error for non-existent GitHub release" {
@@ -734,8 +734,8 @@ Describe "Error Handling - Update-LLMWorkflow" {
 
 Describe "Error Handling - Template Drift Detection" {
     BeforeAll {
-        Import-Module $manifestPath -Force
-        $script:driftScriptPath = Join-Path $repoRoot "tools\ci\check-template-drift.ps1"
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
+        $script:driftScriptPath = Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) "tools\ci\check-template-drift.ps1"
     }
 
     It "detects drift when template file is missing" {
@@ -758,8 +758,8 @@ Describe "Error Handling - Template Drift Detection" {
         
         $missingInTarget = @(@("only-in-source.txt") | Where-Object { -not $targetMap.ContainsKey($_) })
         
-        $missingInTarget.Length | Should Be 1
-        $missingInTarget[0] | Should Be "only-in-source.txt"
+        $missingInTarget.Length | Should -Be 1
+        $missingInTarget[0] | Should -Be "only-in-source.txt"
     }
 
     It "detects drift when file content differs" {
@@ -799,7 +799,7 @@ Describe "Error Handling - Template Drift Detection" {
 
 Describe "Error Handling - ContextLattice URL Validation" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Test-LLMWorkflowSetup includes contextlattice_url check" {
@@ -838,7 +838,7 @@ CONTEXTLATTICE_ORCHESTRATOR_API_KEY=test
 
 Describe "Error Handling - MemPalace Bridge Configuration" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "handles missing bridge configuration file gracefully" {
@@ -861,7 +861,7 @@ Describe "Error Handling - MemPalace Bridge Configuration" {
 
 Describe "Error Handling - Uninstall Operations" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Uninstall-LLMWorkflow handles non-existent install root gracefully" {
@@ -898,7 +898,7 @@ Describe "Error Handling - Uninstall Operations" {
 
 Describe "Error Handling - Network and Connectivity" {
     BeforeAll {
-        Import-Module $manifestPath -Force
+        Import-Module (Join-Path ((Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path) 'module\LLMWorkflow\LLMWorkflow.psd1') -Force
     }
 
     It "Test-LLMWorkflowSetup includes connectivity checks when enabled" {
@@ -939,3 +939,6 @@ CONTEXTLATTICE_ORCHESTRATOR_URL=http://127.0.0.1:8075
 }
 
 #endregion
+
+
+

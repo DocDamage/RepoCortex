@@ -23,6 +23,18 @@
 #requires -Version 5.1
 Set-StrictMode -Version Latest
 
+if (-not (Get-Command -Name Write-FunctionTelemetry -ErrorAction SilentlyContinue)) {
+    function Write-FunctionTelemetry {
+        [CmdletBinding()]
+        param(
+            [string]$CorrelationId,
+            [string]$FunctionName,
+            [hashtable]$Attributes = @{}
+        )
+        return $null
+    }
+}
+
 $script:TelemetryTraceLog = [System.Collections.ArrayList]::new()
 
 #region Configuration Data

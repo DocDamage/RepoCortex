@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Deploys the Blender MCP server for LLM Workflow platform.
+    Deploys the Blender MCP server for Repo Cortex platform.
 
 .DESCRIPTION
     Installs blender-mcp requirements, configures BLENDER_PATH environment variable,
@@ -39,7 +39,7 @@
 
 .NOTES
     File Name      : deploy-blender-mcp.ps1
-    Author         : LLM Workflow Team
+    Author         : Repo Cortex Team
     Version        : 1.0.0
     Requires       : PowerShell 5.1+, Python 3.8+, Blender 3.0+
 #>

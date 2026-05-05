@@ -207,9 +207,12 @@ function Test-AnswerConfidence {
 
             # Identify evidence issues - wrap in @() for PS 5.1 compatibility
             $evidenceIssues = @(Get-EvidenceIssues -Evidence $evidenceList -Components $components)
+            if ($Context.ContainsKey('evidenceIssues') -and $null -ne $Context.evidenceIssues) {
+                $evidenceIssues = @($evidenceIssues) + @($Context.evidenceIssues)
+            }
 
             # Get policy from answer plan or use default
-            $policy = if ($AnswerPlan.ContainsKey('confidencePolicy')) {
+            $policy = if ($AnswerPlan.ContainsKey('confidencePolicy') -and $null -ne $AnswerPlan.confidencePolicy) {
                 Merge-ConfidencePolicy -CustomPolicy $AnswerPlan.confidencePolicy -CorrelationId $CorrelationId
             }
             else {
@@ -658,8 +661,10 @@ function Get-AnswerMode {
         $issuesList = @($EvidenceIssues)
 
         # Check for policy violations that require escalation
-        $policyViolations = @($issuesList | Where-Object { 
-            $_.severity -eq 'critical' -or $_.type -eq 'policy-violation' 
+        $policyViolations = @($issuesList | Where-Object {
+            $severity = if ($_ -is [hashtable] -and $_.ContainsKey('severity')) { $_.severity } else { $null }
+            $type = if ($_ -is [hashtable] -and $_.ContainsKey('type')) { $_.type } else { $null }
+            $severity -eq 'critical' -or $type -eq 'policy-violation'
         })
         if ($policyViolations.Count -gt 0) {
             return 'escalate'
@@ -686,8 +691,9 @@ function Get-AnswerMode {
         # Determine mode based on confidence score
         if ($ConfidenceScore -ge $thresholds.direct) {
             # Check for issues that prevent direct answer
-            $majorIssues = @($issuesList | Where-Object { 
-                $_.severity -eq 'high' -or $_.severity -eq 'major' 
+        $majorIssues = @($issuesList | Where-Object {
+                $severity = if ($_ -is [hashtable] -and $_.ContainsKey('severity')) { $_.severity } else { $null }
+                $severity -eq 'high' -or $severity -eq 'major'
             })
             if ($majorIssues.Count -eq 0) {
                 return 'direct'
