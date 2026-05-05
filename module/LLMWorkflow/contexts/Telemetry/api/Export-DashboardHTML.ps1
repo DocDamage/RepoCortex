@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() { renderMermaid('.merma
             $(if ($AutoRefreshSeconds -gt 0) { "Auto-refresh $AutoRefreshSeconds seconds" } else { $null })
         )
         $extraHead = @($refreshMeta, $graphHead) -join "`n"
-        $html = New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Operations Dashboard" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems $metaItems -ExtraHead $extraHead -UseGrid
+        $html = New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Operations Dashboard" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems $metaItems -ExtraHead $extraHead -ProjectRoot $ProjectRoot -UseGrid
         
         # Ensure directory exists
         $exportDir = Split-Path -Parent $ExportPath

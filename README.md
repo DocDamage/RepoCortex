@@ -19,7 +19,7 @@
 
 Repo Cortex is the product identity for the toolkit previously described as **CodeMunch + ContextLattice + MemPalace (All-in-One)**. The underlying module is still named `LLMWorkflow`, and the command surface intentionally keeps familiar aliases such as `llmup`, `llmcheck`, `llmheal`, and `llmdashboard`.
 
-> 
+> **Formerly:** CodeMunch + ContextLattice + MemPalace (All-in-One)
 
 The short version: Repo Cortex gives a project a repeatable AI-workflow backbone. It can bootstrap local workflow assets, index code, wire memory sync, run structured extraction, govern MCP/tool exposure, evaluate answer quality, and certify release readiness.
 

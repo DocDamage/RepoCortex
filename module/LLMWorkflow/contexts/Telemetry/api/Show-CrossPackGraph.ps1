@@ -136,7 +136,7 @@ function Show-CrossPackGraph {
                 return $graphData
             }
             'HTML' {
-                $html = Convert-ToGraphHTML -Data $graphData -Theme 'dark'
+                $html = Convert-ToGraphHTML -Data $graphData -Theme 'dark' -ProjectRoot $ProjectRoot
                 if ($ExportPath) {
                     $html | Out-File -FilePath $ExportPath -Encoding UTF8
                 }

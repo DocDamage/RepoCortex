@@ -47,6 +47,33 @@ $script:StatusThresholds = @{
 
 $script:LockfileStaleDays = 30
 
+function Get-PackHealthObjectProperty {
+    param(
+        [object]$InputObject,
+        [string]$Name,
+        [object]$Default = $null
+    )
+
+    if ($null -eq $InputObject) {
+        return $Default
+    }
+
+    if ($InputObject -is [hashtable]) {
+        if ($InputObject.ContainsKey($Name) -and $null -ne $InputObject[$Name]) {
+            return $InputObject[$Name]
+        }
+
+        return $Default
+    }
+
+    $property = $InputObject.PSObject.Properties[$Name]
+    if ($null -ne $property -and $null -ne $property.Value) {
+        return $property.Value
+    }
+
+    return $Default
+}
+
 <#
 .SYNOPSIS
     Calculates health score (0-100) for a pack.
@@ -210,32 +237,38 @@ function Get-PackHealthScore {
             
             foreach ($sourceEntry in $sourceRegistry.sources.GetEnumerator()) {
                 $source = $sourceEntry.Value
+                $sourceId = [string](Get-PackHealthObjectProperty -InputObject $source -Name 'sourceId' -Default $sourceEntry.Key)
                 
                 # Skip non-active sources
-                if ($source.state -ne 'active') { continue }
+                $sourceState = [string](Get-PackHealthObjectProperty -InputObject $source -Name 'state' -Default 'active')
+                if ($sourceState -ne 'active') { continue }
 
                 # Parse refresh cadence (default 30 days)
                 $refreshDays = 30
-                if ($source.refreshCadence -match '^(\d+)-day$') {
+                $refreshCadence = [string](Get-PackHealthObjectProperty -InputObject $source -Name 'refreshCadence' -Default '')
+                if ($refreshCadence -match '^(\d+)-day$') {
                     $refreshDays = [int]$matches[1]
                 }
-                elseif ($source.refreshCadence -match '^(\d+)-week$') {
+                elseif ($refreshCadence -match '^(\d+)-week$') {
                     $refreshDays = [int]$matches[1] * 7
                 }
-                elseif ($source.refreshCadence -match '^(\d+)-month$') {
+                elseif ($refreshCadence -match '^(\d+)-month$') {
                     $refreshDays = [int]$matches[1] * 30
                 }
 
                 # Check last extraction or review date
                 $lastDate = $null
-                if ($source.lastExtractedUtc) {
-                    $lastDate = [DateTime]::Parse($source.lastExtractedUtc)
+                $lastExtractedUtc = Get-PackHealthObjectProperty -InputObject $source -Name 'lastExtractedUtc' -Default $null
+                $lastReviewedUtc = Get-PackHealthObjectProperty -InputObject $source -Name 'lastReviewedUtc' -Default $null
+                $updatedUtc = Get-PackHealthObjectProperty -InputObject $source -Name 'updatedUtc' -Default $null
+                if ($lastExtractedUtc) {
+                    $lastDate = [DateTime]::Parse($lastExtractedUtc)
                 }
-                elseif ($source.lastReviewedUtc) {
-                    $lastDate = [DateTime]::Parse($source.lastReviewedUtc)
+                elseif ($lastReviewedUtc) {
+                    $lastDate = [DateTime]::Parse($lastReviewedUtc)
                 }
-                elseif ($source.updatedUtc) {
-                    $lastDate = [DateTime]::Parse($source.updatedUtc)
+                elseif ($updatedUtc) {
+                    $lastDate = [DateTime]::Parse($updatedUtc)
                 }
 
                 if ($lastDate) {
@@ -243,16 +276,16 @@ function Get-PackHealthScore {
                     if ($daysSinceUpdate -gt $refreshDays) {
                         $staleSourceCount++
                         $staleSourcePenalty += $script:ScoreWeights.StaleSourcePenalty
-                        $deductions += "Stale source '$($source.sourceId)': $([math]::Round($daysSinceUpdate)) days since update (threshold: $refreshDays days)"
-                        $explanations += "Stale source '$($source.sourceId)': -$([math]::Abs($script:ScoreWeights.StaleSourcePenalty)) pts"
+                        $deductions += "Stale source '$sourceId': $([math]::Round($daysSinceUpdate)) days since update (threshold: $refreshDays days)"
+                        $explanations += "Stale source '$sourceId': -$([math]::Abs($script:ScoreWeights.StaleSourcePenalty)) pts"
                     }
                 }
                 else {
                     # No date information - treat as potentially stale
                     $staleSourceCount++
                     $staleSourcePenalty += $script:ScoreWeights.StaleSourcePenalty
-                    $deductions += "Source '$($source.sourceId)': No freshness date available"
-                    $explanations += "Source '$($source.sourceId)' missing freshness data: -$([math]::Abs($script:ScoreWeights.StaleSourcePenalty)) pts"
+                    $deductions += "Source '$sourceId': No freshness date available"
+                    $explanations += "Source '$sourceId' missing freshness data: -$([math]::Abs($script:ScoreWeights.StaleSourcePenalty)) pts"
                 }
             }
         }
@@ -268,22 +301,25 @@ function Get-PackHealthScore {
         if ($sourceRegistry -and $sourceRegistry.sources) {
             foreach ($sourceEntry in $sourceRegistry.sources.GetEnumerator()) {
                 $source = $sourceEntry.Value
+                $sourceId = [string](Get-PackHealthObjectProperty -InputObject $source -Name 'sourceId' -Default $sourceEntry.Key)
+                $extractionStatus = [string](Get-PackHealthObjectProperty -InputObject $source -Name 'extractionStatus' -Default '')
+                $extractionErrors = [int](Get-PackHealthObjectProperty -InputObject $source -Name 'extractionErrors' -Default 0)
                 
                 # Check extraction status
-                if ($source.extractionStatus -eq 'failed') {
+                if ($extractionStatus -eq 'failed') {
                     $failedExtractionCount++
                     $failedExtractionPenalty += $script:ScoreWeights.FailedExtractionPenalty
-                    $deductions += "Failed extraction for source '$($source.sourceId)'"
-                    $explanations += "Failed extraction '$($source.sourceId)': -$([math]::Abs($script:ScoreWeights.FailedExtractionPenalty)) pts"
+                    $deductions += "Failed extraction for source '$sourceId'"
+                    $explanations += "Failed extraction '$sourceId': -$([math]::Abs($script:ScoreWeights.FailedExtractionPenalty)) pts"
                 }
                 
                 # Check extraction error count
-                if ($source.extractionErrors -and $source.extractionErrors -gt 0) {
-                    $failedExtractionCount += $source.extractionErrors
-                    $penalty = $source.extractionErrors * $script:ScoreWeights.FailedExtractionPenalty
+                if ($extractionErrors -gt 0) {
+                    $failedExtractionCount += $extractionErrors
+                    $penalty = $extractionErrors * $script:ScoreWeights.FailedExtractionPenalty
                     $failedExtractionPenalty += $penalty
-                    $deductions += "Source '$($source.sourceId)' has $($source.extractionErrors) extraction error(s)"
-                    $explanations += "Extraction errors on '$($source.sourceId)': -$([math]::Abs($penalty)) pts"
+                    $deductions += "Source '$sourceId' has $extractionErrors extraction error(s)"
+                    $explanations += "Extraction errors on '$sourceId': -$([math]::Abs($penalty)) pts"
                 }
             }
         }

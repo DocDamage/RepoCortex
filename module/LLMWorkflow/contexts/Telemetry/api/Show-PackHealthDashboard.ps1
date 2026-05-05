@@ -4,6 +4,33 @@ Set-StrictMode -Version Latest
 # Pack Health Dashboard
 #===============================================================================
 
+function Get-PackHealthDashboardValue {
+    param(
+        [object]$InputObject,
+        [string]$Name,
+        [object]$Default = $null
+    )
+
+    if ($null -eq $InputObject) {
+        return $Default
+    }
+
+    if ($InputObject -is [hashtable]) {
+        if ($InputObject.ContainsKey($Name) -and $null -ne $InputObject[$Name]) {
+            return $InputObject[$Name]
+        }
+
+        return $Default
+    }
+
+    $property = $InputObject.PSObject.Properties[$Name]
+    if ($null -ne $property -and $null -ne $property.Value) {
+        return $property.Value
+    }
+
+    return $Default
+}
+
 <#
 .SYNOPSIS
     Displays pack health overview dashboard.
@@ -123,22 +150,28 @@ function Show-PackHealthDashboard {
                 }
             }
             
+            $status = [string](Get-PackHealthDashboardValue -InputObject $packHealth -Name 'status' -Default 'Critical')
+            $score = [int](Get-PackHealthDashboardValue -InputObject $packHealth -Name 'overallScore' -Default 0)
+            $warnings = @(Get-PackHealthDashboardValue -InputObject $packHealth -Name 'warnings' -Default @())
+            $criticalIssues = @(Get-PackHealthDashboardValue -InputObject $packHealth -Name 'criticalIssues' -Default @())
+            $components = Get-PackHealthDashboardValue -InputObject $packHealth -Name 'components' -Default $null
+
             $packEntry = @{
                 packId = $pack.packId
-                score = $packHealth.overallScore
-                status = $packHealth.status
-                severity = if ($packHealth.severity) { $packHealth.severity } else { $packHealth.status }
-                warnings = if ($packHealth.warnings) { $packHealth.warnings.Count } else { 0 }
-                criticalIssues = if ($packHealth.criticalIssues) { $packHealth.criticalIssues.Count } else { 0 }
-                rawMetrics = $packHealth.rawMetrics
-                components = if ($IncludeDetails) { $packHealth.components } else { $null }
+                score = $score
+                status = $status
+                severity = [string](Get-PackHealthDashboardValue -InputObject $packHealth -Name 'severity' -Default $status)
+                warnings = $warnings.Count
+                criticalIssues = $criticalIssues.Count
+                rawMetrics = Get-PackHealthDashboardValue -InputObject $packHealth -Name 'rawMetrics' -Default $null
+                components = if ($IncludeDetails) { $components } else { $null }
             }
             
             $dashboardData.packs += $packEntry
-            $totalScore += $packHealth.overallScore
+            $totalScore += $score
             
             # Update summary counts
-            switch ($packHealth.status) {
+            switch ($status) {
                 'Healthy' { $dashboardData.summary.healthy++ }
                 'Degraded' { $dashboardData.summary.degraded++ }
                 'Critical' { $dashboardData.summary.critical++ }
@@ -156,7 +189,7 @@ function Show-PackHealthDashboard {
                 Write-ConsoleHealthDashboard -Data $dashboardData -UseAnsi:$useAnsiColors -IncludeDetails:$IncludeDetails
             }
             'HTML' {
-                $html = Convert-ToHealthDashboardHTML -Data $dashboardData -Theme 'dark'
+                $html = Convert-ToHealthDashboardHTML -Data $dashboardData -Theme 'dark' -ProjectRoot $ProjectRoot
                 if ($ExportPath) {
                     $html | Out-File -FilePath $ExportPath -Encoding UTF8
                     Write-Host "Health dashboard exported to: $ExportPath"

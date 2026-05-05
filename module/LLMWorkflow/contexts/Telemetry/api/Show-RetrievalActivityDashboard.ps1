@@ -130,7 +130,7 @@ function Show-RetrievalActivityDashboard {
                 Write-ConsoleRetrievalDashboard -Data $dashboardData -UseAnsi:$useAnsiColors
             }
             'HTML' {
-                $html = Convert-ToRetrievalDashboardHTML -Data $dashboardData -Theme 'dark'
+                $html = Convert-ToRetrievalDashboardHTML -Data $dashboardData -Theme 'dark' -ProjectRoot $ProjectRoot
                 if ($ExportPath) {
                     $html | Out-File -FilePath $ExportPath -Encoding UTF8
                 }

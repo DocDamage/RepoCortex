@@ -37,6 +37,10 @@ function Get-DashboardHtmlStyles {
             background: linear-gradient(135deg, color-mix(in srgb, var(--rc-accent) 28%, transparent), color-mix(in srgb, var(--rc-accent-2) 24%, transparent));
             color: var(--rc-text); font-weight: 800; letter-spacing: 0;
         }
+        .brand-mark-image {
+            padding: 8px; object-fit: contain; image-rendering: pixelated;
+            background: color-mix(in srgb, var(--rc-surface) 82%, white);
+        }
         .brand-title { margin: 0; color: var(--rc-text); font-size: clamp(1.55rem, 2.4vw, 2.25rem); line-height: 1.05; letter-spacing: 0; }
         .brand-subtitle { margin-top: 6px; color: var(--rc-muted); font-size: 0.95rem; }
         .brand-meta {
@@ -101,21 +105,64 @@ function Get-DashboardHtmlStyles {
 "@
 }
 
+function Get-DashboardModernUIAssetDataUri {
+    param(
+        [string]$ProjectRoot,
+        [string[]]$RelativeCandidates
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+        return ''
+    }
+
+    $resolvedRoot = try {
+        (Resolve-Path -LiteralPath $ProjectRoot -ErrorAction Stop).Path
+    }
+    catch {
+        $ProjectRoot
+    }
+
+    foreach ($relativePath in $RelativeCandidates) {
+        $assetPath = Join-Path $resolvedRoot $relativePath
+        if (-not (Test-Path -LiteralPath $assetPath -PathType Leaf)) {
+            continue
+        }
+
+        $resolvedAssetPath = (Resolve-Path -LiteralPath $assetPath).Path
+        $extension = [IO.Path]::GetExtension($resolvedAssetPath).TrimStart('.').ToLowerInvariant()
+        if ($extension -eq 'jpg') {
+            $extension = 'jpeg'
+        }
+
+        $bytes = [IO.File]::ReadAllBytes($resolvedAssetPath)
+        return "data:image/$extension;base64,$([Convert]::ToBase64String($bytes))"
+    }
+
+    return ''
+}
+
 function New-DashboardHtmlHeader {
     param(
         [string]$Title,
         [string]$Subtitle,
-        [string[]]$MetaItems = @()
+        [string[]]$MetaItems = @(),
+        [string]$BrandAssetUri = ''
     )
 
     $metaHtml = $MetaItems | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
         "<span class='meta-chip'>$($_)</span>"
     }
+    $brandMarkHtml = if ([string]::IsNullOrWhiteSpace($BrandAssetUri)) {
+        '<div class="brand-mark">RC</div>'
+    }
+    else {
+        "<img class=`"brand-mark brand-mark-image`" src=`"$BrandAssetUri`" alt=`"Repo Cortex ModernUI mark`">"
+    }
 
     return @"
 <header class="brand-header">
     <div class="brand-lockup">
-        <div class="brand-mark">RC</div>
+        $brandMarkHtml
         <div>
             <h1 class="brand-title">$Title</h1>
             <div class="brand-subtitle">$Subtitle</div>
@@ -136,6 +183,7 @@ function New-DashboardHtmlDocument {
         [string]$Theme,
         [string[]]$MetaItems = @(),
         [string]$ExtraHead = '',
+        [string]$ProjectRoot = '',
         [switch]$UseGrid
     )
 
@@ -147,7 +195,13 @@ function New-DashboardHtmlDocument {
         $Sections -join "`n"
     }
     $styles = Get-DashboardHtmlStyles -ThemeColors $themeColors
-    $header = New-DashboardHtmlHeader -Title $Title -Subtitle $Subtitle -MetaItems $MetaItems
+    $brandAssetUri = Get-DashboardModernUIAssetDataUri -ProjectRoot $ProjectRoot -RelativeCandidates @(
+        'ModernUI\16x16\Modern_UI_Gamepad.png',
+        'ModernUI\32x32\Modern_UI_Gamepad_32x32.png',
+        'ModernUI\48x48\Modern_UI_Gamepad_48x48.png'
+    )
+    $modernUIEnabled = if ([string]::IsNullOrWhiteSpace($brandAssetUri)) { 'false' } else { 'true' }
+    $header = New-DashboardHtmlHeader -Title $Title -Subtitle $Subtitle -MetaItems $MetaItems -BrandAssetUri $brandAssetUri
 
     return @"
 <!DOCTYPE html>
@@ -161,7 +215,7 @@ $ExtraHead
 $styles
 </style>
 </head>
-<body>
+<body data-modern-ui="$modernUIEnabled">
 <main class="page-shell">
 $header
 $content
@@ -172,17 +226,17 @@ $content
 }
 
 function Convert-ToHealthDashboardHTML {
-    param($Data, $Theme)
+    param($Data, $Theme, [string]$ProjectRoot = '')
     
     $sections = @(Convert-HealthToHtmlSection -Data $Data -ThemeColors $script:HtmlThemes[$Theme])
-    return New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Pack Health" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems @("Dashboard v$($Data.version)", "Generated $($Data.generatedAt)")
+    return New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Pack Health" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems @("Dashboard v$($Data.version)", "Generated $($Data.generatedAt)") -ProjectRoot $ProjectRoot
 }
 
 function Convert-ToRetrievalDashboardHTML {
-    param($Data, $Theme)
+    param($Data, $Theme, [string]$ProjectRoot = '')
     
     $sections = @(Convert-RetrievalToHtmlSection -Data $Data -ThemeColors $script:HtmlThemes[$Theme])
-    return New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Retrieval" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems @("Range $($Data.timeRange)", "Dashboard v$($Data.version)")
+    return New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Retrieval" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems @("Range $($Data.timeRange)", "Dashboard v$($Data.version)") -ProjectRoot $ProjectRoot
 }
 
 function Convert-ToGatewayStatusHTML {
@@ -200,7 +254,7 @@ function Convert-ToFederationStatusHTML {
 }
 
 function Convert-ToGraphHTML {
-    param($Data, $Theme)
+    param($Data, $Theme, [string]$ProjectRoot = '')
     
     $sections = @(Convert-GraphToHtmlSection -Data $Data -ThemeColors $script:HtmlThemes[$Theme])
     
@@ -223,5 +277,5 @@ function renderMermaid(selector) {
 document.addEventListener('DOMContentLoaded', function() { renderMermaid('.mermaid'); });
     </script>
 "@
-    return New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Cross-Pack Graph" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems @("Dashboard v$($Data.version)", "Generated $($Data.generatedAt)") -ExtraHead $graphHead
+    return New-DashboardHtmlDocument -Title "$($script:ProductBrandName) Cross-Pack Graph" -Subtitle $script:ProductBrandTagline -Sections $sections -Theme $Theme -MetaItems @("Dashboard v$($Data.version)", "Generated $($Data.generatedAt)") -ExtraHead $graphHead -ProjectRoot $ProjectRoot
 }
