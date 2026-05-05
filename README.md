@@ -1,300 +1,409 @@
-# 🧠 Repo Cortex
+# Repo Cortex
 
 <p align="center">
-  <img src="repo_cortex_transparent_logo.png" alt="Repo Cortex logo" width="200"/>
+  <img src="repo_cortex_transparent_logo.png" alt="Repo Cortex logo" width="220"/>
 </p>
 
-[![Version](https://img.shields.io/badge/version-0.9.6-blue.svg)](VERSION)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Packs](https://img.shields.io/badge/domain%20packs-10-green.svg)](#domain-packs)
-[![Parsers](https://img.shields.io/badge/extraction%20parsers-30-orange.svg)](#platform-scope)
-[![PowerShell Modules](https://img.shields.io/badge/PowerShell%20modules-220-blue.svg)](#platform-scope)
-[![Golden Tasks](https://img.shields.io/badge/golden%20tasks-60-purple.svg)](#testing)
-[![Certification](https://img.shields.io/badge/release%20certification-passing-brightgreen.svg)](scripts/Invoke-ReleaseCertification.ps1)
-[![Preflight](https://img.shields.io/badge/release%20preflight-passing-brightgreen.svg)](tools/release/test-release-prereqs.ps1)
+<p align="center">
+  <strong>PowerShell-native workflow infrastructure for AI-assisted development, retrieval, governance, MCP tooling, and persistent project memory.</strong>
+</p>
 
-> Unified toolkit for AI-assisted development — indexing, orchestration, vector memory, and LLM workflow automation.
+<p align="center">
+  <a href="VERSION"><img src="https://img.shields.io/badge/version-0.9.6-blue.svg" alt="Version 0.9.6"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT license"/></a>
+  <a href="#platform-scope"><img src="https://img.shields.io/badge/domain%20packs-10-green.svg" alt="10 domain packs"/></a>
+  <a href="#platform-scope"><img src="https://img.shields.io/badge/parsers-30-orange.svg" alt="30 extraction parsers"/></a>
+  <a href="#certification"><img src="https://img.shields.io/badge/release%20certification-passing-brightgreen.svg" alt="Release certification passing"/></a>
+</p>
 
-> **Formerly:** CodeMunch · ContextLattice · MemPalace (All-in-One)
+Repo Cortex is the product identity for the toolkit previously described as **CodeMunch + ContextLattice + MemPalace (All-in-One)**. The underlying module is still named `LLMWorkflow`, and the command surface intentionally keeps familiar aliases such as `llmup`, `llmcheck`, `llmheal`, and `llmdashboard`.
 
----
+> **Formerly:** CodeMunch + ContextLattice + MemPalace (All-in-One)
 
-## Project Status
-
-**Current Version:** `0.9.6` · **Target:** `v1.0-RC1` · **Branch:** `ci-fixes-attempt`
-
-This repository has completed **post-0.9.6 hardening and release-state reconciliation**. All critical blockers and high-severity findings identified in the May 2026 audit have been resolved and verified.
-
-The repository passed the full [**v1.0 Release Certification Suite**](scripts/Invoke-ReleaseCertification.ps1) on 2026-05-04.
-
-| Severity | Original | Resolved | Status |
-|----------|----------|----------|--------|
-| Blocker | 6 | 6 | **CLOSED** - All critical runtime and contract blockers resolved |
-| High | 6 | 6 | **CLOSED** - Implementation and documentation drift remediated |
-
-The [**AAA Production Release Audit**](AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md) and [**Remediation Plan**](AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md) are now fully addressed.
+The short version: Repo Cortex gives a project a repeatable AI-workflow backbone. It can bootstrap local workflow assets, index code, wire memory sync, run structured extraction, govern MCP/tool exposure, evaluate answer quality, and certify release readiness.
 
 ---
 
-## What's New (2026-05-04 Release Remediation)
+## Contents
 
-### Governance & Golden Task Fixes
-- **`Invoke-LLMQuery`** rewritten with `-Offline` simulation mode, real provider resolution via `Resolve-ProviderProfile` when env vars are set, and clear error messages when no executor is available
-- **`Save-GoldenTaskResult`** fixed for PS 5.1 compatibility (replaced `ConvertFrom-Json -AsHashtable` with `ConvertFrom-Json` + `ConvertTo-Hashtable`)
-- **`Get-LLMWorkflowPalaces`** fixed for PS 5.1 compatibility in module loader
-
-### New Test Coverage
-- `tests/ModuleExportSurface.Tests.ps1` — validates every exported function and alias resolves at module load
-- `tests/GoldenTaskExecution.Tests.ps1` — tests offline mode, error paths, and PS 5.1 result persistence
-- `tests/BuildOrchestration.Tests.ps1` — validates build/CI/release tooling and security script presence
-
-### Release Certification Hardened
-- `scripts/Invoke-ReleaseCertification.ps1` — added `-Strict` mode with mojibake detection, stale artifact checks, module export/alias parity validation, build orchestrator existence checks, and Pester smoke test validation
-- `tools/release/test-release-prereqs.ps1` — new release preflight script verifying VERSION/manifest/lock/changelog agreement
-
-### Full Remediation Report
-See [`what_should_be_done_release_plan_2026-05-04.md`](what_should_be_done_release_plan_2026-05-04.md) for the complete phase-by-phase account.
+- [What It Does](#what-it-does)
+- [Quick Start](#quick-start)
+- [Core Commands](#core-commands)
+- [Architecture](#architecture)
+- [Platform Scope](#platform-scope)
+- [Domain Packs](#domain-packs)
+- [Memory And Orchestration](#memory-and-orchestration)
+- [Game-Team Workflow](#game-team-workflow)
+- [Testing](#testing)
+- [Certification](#certification)
+- [Repository Map](#repository-map)
+- [Documentation](#documentation)
 
 ---
 
-## What Is This?
+## What It Does
 
-**Repo Cortex** is a unified PowerShell-native toolkit that wires together three subsystems:
+Repo Cortex is organized around five practical jobs:
 
-- **Code indexing** — Project indexing, MCP wrapper setup, and searchable code context
-- **Orchestration** — Project bootstrap, orchestrator connectivity, and verification
-- **Vector memory** — Vector storage (ChromaDB) with incremental bridge sync to orchestrator
+| Job | What Repo Cortex Provides |
+|-----|---------------------------|
+| Bootstrap | Project setup, reusable templates, launcher aliases, environment checks |
+| Context | Code indexing, structured extraction, document ingestion, domain-pack registries |
+| Memory | Vector-memory bridge tooling, ChromaDB support, ContextLattice orchestrator integration |
+| Governance | Policy checks, human-review gates, golden tasks, provenance, release criteria |
+| Operations | Dashboards, self-healing diagnostics, security scans, SBOMs, certification reports |
 
-### Why Use This Toolkit?
-
-**For AI-Assisted Development**
-- **One-command bootstrap:** `llmup` scaffolds the entire toolchain
-- **Multi-provider LLM support:** OpenAI, Claude, Kimi, Gemini, GLM, and Ollama with auto-detection and alias env-var handling
-- **Memory persistence:** Vector memory + orchestrator bridge sync preserves project context across sessions
-- **Provider resolver hardening:** Explicit override fallback, base-URL precedence, and key-validation edge cases are covered
-
-**For Game Development**
-- **Game-team preset:** `llmup -GameTeam` scaffolds engine-aware project structure
-- **Asset management:** Manifests, license tracking, and game-team templates for Godot, RPG Maker MZ, Blender, and Unreal
-- **Jam mode:** Fast startup path for rapid prototyping
-- **Structured extraction:** Godot, RPG Maker, Blender, OpenAPI, shader, schema, YAML, JSON, SQL, and Docker parsers
-
-**For Operations and CI**
-- **Cross-platform CI:** Windows primary matrix (`powershell` / `pwsh`) with Linux/macOS experimental lanes
-- **Safe test runner:** `tools/ci/invoke-pester-safe.ps1`
-- **Docs-truth and drift guards:** Compatibility-lock validation, template-drift detection, docs validation
-- **Security baselines:** SBOM, secret-scan, vulnerability-scan, and security-baseline reports generated under [`security-reports/`](security-reports/)
+It is built for repositories that need more than a prompt folder. The platform treats AI-assisted development as an operational system with tests, policy, telemetry, release gates, and explicit evidence.
 
 ---
 
-## Platform Scope
+## Quick Start
 
-**220 PowerShell Modules**
+Requirements:
 
-| Area | Count |
-|------|------:|
-| Domain packs | 10 |
-| **PowerShell Modules** | 220 |
-| Exported functions | 54 |
-| Source scripts | 130+ |
-| **Extraction Parsers** | 30 |
-| Golden tasks | 60 |
-| Benchmark suites | 5 |
-| MCP tool surface | 38 |
+- PowerShell 5.1 or PowerShell 7+
+- Git
+- Python where bridge, ingestion, or local test helpers require it
+- Optional: Docker, ChromaDB, Ollama, and a reachable ContextLattice orchestrator
 
----
-
-## Architecture
-
-The platform is organized around a unified PowerShell workflow layer that coordinates indexing, verification, sync, extraction, retrieval, governance, and MCP tooling.
-
-Core lanes:
-- **Core infrastructure:** Run IDs, journaling, atomic writes, config, policy, execution modes, workspaces, visibility
-- **Pack framework:** Manifests, source registries, lockfiles, transactions, compatibility
-- **Extraction:** Domain-specific parsers and batch extraction support
-- **Retrieval and integrity:** Routing, confidence policy, answer planning, caveats, caching, incident bundles
-- **Governance:** Golden tasks, review gates, human annotations, replay, pack SLOs
-- **Expansion:** MCP, inter-pack pipelines, snapshots, external ingestion, federated memory
-
-For detailed architecture, see [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md).
-
----
-
-## Domain Packs
-
-| Pack | Status | Focus |
-|------|--------|-------|
-| `godot-engine` | [Promoted] | Godot engine development, GDScript, scenes, signals |
-| `blender-engine` | [Promoted] | Blender automation, operators, geometry nodes, export workflows |
-| `rpgmaker-mz` | [Promoted] | RPG Maker plugin development, conflict diagnosis, notetags |
-| `voice-audio-generation` | [Promoted] | Voice, TTS/STS, audio generation pipelines |
-| `agent-simulation` | [Promoted] | Agent workflows and simulation patterns |
-| `notebook-data-workflow` | [Promoted] | Notebook and data workflow extraction |
-| `ui-frontend-framework` | [Promoted] | UI/component and design-system workflows |
-| `api-reverse-tooling` | [Promoted] | API discovery, reverse engineering, documentation |
-| `ml-educational-reference` | [Promoted] | ML educational and reference content |
-| `engine-reference` | [Promoted] | Cross-engine patterns and migration guidance |
-
----
-
-## Installation
-
-### Recommended: module import
+Import the module from the repository:
 
 ```powershell
 Import-Module .\module\LLMWorkflow\LLMWorkflow.psd1 -Force
+```
+
+Install launcher assets:
+
+```powershell
 Install-LLMWorkflow -NoProfileUpdate
 ```
 
-Then in any project:
+Bootstrap or check a project:
 
 ```powershell
-Invoke-LLMWorkflowUp
-# alias
 llmup
+llmcheck
 ```
 
-### Global script install
+Run the dashboard:
 
 ```powershell
-.\tools\workflow\install-global-llm-workflow.ps1
+llmdashboard
 ```
 
-### Uninstall
+Uninstall launcher/profile integration:
 
 ```powershell
-Uninstall-LLMWorkflow
-# alias
 llmdown
 ```
 
 ---
 
-## Common Commands
+## Core Commands
 
-| Command | Purpose |
-|---------|---------|
-| `llmup` | Bootstrap project workflow |
-| `llmcheck` | Validate setup |
-| `llmver` | Show version |
-| `llmupdate` | Update toolkit |
-| `llmdashboard` | Interactive dashboard |
-| `llmheal` | Self-healing diagnostics |
+| Command | Full Function | Purpose |
+|---------|---------------|---------|
+| `llmup` | `Invoke-LLMWorkflowUp` | Bootstrap the workflow toolkit in a project |
+| `llmcheck` | `Test-LLMWorkflowSetup` | Validate prerequisites and optional connectivity |
+| `llmver` | `Get-LLMWorkflowVersion` | Show manifest/install version details |
+| `llmupdate` | `Update-LLMWorkflow` | Install a requested or latest release artifact |
+| `llmheal` | `Invoke-LLMWorkflowHeal` | Run issue detection and guided repair |
+| `llmdashboard` | `Show-LLMWorkflowDashboard` | Show local workflow health and activity |
+| `llmplugins` | `Get-LLMWorkflowPlugins` | Inspect registered plugins |
+| `llmpalaces` | `Get-LLMWorkflowPalaces` | Inspect configured memory palaces |
+| `llmsync` | `Sync-LLMWorkflowAllPalaces` | Sync configured memory sources |
 
-### Game Team Workflow
+The manifest exports 54 public functions plus the aliases above. See [`module/LLMWorkflow/LLMWorkflow.psd1`](module/LLMWorkflow/LLMWorkflow.psd1) for the exact export list.
+
+---
+
+## Architecture
+
+<p align="center">
+  <img src="repo_cortex_transparent_logo.png" alt="Repo Cortex logo" width="160"/>
+</p>
+
+Repo Cortex is a layered PowerShell module with templates, tools, policy artifacts, domain packs, and release automation around it.
+
+```text
+Repo Cortex
+├─ module/LLMWorkflow/       PowerShell module and public command surface
+├─ tools/                    Bootstrap, CodeMunch, ContextLattice, memory bridge, release, CI
+├─ packs/                    Domain pack manifests, registries, and MCP toolkit descriptors
+├─ policy/opa/               External policy artifacts
+├─ scripts/security/         Secret scan, SBOM, vulnerability scan, security baseline
+├─ scripts/release/          Release certification orchestration
+├─ docs/                     Architecture, operations, implementation, release state
+└─ tests/                    Pester suites and integration helpers
+```
+
+Main subsystems:
+
+| Subsystem | Files |
+|-----------|-------|
+| Core primitives | `module/LLMWorkflow/core/` |
+| Workflow orchestration | `module/LLMWorkflow/workflow/` |
+| Ingestion and extraction | `module/LLMWorkflow/ingestion/` |
+| Retrieval integrity | `module/LLMWorkflow/retrieval/` |
+| Governance | `module/LLMWorkflow/governance/` and `module/LLMWorkflow/contexts/Governance/` |
+| MCP | `module/LLMWorkflow/mcp/` |
+| Telemetry and dashboards | `module/LLMWorkflow/telemetry/` and `module/LLMWorkflow/contexts/Telemetry/` |
+| Game assets | `module/LLMWorkflow/contexts/GameAssets/` |
+| Healing | `module/LLMWorkflow/contexts/Healing/` |
+
+For detailed diagrams and flows, read [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) and [`docs/architecture/PLATFORM_OVERVIEW.md`](docs/architecture/PLATFORM_OVERVIEW.md).
+
+---
+
+## Platform Scope
+
+Current release-state metrics:
+
+| Metric | Count |
+|--------|------:|
+| Domain packs | 10 |
+| PowerShell modules | 220 |
+| Exported functions | 54 |
+| Extraction parsers | 30 |
+| Golden tasks | 60 |
+| MCP tool surface | 38 |
+| Benchmark suites | 5 |
+
+These counts are tracked in [`docs/releases/RELEASE_STATE.md`](docs/releases/RELEASE_STATE.md) and cross-checked by documentation-truth tooling.
+
+---
+
+## Domain Packs
+
+| Pack | Focus |
+|------|-------|
+| `godot-engine` | Godot scenes, GDScript, signals, engine workflows |
+| `blender-engine` | Blender Python, operators, geometry nodes, export workflows |
+| `rpgmaker-mz` | RPG Maker MZ plugin development, notetags, asset cataloging |
+| `voice-audio-generation` | Voice, TTS/STS, audio generation pipelines |
+| `agent-simulation` | Agent workflow and simulation patterns |
+| `notebook-data-workflow` | Notebook and data workflow extraction |
+| `ui-frontend-framework` | UI/component and design-system workflows |
+| `api-reverse-tooling` | API discovery, traffic capture, reverse tooling |
+| `ml-educational-reference` | ML educational and reference content |
+| `engine-reference` | Cross-engine patterns and migration guidance |
+
+Pack manifests live in [`packs/manifests/`](packs/manifests/). Source registries live in [`packs/registries/`](packs/registries/).
+
+---
+
+## Memory And Orchestration
+
+Repo Cortex keeps the old integration strengths under a clearer product umbrella:
+
+- **CodeMunch tooling**: project indexing and MCP wrapper setup
+- **ContextLattice tooling**: orchestrator configuration, connectivity verification, smoke write/search
+- **MemPalace bridge**: ChromaDB-backed local memory sync into the orchestrator
+
+Important paths:
+
+| Path | Purpose |
+|------|---------|
+| [`tools/codemunch/`](tools/codemunch/) | Index defaults, project bootstrap, indexing scripts |
+| [`tools/contextlattice/`](tools/contextlattice/) | Orchestrator env schema, bootstrap, verify script |
+| [`tools/memorybridge/`](tools/memorybridge/) | Memory bridge config, PowerShell wrapper, Python sync scripts |
+| [`.codemunch/`](.codemunch/) | Local/project CodeMunch config |
+| [`.contextlattice/`](.contextlattice/) | Local/project ContextLattice config |
+| [`.memorybridge/`](.memorybridge/) | Local/project bridge config |
+
+`docker-compose.yml` does not bundle a ContextLattice service by default. Set `CONTEXTLATTICE_ORCHESTRATOR_URL` to a reachable external orchestrator before relying on compose-based workflows.
+
+---
+
+## Game-Team Workflow
+
+Repo Cortex includes an engine-aware scaffold for game development:
 
 ```powershell
 llmup -GameTeam -GameTemplate "topdown-rpg" -GameEngine "Godot"
 llmup -GameTeam -JamMode
 ```
 
-Game-oriented structure includes:
+The game-team preset can create:
+
 - `docs/GDD.md`
 - `docs/TASKS.md`
 - `assets/ASSET_MANIFEST.json`
-- `assets/art`, `spritesheets`, `tilemaps`, `sfx`, `music`, `plugins`
+- `assets/art/`
+- `assets/spritesheets/`
+- `assets/tilemaps/`
+- `assets/sfx/`
+- `assets/music/`
+- `assets/plugins/`
 - `.llm-workflow/game-preset.json`
+
+Related commands:
+
+```powershell
+New-LLMWorkflowGamePreset
+Get-LLMWorkflowGameTemplates
+Export-LLMWorkflowAssetManifest
+Invoke-LLMWorkflowGameUp
+```
 
 ---
 
-## Plugin Architecture
+## Plugins
 
-Third-party tools can register through `.llm-workflow/plugins.json`.
+External tools can be registered with Repo Cortex through plugin manifests:
 
 ```powershell
 Register-LLMWorkflowPlugin -ManifestPath "tools/my-plugin/manifest.json"
 Get-LLMWorkflowPlugins
+Invoke-LLMWorkflowPlugins
 Unregister-LLMWorkflowPlugin -Name "my-plugin"
 ```
+
+An example plugin lives under [`tools/plugins/example-plugin/`](tools/plugins/example-plugin/).
 
 ---
 
 ## Testing
 
-The branch baseline is exercised through the full `tests/` envelope:
-
-- Full `tests/` execution via `tools/ci/invoke-pester-safe.ps1`
-- Windows CI matrix (`powershell` + `pwsh`)
-- Linux/macOS experimental Pester lanes
-- Install/bootstrap smoke
-- Docs-truth validation
-- Compatibility-lock validation
-- Template drift validation
-- Orchestrator integration lane
-
-### Local invocation
+Install Pester when needed:
 
 ```powershell
 Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+```
+
+Run the local suite through the safe wrapper:
+
+```powershell
 .\tools\ci\invoke-pester-safe.ps1 -Path .\tests -CI
 ```
 
-### Hardening now covered
-- Provider resolver priority order and `LLM_PROVIDER` override fallback
-- Alias environment variable handling (`MOONSHOT_API_KEY`, `GOOGLE_API_KEY`, `ZHIPU_API_KEY`)
-- Base-URL precedence and fallback (`OLLAMA_HOST` / `OLLAMA_BASE_URL`)
-- Curated-plugin compatibility fixtures (active, deprecated, quarantined, retired, mixed)
-- Primitive test suites (AtomicWrite, CommandContract, FileLock, Journal, StateFile, Workspace)
-- Golden Task Evaluations (60 Tasks)
-- Golden Task Coverage (60 Total)
-- 60 predefined validation scenarios
+Focused test examples:
 
-CI workflows:
-- `.github/workflows/ci.yml`
-- `.github/workflows/gitleaks.yml`
-- `.github/workflows/codeql.yml`
-- `.github/workflows/release.yml`
-- `.github/workflows/publish-gallery.yml`
-- `.github/workflows/supply-chain.yml`
-- `.github/workflows/docker-build.yml`
+```powershell
+.\tools\ci\invoke-pester-safe.ps1 -Path .\tests\CoreModule.Tests.ps1
+.\tools\ci\invoke-pester-safe.ps1 -Path .\tests\ReleaseCertification.Tests.ps1
+.\tools\ci\invoke-pester-safe.ps1 -Path .\tests\Integration.ContextLattice.Tests.ps1
+```
+
+Coverage areas include:
+
+- Module export surface and aliases
+- Provider resolver behavior
+- Primitive filesystem safety
+- Policy adapter and OPA fallback behavior
+- Retrieval routing, confidence, cache, and answer integrity
+- MCP governance
+- Document ingestion and extraction
+- Game asset manifests
+- Golden task execution
+- Security baseline checks
+- Release certification
 
 ---
 
-## Security & Compliance
+## Certification
 
-Current checked-in security evidence under [`security-reports/`](security-reports/) is not yet populated on this branch. Regenerate SBOM, secret-scan, security-baseline, and vulnerability-scan artifacts before treating this branch as release-ready.
+<p align="center">
+  <img src="repo_cortex_transparent_logo.png" alt="Repo Cortex logo" width="140"/>
+</p>
 
-Run certification locally:
+The current declared version is `0.9.6`, with v1.0 certification criteria tracked in [`docs/releases/V1_RELEASE_CRITERIA.md`](docs/releases/V1_RELEASE_CRITERIA.md).
+
+Run release certification:
 
 ```powershell
 .\scripts\Invoke-ReleaseCertification.ps1 -ProjectRoot .
 ```
 
+Run release certification with strict checks:
+
+```powershell
+.\scripts\Invoke-ReleaseCertification.ps1 -ProjectRoot . -Strict
+```
+
+Run release preflight:
+
+```powershell
+.\tools\release\test-release-prereqs.ps1 -ProjectRoot .
+```
+
+Certification reports are written to [`certification-reports/`](certification-reports/). Security reports are written to [`security-reports/`](security-reports/).
+
+The certification path checks documentation truth, branding assets, observability, module contracts, policy, ingestion, security, durable execution, MCP governance, container runtime configuration, retrieval backend implementation, and CI validation.
+
 ---
 
-## Release
+## Release Workflow
+
+Bump the module version:
 
 ```powershell
 .\tools\release\bump-module-version.ps1 -Version 0.10.0
-git add .
-git commit -m "Release 0.10.0"
+```
+
+Create and optionally push a release tag:
+
+```powershell
 .\tools\release\create-release-tag.ps1 -Push
 ```
 
-PowerShell Gallery publishing is automated on GitHub Release publish when `PSGALLERY_API_KEY` is configured in repository secrets.
+PowerShell Gallery publishing is handled by GitHub Release automation when `PSGALLERY_API_KEY` is configured as a repository secret.
 
 ---
 
-## Documentation Index
+## Repository Map
 
-| Document | Purpose |
-|----------|---------|
-| [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) | Canonical implementation progress tracker |
-| [`docs/implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md`](docs/implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md) | Post-0.9.6 execution plan |
-| [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md) | Exit criteria and backlog before v1.0 |
-| [`docs/implementation/CURRENT_TEST_BASELINE_AND_RESOLVER_HARDENING.md`](docs/implementation/CURRENT_TEST_BASELINE_AND_RESOLVER_HARDENING.md) | Test baseline and resolver hardening details |
-| [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | Detailed architecture diagrams and component explanations |
-| [`docs/architecture/PLATFORM_OVERVIEW.md`](docs/architecture/PLATFORM_OVERVIEW.md) | High-level platform overview |
-| [`docs/architecture/SECURITY_BASELINE.md`](docs/architecture/SECURITY_BASELINE.md) | Security baseline architecture |
-| [`docs/releases/V1_RELEASE_CRITERIA.md`](docs/releases/V1_RELEASE_CRITERIA.md) | v1.0 release criteria |
-| [`docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md`](docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md) | Release certification checklist |
-| [`AAA_RELEASE_AUDIT_REPORT.md`](AAA_RELEASE_AUDIT_REPORT.md) | AAA production release audit (2026-05-03) |
-| [`CHANGELOG.md`](CHANGELOG.md) · [`docs/releases/CHANGELOG.md`](docs/releases/CHANGELOG.md) | Change history |
+| Path | Purpose |
+|------|---------|
+| [`module/LLMWorkflow/`](module/LLMWorkflow/) | Main PowerShell module |
+| [`tools/workflow/`](tools/workflow/) | Install, bootstrap, doctor, and check scripts |
+| [`tools/ci/`](tools/ci/) | CI validation helpers |
+| [`tools/release/`](tools/release/) | Version and tag release helpers |
+| [`scripts/Invoke-ReleaseCertification.ps1`](scripts/Invoke-ReleaseCertification.ps1) | Certification engine |
+| [`scripts/security/`](scripts/security/) | SBOM, secret scan, vulnerability scan, security baseline |
+| [`packs/`](packs/) | Pack manifests, registries, MCP toolkit descriptors |
+| [`policy/opa/`](policy/opa/) | OPA-style policy bundles |
+| [`docs/architecture/`](docs/architecture/) | Architecture reference |
+| [`docs/operations/`](docs/operations/) | Operator guides and troubleshooting |
+| [`docs/releases/`](docs/releases/) | Release state, criteria, checklist, changelog |
+| [`tests/`](tests/) | Pester tests and fixtures |
 
 ---
 
-## Notes
+## Documentation
 
-- Keep secrets in local `.env` files and **never commit them**.
-- Use `CONTEXTLATTICE_ORCHESTRATOR_API_KEY` in `.env` or `.contextlattice/orchestrator.env` for orchestrator auth.
-- For deeper implementation state, see [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md).
+Start here:
+
+| Document | Why It Matters |
+|----------|----------------|
+| [`docs/architecture/PLATFORM_OVERVIEW.md`](docs/architecture/PLATFORM_OVERVIEW.md) | High-level platform model |
+| [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | Detailed architecture and flows |
+| [`docs/releases/RELEASE_STATE.md`](docs/releases/RELEASE_STATE.md) | Current release truth and metrics |
+| [`docs/releases/V1_RELEASE_CRITERIA.md`](docs/releases/V1_RELEASE_CRITERIA.md) | v1.0 exit criteria |
+| [`docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md`](docs/releases/RELEASE_CERTIFICATION_CHECKLIST.md) | Manual sign-off checklist |
+| [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) | Implementation progress tracker |
+| [`docs/implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md`](docs/implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md) | Strategic plan after 0.9.6 |
+| [`docs/operations/TROUBLESHOOTING.md`](docs/operations/TROUBLESHOOTING.md) | Diagnosis and recovery guide |
+| [`docs/architecture/SECURITY_BASELINE.md`](docs/architecture/SECURITY_BASELINE.md) | Security baseline model |
+| [`docs/reference/DOCS_TRUTH_MATRIX.md`](docs/reference/DOCS_TRUTH_MATRIX.md) | Documentation drift guardrail |
+
+---
+
+## Safety Notes
+
+- Keep secrets in local `.env` files and never commit them.
+- Use `CONTEXTLATTICE_ORCHESTRATOR_API_KEY` for orchestrator authentication.
+- Use `CONTEXTLATTICE_ORCHESTRATOR_URL` when running against an external ContextLattice service.
+- Treat generated reports as evidence artifacts and refresh them before release promotion.
+- Keep README, `VERSION`, module manifest, release state, and changelog aligned.
+
+---
+
+<p align="center">
+  <img src="repo_cortex_transparent_logo.png" alt="Repo Cortex logo" width="120"/>
+</p>
+
+<p align="center">
+  <strong>Repo Cortex</strong><br/>
+  Formerly CodeMunch + ContextLattice + MemPalace. Still the same useful machine, now with a cleaner name on the case.
+</p>
