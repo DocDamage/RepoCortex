@@ -1,6 +1,7 @@
-# LLM Workflow Architecture
+# Repo Cortex Architecture
 
-This document provides detailed architectural diagrams and explanations of the CodeMunch + ContextLattice + MemPalace integrated workflow system.
+This document provides detailed architectural diagrams and explanations of the Repo Cortex integrated workflow system (formerly CodeMunch + ContextLattice + MemPalace).
+
 
 ## Related Docs
 - [Post-0.9.6 Strategic Execution Plan](../implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)

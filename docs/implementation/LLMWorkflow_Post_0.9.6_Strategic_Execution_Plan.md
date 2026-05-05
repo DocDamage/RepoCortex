@@ -1,4 +1,5 @@
-# LLM Workflow - Post-0.9.6 Strategic Execution Plan
+# Repo Cortex - Post-0.9.6 Strategic Execution Plan
+
 
 ## Document Purpose
 

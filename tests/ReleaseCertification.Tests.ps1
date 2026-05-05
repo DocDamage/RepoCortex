@@ -1,7 +1,8 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-    Release certification tests for LLMWorkflow v1.0 readiness.
+    Release certification tests for Repo Cortex (LLMWorkflow) v1.0 readiness.
+
 
 .DESCRIPTION
     Pester v5 test suite that certifies release readiness by verifying the
@@ -69,6 +70,30 @@ Describe "Documentation Truth" {
             $path = Join-Path $script:DocsRoot ($subdir + '\' + $doc)
             Test-Path -LiteralPath $path | Should -Be $true -Because "'$doc' should exist in docs/$subdir/"
         }
+    }
+}
+
+Describe "Branding" {
+    It "README uses Repo Cortex as the product brand and displays the logo" {
+        $readmePath = Join-Path $script:ProjectRoot "README.md"
+        $readme = Get-Content -LiteralPath $readmePath -Raw
+
+        $readme | Should -Match '(?m)^# .*\bRepo Cortex\b'
+        $readme | Should -Match '<img\s+[^>]*src="repo_cortex_transparent_logo\.png"[^>]*alt="Repo Cortex logo"'
+        $readme | Should -Match '\*\*Formerly:\*\* CodeMunch'
+    }
+
+    It "root logo asset exists and is a PNG" {
+        $logoPath = Join-Path $script:ProjectRoot "repo_cortex_transparent_logo.png"
+        Test-Path -LiteralPath $logoPath | Should -Be $true
+
+        $logoBytes = [System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $logoPath).Path)
+        $pngHeader = $logoBytes[0..7]
+        $pngHeader | Should -Be @(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+    }
+
+    It "release certification includes the branding gate" {
+        Test-BrandingAssets -ProjectRoot $script:ProjectRoot | Should -Be $true
     }
 }
 

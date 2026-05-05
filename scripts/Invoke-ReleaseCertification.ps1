@@ -1,12 +1,13 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-    Runs the full v1.0 release certification suite for LLMWorkflow.
+    Runs the full v1.0 release certification suite for Repo Cortex (LLMWorkflow module).
 
 .DESCRIPTION
     Evaluates release readiness across all categories defined in
     docs/V1_RELEASE_CRITERIA.md and produces structured JSON and Markdown
     certification reports.
+
 
     Functions:
     - Invoke-ReleaseCertification: runs all checks and outputs a report
@@ -162,6 +163,55 @@ function Test-RetrievalBackendImplementation {
     return $true
 }
 
+function Test-BrandingAssets {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProjectRoot
+    )
+
+    $readmePath = Join-Path $ProjectRoot "README.md"
+    $logoPath = Join-Path $ProjectRoot "repo_cortex_transparent_logo.png"
+
+    if (-not (Test-Path -LiteralPath $readmePath)) {
+        return $false
+    }
+    if (-not (Test-Path -LiteralPath $logoPath)) {
+        return $false
+    }
+
+    $readme = Get-Content -LiteralPath $readmePath -Raw -ErrorAction SilentlyContinue
+    if ([string]::IsNullOrWhiteSpace($readme)) {
+        return $false
+    }
+
+    $hasBrandTitle = $readme -match '(?m)^# .*\bRepo Cortex\b'
+    $hasLogoReference = $readme -match '<img\s+[^>]*src="repo_cortex_transparent_logo\.png"[^>]*alt="Repo Cortex logo"'
+    $hasFormerNameDisclosure = $readme -match '\*\*Formerly:\*\* CodeMunch'
+
+    try {
+        $logoBytes = [System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $logoPath).Path)
+    }
+    catch {
+        return $false
+    }
+
+    $hasPngHeader = (
+        $logoBytes.Count -ge 8 -and
+        $logoBytes[0] -eq 0x89 -and
+        $logoBytes[1] -eq 0x50 -and
+        $logoBytes[2] -eq 0x4E -and
+        $logoBytes[3] -eq 0x47 -and
+        $logoBytes[4] -eq 0x0D -and
+        $logoBytes[5] -eq 0x0A -and
+        $logoBytes[6] -eq 0x1A -and
+        $logoBytes[7] -eq 0x0A
+    )
+
+    return ($hasBrandTitle -and $hasLogoReference -and $hasFormerNameDisclosure -and $hasPngHeader)
+}
+
 function Get-CertificationStatus {
     [CmdletBinding()]
     [OutputType([string])]
@@ -225,6 +275,7 @@ function Test-ReleaseCriteria {
     $composePath = Join-Path $ProjectRoot "docker-compose.yml"
     $buildRoot = Join-Path $ProjectRoot "tools\build"
     $testRoot = Join-Path $ProjectRoot "tests"
+    $branding = Test-BrandingAssets -ProjectRoot $ProjectRoot
 
     # --- Documentation Truth ---
     $versionPath = Join-Path $ProjectRoot "VERSION"
@@ -467,6 +518,7 @@ function Test-ReleaseCriteria {
 
     $overallPassed = (
         $documentationTruth -and
+        $branding -and
         $observability -and
         $moduleContracts -and
         $policy -and
@@ -486,6 +538,7 @@ function Test-ReleaseCriteria {
         OverallPassed = $overallPassed
         Categories = [ordered]@{
             DocumentationTruth = $documentationTruth
+            Branding = $branding
             Observability = $observability
             ModuleContracts = $moduleContracts
             Policy = $policy

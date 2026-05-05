@@ -1,4 +1,8 @@
-# CodeMunch + ContextLattice + MemPalace (All-in-One)
+# 🧠 Repo Cortex
+
+<p align="center">
+  <img src="repo_cortex_transparent_logo.png" alt="Repo Cortex logo" width="200"/>
+</p>
 
 [![Version](https://img.shields.io/badge/version-0.9.6-blue.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -9,7 +13,9 @@
 [![Certification](https://img.shields.io/badge/release%20certification-passing-brightgreen.svg)](scripts/Invoke-ReleaseCertification.ps1)
 [![Preflight](https://img.shields.io/badge/release%20preflight-passing-brightgreen.svg)](tools/release/test-release-prereqs.ps1)
 
-> Canonical toolkit repo for the integrated CodeMunch · ContextLattice · MemPalace workflow.
+> Unified toolkit for AI-assisted development — indexing, orchestration, vector memory, and LLM workflow automation.
+
+> **Formerly:** CodeMunch · ContextLattice · MemPalace (All-in-One)
 
 ---
 
@@ -17,7 +23,7 @@
 
 **Current Version:** `0.9.6` · **Target:** `v1.0-RC1` · **Branch:** `ci-fixes-attempt`
 
-This repository has successfully completed **post-0.9.6 hardening and release-state reconciliation**. All critical blockers and high-severity findings identified in the May 2024 audit have been resolved and verified.
+This repository has completed **post-0.9.6 hardening and release-state reconciliation**. All critical blockers and high-severity findings identified in the May 2026 audit have been resolved and verified.
 
 The repository passed the full [**v1.0 Release Certification Suite**](scripts/Invoke-ReleaseCertification.ps1) on 2026-05-04.
 
@@ -28,7 +34,7 @@ The repository passed the full [**v1.0 Release Certification Suite**](scripts/In
 
 The [**AAA Production Release Audit**](AAA_PRODUCTION_RELEASE_AUDIT_2026-05-04_LOCAL.md) and [**Remediation Plan**](AAA_PRODUCTION_RELEASE_REMEDIATION_PLAN_2026-05-04.md) are now fully addressed.
 
-> **Release Candidate Note:** This branch (`ci-fixes-attempt`) is now considered the **v1.0 Release Candidate**. Release truth, container wiring, retrieval implementation, certification depth, and governance execution paths are now verified.
+---
 
 ## What's New (2026-05-04 Release Remediation)
 
@@ -51,26 +57,20 @@ See [`what_should_be_done_release_plan_2026-05-04.md`](what_should_be_done_relea
 
 ---
 
-## Docker Compose note
-[`docker-compose.yml`](docker-compose.yml) does not bundle a `contextlattice` service. Set `CONTEXTLATTICE_ORCHESTRATOR_URL` to a reachable external orchestrator before running the compose stack.
-
-
----
-
 ## What Is This?
 
-A unified PowerShell-native toolkit that wires together three subsystems:
+**Repo Cortex** is a unified PowerShell-native toolkit that wires together three subsystems:
 
-- **CodeMunch** — Project indexing, MCP wrapper setup, and searchable code context
-- **ContextLattice** — Project bootstrap, orchestrator connectivity, and verification
-- **MemPalace** — Vector storage (ChromaDB) with incremental bridge sync to ContextLattice
+- **Code indexing** — Project indexing, MCP wrapper setup, and searchable code context
+- **Orchestration** — Project bootstrap, orchestrator connectivity, and verification
+- **Vector memory** — Vector storage (ChromaDB) with incremental bridge sync to orchestrator
 
 ### Why Use This Toolkit?
 
 **For AI-Assisted Development**
 - **One-command bootstrap:** `llmup` scaffolds the entire toolchain
 - **Multi-provider LLM support:** OpenAI, Claude, Kimi, Gemini, GLM, and Ollama with auto-detection and alias env-var handling
-- **Memory persistence:** MemPalace + ContextLattice bridge sync preserves project context across sessions
+- **Memory persistence:** Vector memory + orchestrator bridge sync preserves project context across sessions
 - **Provider resolver hardening:** Explicit override fallback, base-URL precedence, and key-validation edge cases are covered
 
 **For Game Development**
@@ -220,7 +220,7 @@ The branch baseline is exercised through the full `tests/` envelope:
 - Docs-truth validation
 - Compatibility-lock validation
 - Template drift validation
-- ContextLattice integration lane
+- Orchestrator integration lane
 
 ### Local invocation
 
@@ -281,7 +281,6 @@ PowerShell Gallery publishing is automated on GitHub Release publish when `PSGAL
 |----------|---------|
 | [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md) | Canonical implementation progress tracker |
 | [`docs/implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md`](docs/implementation/LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md) | Post-0.9.6 execution plan |
-| [`docs/implementation/TECHNICAL_DEBT_AUDIT.md`](docs/implementation/TECHNICAL_DEBT_AUDIT.md) | Technical debt findings |
 | [`docs/implementation/REMAINING_WORK.md`](docs/implementation/REMAINING_WORK.md) | Exit criteria and backlog before v1.0 |
 | [`docs/implementation/CURRENT_TEST_BASELINE_AND_RESOLVER_HARDENING.md`](docs/implementation/CURRENT_TEST_BASELINE_AND_RESOLVER_HARDENING.md) | Test baseline and resolver hardening details |
 | [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | Detailed architecture diagrams and component explanations |
@@ -297,5 +296,5 @@ PowerShell Gallery publishing is automated on GitHub Release publish when `PSGAL
 ## Notes
 
 - Keep secrets in local `.env` files and **never commit them**.
-- Use `CONTEXTLATTICE_ORCHESTRATOR_API_KEY` in `.env` or `.contextlattice/orchestrator.env` for ContextLattice auth.
+- Use `CONTEXTLATTICE_ORCHESTRATOR_API_KEY` in `.env` or `.contextlattice/orchestrator.env` for orchestrator auth.
 - For deeper implementation state, see [`docs/implementation/PROGRESS.md`](docs/implementation/PROGRESS.md).

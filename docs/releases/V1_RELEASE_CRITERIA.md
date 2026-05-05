@@ -1,4 +1,5 @@
-# v1.0 Release Criteria
+# v1.0 Release Criteria — Repo Cortex
+
 
 > Workstream 8: v1.0 Certification and Release Discipline  
 > Version: 1.0.0  

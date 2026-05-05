@@ -9,7 +9,7 @@
     Author = 'DocDamage'
     CompanyName = 'DocDamage'
     Copyright = '(c) DocDamage. All rights reserved.'
-    Description = 'All-in-one workflow module for CodeMunch Pro, ContextLattice, and MemPalace. Phase 5 Cross-Pack Arbitration - Multi-pack query routing, authority scoring, dispute sets, and answer labeling.'
+    Description = 'Repo Cortex — All-in-one workflow module for AI-assisted development: indexing, orchestration, vector memory, governance, and LLM workflow automation.'
     PowerShellVersion = '5.1'
     FunctionsToExport = @(
         'Invoke-LLMWorkflowUp', 'Uninstall-LLMWorkflow', 'Install-LLMWorkflow', 'Update-LLMWorkflow', 
@@ -42,11 +42,10 @@
     VariablesToExport = @()
     PrivateData = @{
         PSData = @{
-            Tags = @('CodeMunch', 'ContextLattice', 'MemPalace', 'workflow', 'RPGMaker', 'Godot', 'Blender', 'pack-framework')
+            Tags = @('RepoCortex', 'workflow', 'RPGMaker', 'Godot', 'Blender', 'pack-framework', 'llm')
             ProjectUri = 'https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one'
             LicenseUri = 'https://github.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/blob/main/LICENSE'
-            ReleaseNotes = 'v0.9.6: Technical debt reduction, consolidation of extraction/MCP modules, bounded context and testing portability improvements.'
+            ReleaseNotes = 'v0.9.6: Rebranded to Repo Cortex. Technical debt reduction, consolidation of extraction/MCP modules, bounded context and testing portability improvements.'
         }
     }
 }
-

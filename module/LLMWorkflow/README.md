@@ -1,4 +1,5 @@
-# LLMWorkflow PowerShell Module
+# LLMWorkflow Module (Repo Cortex)
+
 
 Exports:
 

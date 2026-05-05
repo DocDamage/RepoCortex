@@ -1,8 +1,9 @@
-# Implementation Progress
+# Repo Cortex — Implementation Progress
 
-This document tracks implementation progress against the post-0.9.6 architecture and release-hardening plan.
+This document tracks implementation progress against the post-0.9.6 architecture and release-hardening plan for Repo Cortex.
 
 ## Related Docs
+
 - [Post-0.9.6 Strategic Execution Plan](./LLMWorkflow_Post_0.9.6_Strategic_Execution_Plan.md)
 - [Technical Debt Audit Summary](./TECHNICAL_DEBT_AUDIT.md)
 - [Remaining Work](./REMAINING_WORK.md)
