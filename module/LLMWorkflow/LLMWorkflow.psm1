@@ -1589,6 +1589,11 @@ Set-Alias -Name llmpalaces -Value Get-LLMWorkflowPalaces
 Set-Alias -Name llmsync -Value Sync-LLMWorkflowAllPalaces
 Set-Alias -Name llmdashboard -Value Show-LLMWorkflowDashboard
 Set-Alias -Name llmheal -Value Invoke-LLMWorkflowHeal
+Set-Alias -Name llmnext -Value Get-LLMWorkflowNextAction
+Set-Alias -Name llmcockpit -Value Export-LLMWorkflowCockpit
+Set-Alias -Name llmpacknew -Value New-LLMWorkflowPackScaffold
+Set-Alias -Name llmcorpus -Value Invoke-LLMWorkflowCorpusRegression
+Set-Alias -Name llmsecx -Value Test-LLMWorkflowSecurityExceptions
 
 function Get-GoldenTasks {
     [CmdletBinding()]
@@ -1665,6 +1670,9 @@ Export-ModuleMember -Function @(
     'Show-LLMWorkflowDashboard',
     'Show-PackHealthDashboard', 'Show-RetrievalActivityDashboard', 'Show-CrossPackGraph',
     'Show-MCPGatewayStatus', 'Show-FederationStatus', 'Export-DashboardHTML',
+    'Get-LLMWorkflowNextAction', 'Export-LLMWorkflowEvidenceReport', 'New-LLMWorkflowPackScaffold',
+    'Invoke-LLMWorkflowCorpusRegression', 'Test-LLMWorkflowSecurityExceptions',
+    'Export-LLMWorkflowCockpit', 'Update-LLMWorkflowProject',
     # Plugins
     'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins',
     # Palaces
@@ -1687,6 +1695,6 @@ Export-ModuleMember -Function @(
     'Start-InteractiveConfig', 'ConvertFrom-NaturalLanguageConfig',
     # Game team
     'New-LLMWorkflowGamePreset', 'Get-LLMWorkflowGameTemplates', 'Export-LLMWorkflowAssetManifest', 'Invoke-LLMWorkflowGameUp'
-) -Alias llmup, llmdown, llmcheck, llmver, llmupdate, llmplugins, llmpalaces, llmsync, llmdashboard, llmheal
+) -Alias llmup, llmdown, llmcheck, llmver, llmupdate, llmplugins, llmpalaces, llmsync, llmdashboard, llmheal, llmnext, llmcockpit, llmpacknew, llmcorpus, llmsecx
 
 

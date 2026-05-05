@@ -115,6 +115,18 @@ This checklist must be completed and signed off before a release candidate can b
 | 8.5 | Build orchestration tests exist and pass | QA Owner | `tests/BuildOrchestration.Tests.ps1` | Pending |
 | 8.6 | Test coverage is documented or measured | QA Owner | Coverage report or test inventory | Pending |
 
+## 8.5. Operator Experience
+
+| # | Check | Owner | Evidence | Status |
+|---|-------|-------|----------|--------|
+| 8.5.1 | Next-action ranking command is exported and tested | Workflow Owner | `Get-LLMWorkflowNextAction`, `tests/OperatorExperience.Tests.ps1` | Pending |
+| 8.5.2 | Evidence explorer report export is available | Retrieval Owner | `Export-LLMWorkflowEvidenceReport` | Pending |
+| 8.5.3 | Pack authoring scaffold command is available | Pack Owner | `New-LLMWorkflowPackScaffold` | Pending |
+| 8.5.4 | Corpus regression harness is available | QA Owner | `Invoke-LLMWorkflowCorpusRegression` | Pending |
+| 8.5.5 | Security exception ledger validation is available | Security Owner | `Test-LLMWorkflowSecurityExceptions` | Pending |
+| 8.5.6 | Local cockpit export is available | Operations Owner | `Export-LLMWorkflowCockpit` | Pending |
+| 8.5.7 | Project migration planning is available | Release Lead | `Update-LLMWorkflowProject -Plan` | Pending |
+
 
 ## 9. Cross-Workstream Gates
 

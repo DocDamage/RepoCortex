@@ -22,11 +22,11 @@ This document tracks implementation progress against the post-0.9.6 architecture
 | Phase 7 | Platform expansion (MCP, inter-pack, federation) | Complete | 100% |
 | Phase 8 | Extended packs | Complete | 100% |
 
-**Last Updated:** 2026-05-04 (release remediation completed)
+**Last Updated:** 2026-05-05 (operator experience expansion)
 
 
 **Current Version:** 0.9.6  
-**PowerShell Modules:** 220  
+**PowerShell Modules:** 227
 **Domain Packs:** 10  
 **Extraction Parsers:** 30  
 **Golden Tasks:** 60  
@@ -64,6 +64,7 @@ Documented head work includes:
 - RPG Maker asset catalog parsing for `img/*`, `audio/*`, and `js/plugins`
 - resolver hardening around provider selection, alias env vars, override fallback, and base URL precedence
 - curated-plugin compatibility fixtures with richer active/deprecated/quarantined/retired/mixed-state coverage
+- operator experience commands for next-action ranking, evidence reports, pack scaffolding, corpus regression, security exception ledgers, cockpit export, and migration planning
 
 Strategic emphasis has shifted from raw expansion toward:
 - release-state reconciliation

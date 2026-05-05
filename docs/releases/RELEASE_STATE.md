@@ -10,7 +10,7 @@
 - [Remaining Work](../implementation/REMAINING_WORK.md)
 - [Documentation Truth Matrix](../reference/DOCS_TRUTH_MATRIX.md)
 
-**Last Updated:** 2026-05-04
+**Last Updated:** 2026-05-05
 
 ## Release State Labels
 
@@ -27,7 +27,7 @@
 |-----------|-------|-------|
 | Core infrastructure (Phase 1) | released | Journaling, locking, config, policy, execution modes |
 | Pack framework (Phase 2) | released | Manifests, source registries, transactions |
-| Operator workflow (Phase 3) | documented-head | Health scores, planner, and git hooks are present, but compatibility enforcement still contains placeholder drift/version checks |
+| Operator workflow (Phase 3) | documented-head | Health scores, planner, git hooks, next-action ranking, cockpit export, evidence reports, corpus regression, pack scaffolding, security exception ledger checks, and migration planning are present |
 | Structured extraction (Phase 4) | released | 30 parsers across code and asset formats |
 | Retrieval and answer integrity (Phase 5) | released | Query routing, arbitration, and evidence exist; real Qdrant (REST) and LanceDB (file) adapters implemented |
 | Human trust and governance (Phase 6) | released | Annotations, SLOs, review gates, golden tasks |
@@ -48,7 +48,7 @@
 These definitions are used to keep counts consistent across README, PROGRESS, and canonical docs.
 
 - **PowerShell Module**: A `.ps1` file under `module/LLMWorkflow/` that exports functions and is not a test file or template helper.
-  - Current count: **220**
+  - Current count: **227**
 - **Domain Pack**: A JSON manifest under `packs/manifests/` with a matching source registry.
   - Current count: **10**
 - **Extraction Parser**: A parser or extractor module under `module/LLMWorkflow/ingestion/parsers/` whose filename ends in `Parser.ps1` or `Extractor.ps1`.
@@ -63,8 +63,8 @@ These definitions are used to keep counts consistent across README, PROGRESS, an
 | Date | Version | Change |
 |------|---------|--------|
 | 2026-05-04 | 0.9.6 | **Release remediation completed** — Governance/GoldenTask execution fixes, PS 5.1 compatibility, release certification tightened with `-Strict` mode, new export surface/golden task/build orchestration tests, release preflight script, remediation report produced. See [`what_should_be_done_release_plan_2026-05-04.md`](../../what_should_be_done_release_plan_2026-05-04.md) |
+| 2026-05-05 | 0.9.6 | Added operator experience commands for next-action ranking, evidence exploration, pack scaffolding, corpus regression, security exception ledgers, cockpit export, and migration planning |
 | 2026-04-13 | 0.9.6 | Added remediation status alignment across README, progress, audit, remaining work, and strategic plan |
 | 2026-04-13 | 0.9.6 | Added release-state documentation and truth reconciliation |
 | 2026-04-14 | 0.9.6 | Reconciled version drift and released vs documented-head wording across top-level docs; fixed parser count to 30 and added CHANGELOG to truth matrix |
-
 

@@ -11,7 +11,7 @@
 <p align="center">
   <a href="VERSION"><img src="https://img.shields.io/badge/version-0.9.6-blue.svg" alt="Version 0.9.6"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT license"/></a>
-  <a href="#platform-scope"><img src="https://img.shields.io/badge/PowerShell%20modules-220-blue.svg" alt="220 PowerShell modules"/></a>
+  <a href="#platform-scope"><img src="https://img.shields.io/badge/PowerShell%20modules-227-blue.svg" alt="227 PowerShell modules"/></a>
   <a href="#platform-scope"><img src="https://img.shields.io/badge/domain%20packs-10-green.svg" alt="10 domain packs"/></a>
   <a href="#platform-scope"><img src="https://img.shields.io/badge/parsers-30-orange.svg" alt="30 extraction parsers"/></a>
   <a href="#certification"><img src="https://img.shields.io/badge/release%20certification-passing-brightgreen.svg" alt="Release certification passing"/></a>
@@ -30,6 +30,7 @@ The short version: Repo Cortex gives a project a repeatable AI-workflow backbone
 - [What It Does](#what-it-does)
 - [Quick Start](#quick-start)
 - [Core Commands](#core-commands)
+- [Operator Experience](#operator-experience)
 - [Architecture](#architecture)
 - [Platform Scope](#platform-scope)
 - [Domain Packs](#domain-packs)
@@ -114,7 +115,25 @@ llmdown
 | `llmpalaces` | `Get-LLMWorkflowPalaces` | Inspect configured memory palaces |
 | `llmsync` | `Sync-LLMWorkflowAllPalaces` | Sync configured memory sources |
 
-The manifest exports 54 public functions plus the aliases above. See [`module/LLMWorkflow/LLMWorkflow.psd1`](module/LLMWorkflow/LLMWorkflow.psd1) for the exact export list.
+The manifest exports 86 public functions plus the aliases above. See [`module/LLMWorkflow/LLMWorkflow.psd1`](module/LLMWorkflow/LLMWorkflow.psd1) for the exact export list.
+
+---
+
+## Operator Experience
+
+Repo Cortex now includes a practical operator layer for deciding what matters next, inspecting evidence, and extending the platform without hand-assembling release artifacts.
+
+| Command | Full Function | Purpose |
+|---------|---------------|---------|
+| `llmnext` | `Get-LLMWorkflowNextAction` | Rank the next operational action from version, certification, and security evidence |
+| `llmcockpit` | `Export-LLMWorkflowCockpit` | Export a local HTML cockpit with health, next action, and release evidence |
+| `llmpacknew` | `New-LLMWorkflowPackScaffold` | Scaffold a governed pack manifest, source registry, and golden task stub |
+| `llmcorpus` | `Invoke-LLMWorkflowCorpusRegression` | Run file-backed real-corpus regression cases and write a report |
+| `llmsecx` | `Test-LLMWorkflowSecurityExceptions` | Validate the structured security exception ledger |
+| n/a | `Export-LLMWorkflowEvidenceReport` | Export answer trace/evidence reports as JSON and HTML |
+| n/a | `Update-LLMWorkflowProject` | Plan or apply local project migrations from older layouts |
+
+When a project contains a `ModernUI/` asset folder, `Export-LLMWorkflowCockpit` automatically embeds the available ModernUI PNG assets into the exported HTML so the cockpit carries the Repo Cortex app visual style without external file dependencies.
 
 ---
 
@@ -160,13 +179,13 @@ For detailed diagrams and flows, read [`docs/architecture/ARCHITECTURE.md`](docs
 
 Current release-state metrics:
 
-**220 PowerShell Modules**
+**227 PowerShell Modules**
 
 | Metric | Count |
 |--------|------:|
 | Domain packs | 10 |
-| PowerShell modules | 220 |
-| Exported functions | 54 |
+| PowerShell modules | 227 |
+| Exported functions | 86 |
 | **Extraction Parsers** | 30 |
 | Golden tasks | 60 |
 | MCP tool surface | 38 |

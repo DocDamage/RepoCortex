@@ -87,6 +87,17 @@ Describe 'Smoke call set' {
         $result = Get-LLMWorkflowGameTemplates
         $result | Should -Not -BeNullOrEmpty
     }
+
+    It 'Get-LLMWorkflowNextAction returns an operator action on TestDrive' {
+        Set-Content -LiteralPath (Join-Path $TestDrive 'VERSION') -Value '1.0.0' -Encoding UTF8
+        $result = Get-LLMWorkflowNextAction -ProjectRoot $TestDrive
+        $result.ActionId | Should -Not -BeNullOrEmpty
+    }
+
+    It 'Update-LLMWorkflowProject can generate a migration plan on TestDrive' {
+        $result = Update-LLMWorkflowProject -ProjectRoot $TestDrive -Plan
+        $result.Mode | Should -Be 'Plan'
+    }
 }
 
 Describe 'Module re-import safety' {

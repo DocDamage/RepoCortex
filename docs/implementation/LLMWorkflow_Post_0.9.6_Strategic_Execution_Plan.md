@@ -121,6 +121,16 @@ The planning docs now share the same ordering on purpose.
 - Parallel subsystem ownership forks were materially reduced; remaining work is ordinary structural refactoring.
 - Observability, policy, security, durable execution, MCP governance, mixed-artifact ingestion, and game-asset ingestion are now release-gated surfaces rather than aspirational plan items.
 
+### Operator Experience Update (2026-05-05)
+
+- Added `Get-LLMWorkflowNextAction` and `llmnext` to rank the next operational move from local evidence.
+- Added `Export-LLMWorkflowEvidenceReport` for JSON/HTML answer trace inspection.
+- Added `New-LLMWorkflowPackScaffold` and `llmpacknew` for governed pack authoring.
+- Added `Invoke-LLMWorkflowCorpusRegression` and `llmcorpus` for real-corpus regression cases.
+- Added `Test-LLMWorkflowSecurityExceptions` and `llmsecx` for reviewed scanner exception ledgers.
+- Added `Export-LLMWorkflowCockpit` and `llmcockpit` for a local HTML operations cockpit.
+- Added `Update-LLMWorkflowProject -Plan` for migration planning from older project layouts.
+
 ---
 
 ## Current Baseline

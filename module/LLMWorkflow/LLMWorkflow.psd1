@@ -24,6 +24,9 @@
         'Show-LLMWorkflowDashboard',
         'Show-PackHealthDashboard', 'Show-RetrievalActivityDashboard', 'Show-CrossPackGraph',
         'Show-MCPGatewayStatus', 'Show-FederationStatus', 'Export-DashboardHTML',
+        'Get-LLMWorkflowNextAction', 'Export-LLMWorkflowEvidenceReport', 'New-LLMWorkflowPackScaffold',
+        'Invoke-LLMWorkflowCorpusRegression', 'Test-LLMWorkflowSecurityExceptions',
+        'Export-LLMWorkflowCockpit', 'Update-LLMWorkflowProject',
         'Get-LLMWorkflowPlugins', 'Register-LLMWorkflowPlugin', 'Unregister-LLMWorkflowPlugin', 'Invoke-LLMWorkflowPlugins', 
         'Get-LLMWorkflowPalaces', 'Test-LLMWorkflowPalace', 'Sync-LLMWorkflowPalace', 'Sync-LLMWorkflowAllPalaces',
         'Get-GoldenTasks', 'Test-GoldenTaskCompleteness', 'Invoke-PackGoldenTasks', 'Test-GoldenTaskResult',
@@ -38,7 +41,7 @@
         # Game team
         'New-LLMWorkflowGamePreset', 'Get-LLMWorkflowGameTemplates', 'Export-LLMWorkflowAssetManifest', 'Invoke-LLMWorkflowGameUp'
     )
-    AliasesToExport = @('llmup', 'llmdown', 'llmcheck', 'llmver', 'llmupdate', 'llmplugins', 'llmpalaces', 'llmsync', 'llmdashboard', 'llmheal')
+    AliasesToExport = @('llmup', 'llmdown', 'llmcheck', 'llmver', 'llmupdate', 'llmplugins', 'llmpalaces', 'llmsync', 'llmdashboard', 'llmheal', 'llmnext', 'llmcockpit', 'llmpacknew', 'llmcorpus', 'llmsecx')
     CmdletsToExport = @()
     VariablesToExport = @()
     PrivateData = @{

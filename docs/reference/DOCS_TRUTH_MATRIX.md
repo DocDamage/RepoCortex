@@ -32,7 +32,7 @@ To keep numbers consistent, use the following counting rules and scripts.
     }).Count
 ```
 
-**Current Count**: `220`
+**Current Count**: `227`
 
 ### Domain Packs
 **Rule**: Count JSON files under `packs/manifests/` that have a matching `.sources.json` registry under `packs/registries/`.
@@ -79,10 +79,10 @@ To keep numbers consistent, use the following counting rules and scripts.
 
 | Document | Version Claimed | Modules Claimed | Packs Claimed | Parsers Claimed | Golden Tasks Claimed | Status |
 |----------|-----------------|-----------------|---------------|-----------------|----------------------|--------|
-| [`README.md`](../../README.md) | 0.9.6 | 220 | 10 | 30 | 60 | ✅ truth |
-| [`PROGRESS.md`](../../docs/implementation/PROGRESS.md) | 0.9.6 | 220 | 10 | 30 | 60 | ✅ truth |
-| [`RELEASE_STATE.md`](../../docs/releases/RELEASE_STATE.md) | 0.9.6 | 220 | 10 | 30 | 60 | ✅ truth |
-| [`CHANGELOG.md`](../../docs/releases/CHANGELOG.md) | 0.9.6 | 220 | 10 | 30 | 60 | ✅ truth |
+| [`README.md`](../../README.md) | 0.9.6 | 227 | 10 | 30 | 60 | ✅ truth |
+| [`PROGRESS.md`](../../docs/implementation/PROGRESS.md) | 0.9.6 | 227 | 10 | 30 | 60 | ✅ truth |
+| [`RELEASE_STATE.md`](../../docs/releases/RELEASE_STATE.md) | 0.9.6 | 227 | 10 | 30 | 60 | ✅ truth |
+| [`CHANGELOG.md`](../../docs/releases/CHANGELOG.md) | 0.9.6 | 227 | 10 | 30 | 60 | ✅ truth |
 
 ## Known Drift
 
@@ -104,8 +104,7 @@ To keep numbers consistent, use the following counting rules and scripts.
 ## Resolution Plan
 
 1. ✅ Reconciled 2026-04-14: `VERSION`, `README.md`, `docs/implementation/PROGRESS.md`, `docs/releases/CHANGELOG.md`, `RELEASE_STATE.md`, and `LLMWorkflow.psd1` all aligned to `0.9.6`.
-2. Metrics verified: 220 PowerShell modules, 10 domain packs, 30 extraction parsers, 60 golden tasks, 38 MCP tools.
+2. Metrics verified: 227 PowerShell modules, 10 domain packs, 30 extraction parsers, 60 golden tasks, 38 MCP tools.
 3. ✅ CI validation added (`tools/ci/validate-docs-truth.ps1`) to catch future drift automatically.
 4. ✅ Remediation documentation sync completed on 2026-04-14 across `README.md`, `PROGRESS.md`, `TECHNICAL_DEBT_AUDIT.md`, `REMAINING_WORK.md`, `CHANGELOG.md`, and strategic execution plan docs.
-
 
