@@ -11,7 +11,7 @@
 <p align="center">
   <a href="VERSION"><img src="https://img.shields.io/badge/version-0.9.6-blue.svg" alt="Version 0.9.6"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT license"/></a>
-  <a href="#platform-scope"><img src="https://img.shields.io/badge/PowerShell%20modules-227-blue.svg" alt="227 PowerShell modules"/></a>
+  <a href="#platform-scope"><img src="https://img.shields.io/badge/PowerShell%20modules-228-blue.svg" alt="228 PowerShell modules"/></a>
   <a href="#platform-scope"><img src="https://img.shields.io/badge/domain%20packs-10-green.svg" alt="10 domain packs"/></a>
   <a href="#platform-scope"><img src="https://img.shields.io/badge/parsers-30-orange.svg" alt="30 extraction parsers"/></a>
   <a href="#certification"><img src="https://img.shields.io/badge/release%20certification-passing-brightgreen.svg" alt="Release certification passing"/></a>
@@ -179,15 +179,15 @@ For detailed diagrams and flows, read [`docs/architecture/ARCHITECTURE.md`](docs
 
 Current release-state metrics:
 
-**227 PowerShell Modules**
+**228 PowerShell Modules**
 
 | Metric | Count |
 |--------|------:|
 | Domain packs | 10 |
-| PowerShell modules | 227 |
+| PowerShell modules | 228 |
 | Exported functions | 86 |
 | **Extraction Parsers** | 30 |
-| Golden tasks | 60 |
+| Golden tasks | 64 |
 | MCP tool surface | 38 |
 | Benchmark suites | 5 |
 
@@ -321,11 +321,11 @@ Coverage areas include:
 - Security baseline checks
 - Release certification
 
-Golden Task Evaluations (60 Tasks)
+### Golden Task Evaluations (64 Tasks)
 
-Golden Task Coverage (60 Total)
+**Golden Task Coverage (64 Total):**
 
-The governance suite includes 60 predefined validation scenarios.
+The governance suite- Runs against **64 predefined validation scenarios** to prevent regressionsfication
 
 ---
 

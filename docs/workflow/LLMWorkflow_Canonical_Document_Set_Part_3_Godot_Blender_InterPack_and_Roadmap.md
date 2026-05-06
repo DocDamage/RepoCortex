@@ -1422,14 +1422,14 @@ The platform now supports **10 domain packs**:
 
 ### Inter-Pack Pipelines Operational
 
-1. **Blender -> Godot Scene Pipeline** â€” Asset export with provenance tracking
-2. **AI Generation Pipeline** â€” Procedural asset generation across packs
-3. **Voice Animation Pipeline** â€” TTS to lip-sync animation workflow
-4. **ML Deployment Pipeline** â€” Model training to runtime inference
+1. **Blender -> Godot Scene Pipeline** — Asset export with provenance tracking
+2. **AI Generation Pipeline** — Procedural asset generation across packs
+3. **Voice Animation Pipeline** — TTS to lip-sync animation workflow
+4. **ML Deployment Pipeline** — Model training to runtime inference
 
 ### Current Statistics
 
-- **227 PowerShell Modules** across all phases
+- **228 PowerShell Modules** across all phases
 - **800+ total functions**
 - **Version 0.9.6**
 - **All retrieval profiles** (7 profiles) operational

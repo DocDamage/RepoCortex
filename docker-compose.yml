@@ -1,8 +1,6 @@
 # Repo Cortex - Docker Compose
 # Multi-service orchestration for containerized deployment
 
-version: "3.8"
-
 services:
   # Main LLM Workflow service
   llm-workflow:

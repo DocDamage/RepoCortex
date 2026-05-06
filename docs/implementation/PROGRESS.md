@@ -26,10 +26,10 @@ This document tracks implementation progress against the post-0.9.6 architecture
 
 
 **Current Version:** 0.9.6  
-**PowerShell Modules:** 227
+**PowerShell Modules:** 228
 **Domain Packs:** 10  
 **Extraction Parsers:** 30  
-**Golden Tasks:** 60  
+**Golden Tasks:** 64  
 **Performance Benchmark Suites:** 5
 
 ---

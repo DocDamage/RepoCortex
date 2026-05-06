@@ -3,7 +3,7 @@
 
 **Version:** 0.9.6  
 **Last Updated:** 2026-04-13  
-**Total Functions:** 800+ | **Modules:** 227 | **Domain Packs:** 10
+**Total Functions:** 800+ | **Modules:** 228 | **Domain Packs:** 10
 
 ## Related Docs
 - [Architecture](./ARCHITECTURE.md)
@@ -28,11 +28,11 @@ The **Repo Cortex platform** is a comprehensive, enterprise-grade system for str
 | Metric | Count |
 |--------|-------|
 | **Domain Packs** | 10 |
-| **PowerShell Modules** | 227 |
+| **PowerShell Modules** | 228 |
 | **Exported Functions** | 800+ |
 | **Extraction Parsers** | 30 |
 | **Retrieval Profiles** | 25+ |
-| **Golden Tasks** | 60 |
+| **Golden Tasks** | 64 |
 | **Supported File Formats** | 30+ |
 
 ### Target Audiences

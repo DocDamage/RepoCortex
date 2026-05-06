@@ -16,6 +16,7 @@ function Get-PredefinedGoldenTasks {
     $allTasks += Get-PredefinedApiReverseTasks
     $allTasks += Get-PredefinedNotebookDataTasks
     $allTasks += Get-PredefinedAgentSimTasks
+    $allTasks += Get-PredefinedNegativeTasks
 
     if ($PackId) {
         return $allTasks | Where-Object { $_.packId -eq $PackId }
