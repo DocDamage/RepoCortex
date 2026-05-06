@@ -1,6 +1,6 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/main/.codemunch/index.defaults.schema.json",
+  "$id": "https://raw.githubusercontent.com/DocDamage/RepoCortex/main/.codemunch/index.defaults.schema.json",
   "title": "CodeMunch Index Defaults",
   "description": "Default include and exclude patterns for CodeMunch project indexing",
   "type": "object",
@@ -10,7 +10,7 @@
       "title": "Schema Reference",
       "description": "URL to this JSON schema file for IDE validation",
       "format": "uri",
-      "default": "https://raw.githubusercontent.com/DocDamage/CodeMunch-ContextLattice-MemPalace---All-in-one/main/.codemunch/index.defaults.schema.json"
+      "default": "https://raw.githubusercontent.com/DocDamage/RepoCortex/main/.codemunch/index.defaults.schema.json"
     },
     "include_patterns": {
       "type": "array",
