@@ -93,10 +93,39 @@ jobs:
             Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck -MinimumVersion 5.5.0
           }
 
-      - name: Run Pester
+      - name: Run stable release smoke suite
         shell: pwsh
         run: |
-          ./tools/ci/invoke-pester-safe.ps1 -Path ./tests -CI
+          $stableTests = @(
+            './tests/LLMWorkflow.Tests.ps1',
+            './tests/ModuleExportSurface.Tests.ps1',
+            './tests/Primitive.AtomicWrite.Tests.ps1',
+            './tests/Primitive.CommandContract.Tests.ps1',
+            './tests/Primitive.FileLock.Tests.ps1',
+            './tests/Primitive.Journal.Tests.ps1',
+            './tests/Primitive.StateFile.Tests.ps1',
+            './tests/Primitive.Workspace.Tests.ps1',
+            './tests/SecurityBaseline.Tests.ps1',
+            './tests/Telemetry.Tests.ps1',
+            './tests/Pack.Tests.ps1',
+            './tests/PackFramework.Tests.ps1',
+            './tests/PolicyEngine.Tests.ps1',
+            './tests/RetrievalIntegrity.Tests.ps1',
+            './tests/RetrievalProfiles.Tests.ps1',
+            './tests/RetrievalBackend.Tests.ps1',
+            './tests/GameAssetManifest.Tests.ps1',
+            './tests/GeometryNodesParser.Tests.ps1',
+            './tests/Governance.Tests.ps1',
+            './tests/MarketplaceProvenance.Tests.ps1',
+            './tests/MCPGovernance.Tests.ps1',
+            './tests/OperatorExperience.Tests.ps1',
+            './tests/RPGMakerAssetCatalog.Tests.ps1',
+            './tests/ImportPerformance.Tests.ps1',
+            './tests/LLMWorkflow.Dashboard.Tests.ps1',
+            './tests/LLMWorkflow.HealFunctions.Tests.ps1',
+            './tests/MCP.Tests.ps1'
+          )
+          ./tools/ci/invoke-pester-safe.ps1 -Path $stableTests -CI
 
       - name: Security Baseline Gate
         shell: pwsh
@@ -156,7 +185,7 @@ jobs:
             Install-Module Pester -Scope CurrentUser -Force -MinimumVersion 5.5.0
           }
 
-      - name: Run Pester
+      - name: Run full experimental Pester suite
         shell: pwsh
         run: |
           ./tools/ci/invoke-pester-safe.ps1 -Path ./tests -CI
@@ -213,7 +242,7 @@ jobs:
             Install-Module Pester -Scope CurrentUser -Force -MinimumVersion 5.5.0
           }
 
-      - name: Run Pester
+      - name: Run full experimental Pester suite
         shell: pwsh
         run: |
           ./tools/ci/invoke-pester-safe.ps1 -Path ./tests -CI
