@@ -28,14 +28,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Ensure python command points to python3
 RUN ln -sf /usr/bin/python3 /usr/bin/python
 
-# Stage 2: Install Python dependencies
+# Stage 2: Install Python runtime dependencies
 FROM base AS python-deps
 
-COPY requirements.lock.txt /tmp/requirements.lock.txt
+COPY requirements.docker.txt /tmp/requirements.docker.txt
 
-# Install from lock file with hash verification
+# Install only the runtime packages needed by the container smoke tests.
+# The full requirements.lock.txt intentionally stays out of the Docker image because it
+# includes heavy optional ML/GPU packages and transitive CUDA wheels that break hash mode.
 RUN python -m pip install --upgrade pip setuptools wheel && \
-    python -m pip install -r /tmp/requirements.lock.txt --require-hashes
+    python -m pip install -r /tmp/requirements.docker.txt
 
 # Verify installations
 RUN python -c "import chromadb; print('ChromaDB version:', chromadb.__version__)" && \
