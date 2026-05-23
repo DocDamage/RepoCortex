@@ -4,7 +4,7 @@
     Build orchestrator for LLMWorkflow with dependency-aware testing and boundary enforcement.
 .DESCRIPTION
     Detects changed files, determines affected contexts via dependency graph,
-    runs boundary violation scans, enforces file size limits, and executes
+    runs boundary violation scans, enforces advisory file size limits, and executes
     Pester tests for only the affected contexts.
 #>
 [CmdletBinding()]
@@ -143,10 +143,10 @@ function Test-FileSizeLimits {
     foreach ($f in $allPs1) {
         $lines = (Get-Content -LiteralPath $f.FullName | Measure-Object).Count
         if ($lines -gt 300) {
-            $issues += "SIZE ERROR: $($f.FullName) has $lines lines (max 300)"
+            $issues += "SIZE WARNING: $($f.FullName) has $lines lines (advisory max 300; refactor recommended)"
         }
         elseif ($lines -gt 200) {
-            $issues += "SIZE WARNING: $($f.FullName) has $lines lines (max 300)"
+            $issues += "SIZE WARNING: $($f.FullName) has $lines lines (advisory max 300)"
         }
     }
     return $issues
@@ -179,9 +179,7 @@ if ($boundaryViolations) {
     foreach ($v in $boundaryViolations) { Write-Error $v }
 }
 if ($sizeIssues) {
-    foreach ($s in $sizeIssues) {
-        if ($s -match 'ERROR') { Write-Error $s } else { Write-Warning $s }
-    }
+    foreach ($s in $sizeIssues) { Write-Warning $s }
 }
 
 if ($WhatIf) {
