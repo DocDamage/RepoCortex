@@ -1,0 +1,6 @@
+# Minimal Python runtime dependencies for the Repo Cortex Docker image.
+# Keep this intentionally smaller than requirements.lock.txt / requirements.scan.txt.
+# The full lockfile includes ML/GPU packages that are not required for llmup,
+# llmcheck, llmver, or the container smoke tests.
+chromadb>=0.5.0,<2
+codemunch-pro>=1.3.0,<2
