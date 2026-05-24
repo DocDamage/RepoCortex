@@ -33,6 +33,19 @@ BeforeAll {
     if (Test-Path $sbomPath) { try { . $sbomPath } catch { if ($_.Exception.Message -notlike "*Export-ModuleMember*") { throw } } }
     if (Test-Path $secretPath) { try { . $secretPath } catch { if ($_.Exception.Message -notlike "*Export-ModuleMember*") { throw } } }
     if (Test-Path $vulnPath) { try { . $vulnPath } catch { if ($_.Exception.Message -notlike "*Export-ModuleMember*") { throw } } }
+
+    function New-TestBase64Url {
+        param([string]$Value)
+
+        return [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($Value)).TrimEnd('=').Replace('+', '-').Replace('/', '_')
+    }
+
+    $script:OpenAIApiKeyFixture = 'sk-' + ('1' * 48)
+    $script:JwtTokenFixture = @(
+        New-TestBase64Url -Value '{"alg":"HS256","typ":"JWT"}'
+        New-TestBase64Url -Value '{"sub":"1234567890"}'
+        'signature'
+    ) -join '.'
 }
 
 Describe "Invoke-SecurityBaseline Orchestration" {
@@ -63,22 +76,19 @@ Describe "Invoke-SecurityBaseline Orchestration" {
         }
 
         It "Should fail on critical findings when -FailOnCritical is specified" {
-            # Create a file with a critical secret
             $secretFile = Join-Path $script:TestRoot "secret.env"
-            'API_KEY=sk-123456789012345678901234567890123456789012345678' | Set-Content -LiteralPath $secretFile
+            "API_KEY=$($script:OpenAIApiKeyFixture)" | Set-Content -LiteralPath $secretFile
 
             { Invoke-SecurityBaseline -ProjectRoot $script:TestRoot -OutputPath $script:ReportsDir -FailOnCritical } |
                 Should -Throw -ExpectedMessage "*Critical findings detected*"
         }
 
         It "Should block promotion when thresholds are exceeded" {
-            # Clean up any lingering secret files from previous tests
             $secretFile = Join-Path $script:TestRoot "secret.env"
             if (Test-Path $secretFile) {
                 Remove-Item -LiteralPath $secretFile -Force
             }
 
-            # Create a file with a high-severity vulnerability pattern
             $composeFile = Join-Path $script:TestRoot "docker-compose.yml"
             "services:`n  app:`n    privileged: true" | Set-Content -LiteralPath $composeFile
 
@@ -166,8 +176,7 @@ Describe "Invoke-SecretScan" {
 
         It "Should detect an OpenAI API key" {
             $testFile = Join-Path $script:SecretTestDir "config.ps1"
-            ' $key = "sk-123456789012345678901234567890123456789012345678" ' |
-                Set-Content -LiteralPath $testFile
+            $script:OpenAIApiKeyFixture | Set-Content -LiteralPath $testFile
 
             $result = Invoke-SecretScan -ProjectRoot $script:SecretTestDir
 
@@ -177,8 +186,7 @@ Describe "Invoke-SecretScan" {
 
         It "Should detect a JWT token" {
             $testFile = Join-Path $script:SecretTestDir "token.txt"
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U' |
-                Set-Content -LiteralPath $testFile
+            $script:JwtTokenFixture | Set-Content -LiteralPath $testFile
 
             $result = Invoke-SecretScan -ProjectRoot $script:SecretTestDir
 
