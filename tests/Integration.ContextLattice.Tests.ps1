@@ -1,73 +1,80 @@
 Set-StrictMode -Version Latest
 
-$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
-
-function Get-FreeTcpPort {
-    [CmdletBinding()]
-    param()
-    $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
-    $listener.Start()
-    try {
-        return $listener.LocalEndpoint.Port
-    } finally {
-        $listener.Stop()
-    }
-}
-
-function Start-MockContextLattice {
-    [CmdletBinding()]
-    param(
-        [string]$StateFile,
-        [string]$ApiKey
-    )
-
-    $port = Get-FreeTcpPort
-    $serverScript = Join-Path $repoRoot "tests\helpers\mock_contextlattice_server.py"
-    $args = @(
-        $serverScript,
-        "--port", "$port",
-        "--api-key", $ApiKey,
-        "--state-file", $StateFile
-    )
-
-    $proc = Start-Process -FilePath python -ArgumentList $args -PassThru -WindowStyle Hidden
-    $baseUrl = "http://127.0.0.1:$port"
-
-    $ready = $false
-    for ($i = 0; $i -lt 40; $i++) {
-        Start-Sleep -Milliseconds 150
-        try {
-            $health = Invoke-RestMethod -Method Get -Uri "$baseUrl/health" -TimeoutSec 2
-            if ($health.ok) {
-                $ready = $true
-                break
-            }
-        } catch {
-        }
-    }
-    if (-not $ready) {
-        try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch {}
-        throw "Mock ContextLattice server did not become ready."
-    }
-
-    return [pscustomobject]@{
-        Process = $proc
-        BaseUrl = $baseUrl
-    }
-}
-
-function Stop-MockContextLattice {
-    [CmdletBinding()]
-    param([System.Diagnostics.Process]$Process)
-    if ($Process -and -not $Process.HasExited) {
-        try {
-            Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
-        } catch {
-        }
-    }
-}
-
 Describe "ContextLattice + MemPalace Integration" {
+    BeforeAll {
+        $script:RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+
+        function Get-FreeTcpPort {
+            [CmdletBinding()]
+            param()
+
+            $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
+            $listener.Start()
+            try {
+                return $listener.LocalEndpoint.Port
+            }
+            finally {
+                $listener.Stop()
+            }
+        }
+
+        function Start-MockContextLattice {
+            [CmdletBinding()]
+            param(
+                [string]$StateFile,
+                [string]$ApiKey
+            )
+
+            $port = Get-FreeTcpPort
+            $serverScript = Join-Path $script:RepoRoot "tests\helpers\mock_contextlattice_server.py"
+            $args = @(
+                $serverScript,
+                "--port", "$port",
+                "--api-key", $ApiKey,
+                "--state-file", $StateFile
+            )
+
+            $proc = Start-Process -FilePath python -ArgumentList $args -PassThru -WindowStyle Hidden
+            $baseUrl = "http://127.0.0.1:$port"
+
+            $ready = $false
+            for ($i = 0; $i -lt 40; $i++) {
+                Start-Sleep -Milliseconds 150
+                try {
+                    $health = Invoke-RestMethod -Method Get -Uri "$baseUrl/health" -TimeoutSec 2
+                    if ($health.ok) {
+                        $ready = $true
+                        break
+                    }
+                }
+                catch {
+                }
+            }
+            if (-not $ready) {
+                try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch {}
+                throw "Mock ContextLattice server did not become ready."
+            }
+
+            return [pscustomobject]@{
+                Process = $proc
+                BaseUrl = $baseUrl
+            }
+        }
+
+        function Stop-MockContextLattice {
+            [CmdletBinding()]
+            param([System.Diagnostics.Process]$Process)
+
+            if ($Process -and -not $Process.HasExited) {
+                try {
+                    Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
+                }
+                catch {
+                }
+            }
+        }
+    }
+
     It "runs contextlattice verify smoke test against mock server" {
         $python = Get-Command python -ErrorAction SilentlyContinue
         if (-not $python) {
@@ -78,7 +85,7 @@ Describe "ContextLattice + MemPalace Integration" {
         $stateFile = Join-Path $TestDrive "mock_state_verify.json"
         $mock = Start-MockContextLattice -StateFile $stateFile -ApiKey $apiKey
         try {
-            $verifyScript = Join-Path $repoRoot "tools\contextlattice\verify.ps1"
+            $verifyScript = Join-Path $script:RepoRoot "tools\contextlattice\verify.ps1"
             & $verifyScript `
                 -OrchestratorUrl $mock.BaseUrl `
                 -ApiKey $apiKey `
@@ -91,7 +98,8 @@ Describe "ContextLattice + MemPalace Integration" {
 
             $serverState = Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
             @($serverState.writes).Count | Should Be 1
-        } finally {
+        }
+        finally {
             Stop-MockContextLattice -Process $mock.Process
         }
     }
@@ -133,7 +141,7 @@ print("ok")
                 throw "Failed to prepare mock MemPalace collection."
             }
 
-            $syncScript = Join-Path $repoRoot "tools\memorybridge\sync-from-mempalace.ps1"
+            $syncScript = Join-Path $script:RepoRoot "tools\memorybridge\sync-from-mempalace.ps1"
             & $syncScript `
                 -ConfigPath (Join-Path $TestDrive "bridge.config.json") `
                 -StatePath (Join-Path $TestDrive "sync-state.json") `
@@ -150,9 +158,9 @@ print("ok")
             @($serverState.writes).Count | Should Be 1
             $serverState.writes[0].topicPath | Should Match "^mempalace/"
             $serverState.writes[0].projectName | Should Be "integration-project"
-        } finally {
+        }
+        finally {
             Stop-MockContextLattice -Process $mock.Process
         }
     }
 }
-
