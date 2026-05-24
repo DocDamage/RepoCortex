@@ -141,6 +141,11 @@ temp_*.json
 temp_*.txt
 test_results.txt
 
-# Security baseline generated reports
+# =============================================================================
+# Generated security and certification reports
+# =============================================================================
+sbom.json
+*.sbom.json
+*.cdx.json
 security-reports/
-
+certification-reports/
