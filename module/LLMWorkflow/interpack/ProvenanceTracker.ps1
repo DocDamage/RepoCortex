@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 5.1
 <#
 .SYNOPSIS
     Provenance Tracker - Cross-Pack Provenance Tracking System
@@ -194,6 +194,61 @@ $script:SupportedOperations = @(
 
 #endregion
 
+function ConvertTo-ProvenanceHashtable {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)]
+        $InputObject
+    )
+
+    process {
+        if ($null -eq $InputObject) {
+            return $null
+        }
+
+        if ($InputObject -is [hashtable]) {
+            return $InputObject
+        }
+
+        if ($InputObject -is [System.Collections.IDictionary]) {
+            $hash = @{}
+            foreach ($key in $InputObject.Keys) {
+                $hash[$key] = ConvertTo-ProvenanceHashtable -InputObject $InputObject[$key]
+            }
+            return $hash
+        }
+
+        if ($InputObject -is [pscustomobject]) {
+            $hash = @{}
+            foreach ($property in $InputObject.PSObject.Properties) {
+                $hash[$property.Name] = ConvertTo-ProvenanceHashtable -InputObject $property.Value
+            }
+            return $hash
+        }
+
+        if ($InputObject -is [System.Collections.IEnumerable] -and $InputObject -isnot [string]) {
+            $items = @()
+            foreach ($item in $InputObject) {
+                $items += ,(ConvertTo-ProvenanceHashtable -InputObject $item)
+            }
+            return ,$items
+        }
+
+        return $InputObject
+    }
+}
+
+function Read-ProvenanceJson {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $json = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+    return ConvertTo-ProvenanceHashtable -InputObject ($json | ConvertFrom-Json)
+}
+
 #region Storage Functions
 
 function Initialize-ProvenanceStore {
@@ -267,7 +322,7 @@ function Load-ProvenanceRecord {
         return $null
     }
     
-    $data = Get-Content $recordPath -Raw | ConvertFrom-Json -AsHashtable
+    $data = Read-ProvenanceJson -Path $recordPath
     
     $record = [ProvenanceRecord]::new($data.AssetId, $data.Operation, $data.PackId)
     $record.ProvenanceId = $data.ProvenanceId
@@ -533,7 +588,7 @@ function Get-ProvenanceHistory {
     # Find the record for this asset
     $recordsPath = Join-Path $StorePath "records"
     $allRecords = Get-ChildItem -Path $recordsPath -Filter "*.json" -File | ForEach-Object {
-        Get-Content $_.FullName -Raw | ConvertFrom-Json -AsHashtable
+        Read-ProvenanceJson -Path $_.FullName
     }
     
     $targetRecord = $allRecords | Where-Object { $_.AssetId -eq $AssetId } | Select-Object -First 1
@@ -990,12 +1045,14 @@ function Compress-String {
 
 #region Exports
 
-Export-ModuleMember -Function @(
-    'New-ProvenanceRecord',
-    'Add-ProvenanceChain',
-    'Get-ProvenanceHistory',
-    'Export-ProvenanceManifest',
-    'Validate-ProvenanceIntegrity'
-)
+if ($null -ne $MyInvocation.MyCommand.ScriptBlock.Module) {
+    Export-ModuleMember -Function @(
+        'New-ProvenanceRecord',
+        'Add-ProvenanceChain',
+        'Get-ProvenanceHistory',
+        'Export-ProvenanceManifest',
+        'Validate-ProvenanceIntegrity'
+    )
+}
 
 #endregion
