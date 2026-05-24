@@ -97,7 +97,7 @@ Describe "ContextLattice + MemPalace Integration" {
                 -TimeoutSec 5
 
             $serverState = Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
-            @($serverState.writes).Count | Should Be 1
+            @($serverState.writes).Count | Should -Be 1
         }
         finally {
             Stop-MockContextLattice -Process $mock.Process
@@ -155,9 +155,9 @@ print("ok")
                 -Strict
 
             $serverState = Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
-            @($serverState.writes).Count | Should Be 1
-            $serverState.writes[0].topicPath | Should Match "^mempalace/"
-            $serverState.writes[0].projectName | Should Be "integration-project"
+            @($serverState.writes).Count | Should -Be 1
+            $serverState.writes[0].topicPath | Should -Match "^mempalace/"
+            $serverState.writes[0].projectName | Should -Be "integration-project"
         }
         finally {
             Stop-MockContextLattice -Process $mock.Process
