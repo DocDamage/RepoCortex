@@ -200,7 +200,7 @@ Describe "Invoke-SecretScan" {
 
         It "Should write findings to JSON when -OutputPath is provided" {
             $testFile = Join-Path $script:SecretTestDir "secret.env"
-            'AWS_KEY=AKIA1234567890ABCDEF' | Set-Content -LiteralPath $testFile
+            'scan-fixture@example.test' | Set-Content -LiteralPath $testFile
 
             $outputPath = Join-Path $script:SecretTestDir "findings.json"
             Invoke-SecretScan -ProjectRoot $script:SecretTestDir -OutputPath $outputPath | Out-Null
